@@ -1,0 +1,45 @@
+package com.somanyteam.event.entity;
+
+import java.util.Date;
+
+public class Blacklist {
+    private Long id;
+
+    private String complaintant;
+
+    private Long questionId;
+
+    private Date createTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getComplaintant() {
+        return complaintant;
+    }
+
+    public void setComplaintant(String complaintant) {
+        this.complaintant = complaintant == null ? null : complaintant.trim();
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+}
