@@ -49,6 +49,12 @@ spring:
   jackson:
     # json返回日期格式
     date-format: yyyy-MM-dd HH:mm:ss
+  mail:
+    default-encoding: UTF-8
+    host: smtp.qq.com
+    port: 587
+    username: 1247054987@qq.com
+    password: jrcrslnpfbiogfhf
 
 # MyBatisPlus配置
 mybatis-plus:
