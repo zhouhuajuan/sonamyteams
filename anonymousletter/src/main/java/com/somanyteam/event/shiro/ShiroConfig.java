@@ -1,8 +1,11 @@
 package com.somanyteam.event.shiro;
 
+import com.somanyteam.event.shiro.cache.RedisCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -54,16 +57,25 @@ public class ShiroConfig {
         filterMap.put("/doc.html#/**", "anon");
         filterMap.put("/webjars/**", "anon");
         // 设置所有接口需要认证访问
-//        filterMap.put("/**", "authc");
+        filterMap.put("/user/hello", "authc");
+        filterMap.put("/**", "authc");
         return filterMap;
     }
     /**
      * 自定义Realm
      */
-    @Bean
-    public UserRealm userRealm() {
-        return new UserRealm();
-    }
+   @Bean
+   public UserRealm userRealm(){
+       UserRealm userRealm = new UserRealm();
+       //开启缓存管理
+       userRealm.setCacheManager(new RedisCacheManager());
+       userRealm.setCachingEnabled(true);//开启全局缓存
+       userRealm.setAuthenticationCachingEnabled(true);//认证认证缓存
+       userRealm.setAuthenticationCacheName("authenticationCache");
+       userRealm.setAuthorizationCachingEnabled(true);//开启授权缓存
+       userRealm.setAuthorizationCacheName("authorizationCache");
+       return userRealm;
+   }
 
     /**
      * 安全管理器
@@ -73,5 +85,16 @@ public class ShiroConfig {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userRealm);
         return securityManager;
+    }
+
+    /**
+     * 开启shiro注解通知器
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(
+            @Qualifier("securityManager") SecurityManager securityManager) {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
     }
 }
