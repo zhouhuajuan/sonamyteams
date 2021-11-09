@@ -17,7 +17,7 @@ public class SpringUtil implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory){
-       SpringUtil.beanFactory = beanFactory;
+        SpringUtil.beanFactory = beanFactory;
     }
 
     /**
