@@ -15,6 +15,10 @@ import com.somanyteam.event.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Service("userService")
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -38,5 +42,24 @@ public class UserServiceImpl implements UserService {
         }
         PasswordUtil.matches(user, password);
         return user;
+    }
+
+    @Override
+    public Integer modifyPassword(User curUser, String newPassword) throws ParseException {
+//        String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getEmail(), userModifyPasswordReqDTO.getOriginalPassword(), curUser.getSalt());
+//        if(!encryptOldPwd.equals(curUser.getPassword())){
+//            throw new UserOldPwdNotMatchException();
+//        }
+        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getEmail(), newPassword, curUser.getSalt());
+        User user = new User();
+        user.setId(curUser.getId());
+        user.setPassword(encryptNewPwd);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = sdf.parse(sdf.format(new Date()));
+        user.setUpdateTime(date);
+        //        if(update >= 1) {
+//            curUser.setPassword(encryptNewPwd);
+//        }
+        return userMapper.updateById(user);
     }
 }

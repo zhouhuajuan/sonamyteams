@@ -60,7 +60,7 @@ public class ShiroConfig {
         filterMap.put("/doc.html#/**", "anon");
         filterMap.put("/webjars/**", "anon");
         // 设置所有接口需要认证访问
-        filterMap.put("/user/hello", "user");
+        filterMap.put("/user/**", "user");
         filterMap.put("/**", "authc");
         return filterMap;
     }
