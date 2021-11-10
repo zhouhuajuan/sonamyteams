@@ -22,6 +22,8 @@ public class User implements Serializable {
 
     private String profile;
 
+    private String imgUrl;
+
     private Date createTime;
 
     private Date updateTime;
@@ -96,6 +98,14 @@ public class User implements Serializable {
 
     public void setProfile(String profile) {
         this.profile = profile == null ? null : profile.trim();
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl == null ? null : imgUrl.trim();
     }
 
     public Date getCreateTime() {
