@@ -80,6 +80,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int forgetPwd(String email, String modifyPwd) {
+        if(!email.matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
+            //邮箱格式不规范
+            throw new UserEmailNotMatchException();
+        }
+
+        String passRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+        boolean matches = modifyPwd.matches(passRegex);
+        if (!matches){
+            //密码不规范
+            throw new PasswordNotStandardException();
+        }
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("email", email);
         User existUser = userMapper.selectOne(wrapper);
