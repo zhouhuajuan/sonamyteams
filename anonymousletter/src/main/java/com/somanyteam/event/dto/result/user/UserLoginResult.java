@@ -18,5 +18,5 @@ public class UserLoginResult {
     private Integer identity;
 
     @ApiModelProperty("头像链接")
-    private String profile;
+    private String imgUrl;
 }

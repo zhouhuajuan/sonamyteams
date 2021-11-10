@@ -1,9 +1,12 @@
-package com.somanyteam.event.shiro;
+package com.somanyteam.event.config;
 
+import com.somanyteam.event.shiro.ShiroLoginFilter;
+import com.somanyteam.event.shiro.UserRealm;
 import com.somanyteam.event.shiro.cache.RedisCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +60,7 @@ public class ShiroConfig {
         filterMap.put("/doc.html#/**", "anon");
         filterMap.put("/webjars/**", "anon");
         // 设置所有接口需要认证访问
-        filterMap.put("/user/hello", "authc");
+        filterMap.put("/user/hello", "user");
         filterMap.put("/**", "authc");
         return filterMap;
     }
@@ -68,12 +71,12 @@ public class ShiroConfig {
    public UserRealm userRealm(){
        UserRealm userRealm = new UserRealm();
        //开启缓存管理
-       userRealm.setCacheManager(new RedisCacheManager());
-       userRealm.setCachingEnabled(true);//开启全局缓存
-       userRealm.setAuthenticationCachingEnabled(true);//认证认证缓存
-       userRealm.setAuthenticationCacheName("authenticationCache");
-       userRealm.setAuthorizationCachingEnabled(true);//开启授权缓存
-       userRealm.setAuthorizationCacheName("authorizationCache");
+//       userRealm.setCacheManager(new RedisCacheManager());
+//       userRealm.setCachingEnabled(true);//开启全局缓存
+//       userRealm.setAuthenticationCachingEnabled(true);//认证认证缓存
+//       userRealm.setAuthenticationCacheName("authenticationCache");
+//       userRealm.setAuthorizationCachingEnabled(true);//开启授权缓存
+//       userRealm.setAuthorizationCacheName("authorizationCache");
        return userRealm;
    }
 
@@ -81,9 +84,11 @@ public class ShiroConfig {
      * 安全管理器
      */
     @Bean
-    public SecurityManager securityManager(UserRealm userRealm) {
+    public SecurityManager securityManager(UserRealm userRealm, CookieRememberMeManager rememberMeManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userRealm);
+//        securityManager.setCacheManager(ehCacheManager());ehCacheManager
+        securityManager.setRememberMeManager(rememberMeManager);
         return securityManager;
     }
 
