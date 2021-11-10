@@ -13,7 +13,7 @@ public class PasswordTest {
     public void test(){
         String passRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
         String passRegex1 = "/^\\w{6,16}$/"; //wrong
-        String password="13010ben_";
+        String password="benbanv";
         boolean matches = password.matches(passRegex);
         System.out.println(matches);
     }

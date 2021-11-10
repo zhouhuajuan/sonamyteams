@@ -5,11 +5,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
 
 @Data
-@ApiModel("注册DTO")
-public class UserRegisterReqDTO {
+@ApiModel("忘记密码DTO")
+public class UserForgetPwdReqDTO {
 
     @ApiModelProperty(value = "邮箱", required = true)
     @NotBlank(message = "邮箱不能为空")
@@ -19,9 +18,9 @@ public class UserRegisterReqDTO {
     @NotBlank(message = "验证码不能为空")
     private String code;
 
-    @ApiModelProperty(value = "密码", required = true)
-    @NotBlank(message = "密码不能为空")
-    private String password;
+    @ApiModelProperty(value = "修改密码", required = true)
+    @NotBlank(message = "修改密码不能为空")
+    private String modifyPwd;
 
     @ApiModelProperty(value = "确认密码", required = true)
     @NotBlank(message = "确认密码不能为空")

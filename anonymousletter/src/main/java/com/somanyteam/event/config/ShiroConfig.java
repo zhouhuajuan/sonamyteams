@@ -48,6 +48,7 @@ public class ShiroConfig {
         filterMap.put("/user/login", "anon");
         filterMap.put("/user/sendEmail", "anon");
         filterMap.put("/user/register", "anon");
+        filterMap.put("/user/forgetPwd", "anon");
         // 放行druid进行测试
         filterMap.put("/druid/**", "anon");
         // 设置退出登录，shiro清除session

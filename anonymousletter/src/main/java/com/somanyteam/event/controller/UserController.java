@@ -1,10 +1,14 @@
 package com.somanyteam.event.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.somanyteam.event.dto.request.user.UserForgetPwdReqDTO;
 import com.somanyteam.event.dto.request.user.UserLoginReqDTO;
 import com.somanyteam.event.dto.request.user.UserRegisterReqDTO;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
+import com.somanyteam.event.exception.user.ConfirmPwdNotMatchException;
+import com.somanyteam.event.exception.user.UserEnterEmptyException;
 import com.somanyteam.event.exception.user.VerifyCodeNotMatchException;
 import com.somanyteam.event.service.UserService;
 import com.somanyteam.event.util.PasswordUtil;
@@ -13,21 +17,13 @@ import com.somanyteam.event.util.ResponseMessage;
 import com.somanyteam.event.util.VerifyCodeUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.repository.query.Param;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-
-import java.util.Date;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -68,29 +64,68 @@ public class UserController {
         return ResponseMessage.newSuccessInstance(result, "登录成功");
     }
 
-    //ViPJRC
     @ApiOperation(value = "注册")
     @PostMapping("/register")
     public ResponseMessage register(@RequestBody @Validated UserRegisterReqDTO userRegisterReqDTO) {
         User user = new User();
-        boolean b = userService.checkCode(userRegisterReqDTO.getEmail(), userRegisterReqDTO.getCode());
-        if (b) {
-            //true，验证码一致
-            BeanUtils.copyProperties(userRegisterReqDTO, user); //邮箱，密码
-            user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
-            user.setUsername("偷心盗贼");
-            user.setIdentity(0);
-            user.setSalt(PasswordUtil.randomSalt());
-            user.setImgUrl("https://8.134.33.6/photo/a.png");//默认头像图片链接
+        if (ObjectUtil.isEmpty(userRegisterReqDTO)){
+            //输入为空
+            throw new UserEnterEmptyException();
+        }
 
-            if (userService.saveUser(user) > 0) {
-                return ResponseMessage.newSuccessInstance("注册成功");
-            } else {
-                return ResponseMessage.newErrorInstance("注册失败");
-            }
+        boolean equals = userRegisterReqDTO.getPassword().equals(userRegisterReqDTO.getConfirmPwd());
+        if (!equals){
+            //确认密码和密码不一致
+            throw new ConfirmPwdNotMatchException();
+        }
+
+        boolean b = userService.checkCode(userRegisterReqDTO.getEmail(), userRegisterReqDTO.getCode());
+        if (!b){
+            //验证码错误
+            throw new VerifyCodeNotMatchException();
+        }
+
+        BeanUtils.copyProperties(userRegisterReqDTO, user); //邮箱，密码
+        user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
+        user.setUsername("偷心盗贼");
+        user.setIdentity(0);
+        user.setSalt(PasswordUtil.randomSalt());
+        user.setImgUrl("https://8.134.33.6/photo/a.png");//默认头像图片链接
+
+        if (userService.saveUser(user) > 0) {
+            return ResponseMessage.newSuccessInstance("注册成功");
         } else {
-            //false，验证码不一致
-            return ResponseMessage.newErrorInstance("验证码错误，注册失败");
+            return ResponseMessage.newErrorInstance("注册失败");
+        }
+    }
+
+    //82f3fbee2649b2f9a28b3a421f3bda97 修改前密码
+    //f28e3f6beb5cdbe31f73eba5d612682c 修改后密码
+    @ApiOperation(value = "忘记密码")
+    @PostMapping("/forgetPwd")
+    public ResponseMessage forgetPwd(@RequestBody @Validated UserForgetPwdReqDTO userForgetPwdReqDTO) {
+        if (ObjectUtil.isEmpty(userForgetPwdReqDTO)){
+            //输入为空
+            throw new UserEnterEmptyException();
+        }
+
+        boolean equals = userForgetPwdReqDTO.getModifyPwd().equals(userForgetPwdReqDTO.getConfirmPwd());
+        if (!equals){
+            //确认密码和修改密码不一致
+            throw new ConfirmPwdNotMatchException();
+        }
+
+        boolean b = userService.checkCode(userForgetPwdReqDTO.getEmail(), userForgetPwdReqDTO.getCode());
+        if (!b){
+            //验证码错误
+            throw new VerifyCodeNotMatchException();
+        }
+
+        int i = userService.forgetPwd(userForgetPwdReqDTO.getEmail(), userForgetPwdReqDTO.getModifyPwd());
+        if (i > 0) {
+            return ResponseMessage.newSuccessInstance("找回密码成功");
+        } else {
+            return ResponseMessage.newErrorInstance("找回密码失败");
         }
     }
 

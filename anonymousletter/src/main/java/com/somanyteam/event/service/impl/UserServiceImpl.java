@@ -3,6 +3,7 @@ package com.somanyteam.event.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.exception.user.*;
 import com.somanyteam.event.mapper.UserMapper;
@@ -54,10 +55,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int saveUser(User user) {
-        if (StrUtil.isEmpty(user.getEmail()) || StrUtil.isEmpty(user.getPassword())){
-            //输入为空
-            throw new UserEnterEmptyException();
-        }
         if(!user.getEmail().matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
             //邮箱格式不规范
             throw new UserEmailNotMatchException();
@@ -79,6 +76,23 @@ public class UserServiceImpl implements UserService {
         user.setPassword(PasswordUtil.encryptPassword(user.getUsername(), user.getPassword(), user.getSalt()));
         user.setCreateTime(new Date());
         return userMapper.insert(user);
+    }
+
+    @Override
+    public int forgetPwd(String email, String modifyPwd) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", email);
+        User existUser = userMapper.selectOne(wrapper);
+        if (ObjectUtil.isNull(existUser)) {
+            throw new UserNotExistException();
+        }
+
+        existUser.setPassword(PasswordUtil.encryptPassword(existUser.getUsername(),
+                modifyPwd, existUser.getSalt()));
+        existUser.setUpdateTime(new Date());
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("email",email);
+        return userMapper.update(existUser, updateWrapper);
     }
 
     @Override

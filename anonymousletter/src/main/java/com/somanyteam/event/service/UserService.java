@@ -8,6 +8,8 @@ public interface UserService {
 
     int saveUser(User user);
 
+    int forgetPwd(String email,String modifyPwd);
+
     String sendEmail(String email);
 
     boolean checkCode(String email,String userCode);
