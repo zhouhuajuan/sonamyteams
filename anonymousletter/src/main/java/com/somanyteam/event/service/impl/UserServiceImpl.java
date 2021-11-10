@@ -4,10 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.somanyteam.event.entity.User;
-import com.somanyteam.event.exception.user.UserEmailNotMatchException;
-import com.somanyteam.event.exception.user.UserEnterEmptyException;
-import com.somanyteam.event.exception.user.UserExistException;
-import com.somanyteam.event.exception.user.UserNotExistException;
+import com.somanyteam.event.exception.user.*;
 import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.UserService;
 
@@ -57,12 +54,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int saveUser(User user) {
+        if (StrUtil.isEmpty(user.getEmail()) || StrUtil.isEmpty(user.getPassword())){
+            //输入为空
+            throw new UserEnterEmptyException();
+        }
+        if(!user.getEmail().matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
+            //邮箱格式不规范
+            throw new UserEmailNotMatchException();
+        }
+
+        String passRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+        boolean matches = (user.getPassword()).matches(passRegex);
+        if (!matches){
+            //密码不规范
+            throw new PasswordNotStandardException();
+        }
+
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("email", user.getEmail());
         User existUser = userMapper.selectOne(wrapper);
         if (ObjectUtil.isNotNull(existUser)) {
             throw new UserExistException();
         }
+        user.setPassword(PasswordUtil.encryptPassword(user.getUsername(), user.getPassword(), user.getSalt()));
+        user.setCreateTime(new Date());
         return userMapper.insert(user);
     }
 

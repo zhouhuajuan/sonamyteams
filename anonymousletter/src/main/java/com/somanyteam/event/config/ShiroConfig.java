@@ -46,6 +46,8 @@ public class ShiroConfig {
         // filterMap.put("/report/**", "anon");
         // 放行登陆接口
         filterMap.put("/user/login", "anon");
+        filterMap.put("/user/sendEmail", "anon");
+        filterMap.put("/user/register", "anon");
         // 放行druid进行测试
         filterMap.put("/druid/**", "anon");
         // 设置退出登录，shiro清除session
@@ -62,6 +64,7 @@ public class ShiroConfig {
         // 设置所有接口需要认证访问
         filterMap.put("/user/hello", "user");
         filterMap.put("/**", "authc");
+//        filterMap.put("/**", "anon");
         return filterMap;
     }
     /**

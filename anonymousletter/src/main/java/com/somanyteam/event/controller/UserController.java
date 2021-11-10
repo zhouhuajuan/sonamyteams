@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-
-
 /**
  * @author zbr
  */
@@ -70,31 +68,21 @@ public class UserController {
         return ResponseMessage.newSuccessInstance(result, "登录成功");
     }
 
-
-    /**
-     * 1.先发送邮件
-     *      保存验证码进redis，并设置过期时间
-     * 2.注册账号
-     *      在service层验证 code是否一致
-     *      邮箱，用户id（随机生成），密码
-     *      验证码不一致不通过，为空也不通过
-     *      必要选项每天也不通过
-     *      密码不符合标准也不通过
-     */
+    //ViPJRC
     @ApiOperation(value = "注册")
     @PostMapping("/register")
-    public ResponseMessage register(@RequestBody @Validated UserRegisterReqDTO userRegisterReqDTO,String userCode) {
+    public ResponseMessage register(@RequestBody @Validated UserRegisterReqDTO userRegisterReqDTO) {
         User user = new User();
-        boolean b = userService.checkCode(userRegisterReqDTO.getEmail(), userCode);
+        boolean b = userService.checkCode(userRegisterReqDTO.getEmail(), userRegisterReqDTO.getCode());
         if (b) {
             //true，验证码一致
-            BeanUtils.copyProperties(userRegisterReqDTO, user);
-            user.setSalt(PasswordUtil.randomSalt());
-            // 原始密码默认与账号名称相同
-            user.setPassword(PasswordUtil.encryptPassword(user.getUsername(), user.getUsername(), user.getSalt()));
-            user.setIdentity(0);
+            BeanUtils.copyProperties(userRegisterReqDTO, user); //邮箱，密码
             user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
-            user.setImgUrl("http://8.134.33.6/photo/a.png");//默认头像图片链接
+            user.setUsername("偷心盗贼");
+            user.setIdentity(0);
+            user.setSalt(PasswordUtil.randomSalt());
+            user.setImgUrl("https://8.134.33.6/photo/a.png");//默认头像图片链接
+
             if (userService.saveUser(user) > 0) {
                 return ResponseMessage.newSuccessInstance("注册成功");
             } else {
@@ -105,6 +93,20 @@ public class UserController {
             return ResponseMessage.newErrorInstance("验证码错误，注册失败");
         }
     }
+
+    @ApiOperation(value = "发送邮件")
+    @PostMapping("/sendEmail")
+    public ResponseMessage sendEmail(String email) {
+        //拿到验证码，为空则发送邮件失败
+        String code = userService.sendEmail(email);
+        if (StrUtil.isEmpty(code)) {
+            return ResponseMessage.newErrorInstance("发送失败");
+        } else {
+            //返回前端验证码，前端判断验证码是否输入正确
+            return ResponseMessage.newSuccessInstance("发送成功",code);
+        }
+    }
+
     @ApiOperation(value = "登出")
     @PostMapping("/logout")
     public ResponseMessage logout(){
@@ -115,19 +117,6 @@ public class UserController {
         }else{
             return ResponseMessage.newErrorInstance("登出失败");
 
-        }
-    }
-
-    @ApiOperation(value = "发送邮件")
-    @PostMapping("/sendEmail")
-    public ResponseMessage sendEmail(@ApiParam("邮箱") @Param(value = "email") String email) {
-        //拿到验证码，为空则发送邮件失败
-        String code = userService.sendEmail(email);
-        if (StrUtil.isEmpty(code)) {
-            return ResponseMessage.newErrorInstance("发送失败");
-        } else {
-            //返回前端验证码，前端判断验证码是否输入正确
-            return ResponseMessage.newSuccessInstance("发送成功",code);
         }
     }
 
