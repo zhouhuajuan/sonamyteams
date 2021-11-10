@@ -163,6 +163,8 @@
     <orderEntry type="library" name="Maven: org.apache.shiro:shiro-spring:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.shiro:shiro-web:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.owasp.encoder:encoder:1.2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.shiro:shiro-ehcache:1.5.3" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache-core:2.6.11" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus-boot-starter:3.4.3" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus:3.4.3" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus-extension:3.4.3" level="project" />

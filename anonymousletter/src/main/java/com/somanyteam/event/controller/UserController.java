@@ -5,10 +5,12 @@ import com.somanyteam.event.dto.request.user.UserLoginReqDTO;
 import com.somanyteam.event.dto.request.user.UserRegisterReqDTO;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
+import com.somanyteam.event.exception.user.VerifyCodeNotMatchException;
 import com.somanyteam.event.service.UserService;
 import com.somanyteam.event.util.PasswordUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
 import com.somanyteam.event.util.ResponseMessage;
+import com.somanyteam.event.util.VerifyCodeUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,12 +24,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 import java.util.Date;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+
 
 
 /**
@@ -43,11 +49,18 @@ public class UserController {
 
     @ApiOperation(value = "用户登录")
     @PostMapping("/login")
-    public ResponseMessage<UserLoginResult> login(@RequestBody @Validated UserLoginReqDTO userLoginReqDTO){
+    public ResponseMessage<UserLoginResult> login(@RequestBody @Validated UserLoginReqDTO userLoginReqDTO, HttpSession session){
+        String rightCode = (String) session.getAttribute("code");
 
+        if(!rightCode.equals(userLoginReqDTO.getCode())){
+            throw new VerifyCodeNotMatchException();
+        }
         Subject subject = SecurityUtils.getSubject();
 
         UsernamePasswordToken token  = new UsernamePasswordToken(userLoginReqDTO.getEmail(), userLoginReqDTO.getPassword());
+        if(userLoginReqDTO.getRememberMe() != null && userLoginReqDTO.getRememberMe() == 1) {
+            token.setRememberMe(true);
+        }
         subject.login(token);
 
         User loginUser = (User) subject.getPrincipal();
@@ -56,6 +69,7 @@ public class UserController {
 
         return ResponseMessage.newSuccessInstance(result, "登录成功");
     }
+
 
     /**
      * 1.先发送邮件
@@ -72,7 +86,7 @@ public class UserController {
     public ResponseMessage register(@RequestBody @Validated UserRegisterReqDTO userRegisterReqDTO,String userCode) {
         User user = new User();
         boolean b = userService.checkCode(userRegisterReqDTO.getEmail(), userCode);
-        if (b){
+        if (b) {
             //true，验证码一致
             BeanUtils.copyProperties(userRegisterReqDTO, user);
             user.setSalt(PasswordUtil.randomSalt());
@@ -86,9 +100,21 @@ public class UserController {
             } else {
                 return ResponseMessage.newErrorInstance("注册失败");
             }
-        }else {
+        } else {
             //false，验证码不一致
             return ResponseMessage.newErrorInstance("验证码错误，注册失败");
+        }
+    }
+    @ApiOperation(value = "登出")
+    @PostMapping("/logout")
+    public ResponseMessage logout(){
+        Subject subject = SecurityUtils.getSubject();
+        if(subject.isAuthenticated()){
+            subject.logout();
+            return ResponseMessage.newSuccessInstance("登出成功");
+        }else{
+            return ResponseMessage.newErrorInstance("登出失败");
+
         }
     }
 
@@ -103,6 +129,19 @@ public class UserController {
             //返回前端验证码，前端判断验证码是否输入正确
             return ResponseMessage.newSuccessInstance("发送成功",code);
         }
+    }
+
+    @ApiOperation("获取验证码")
+    @GetMapping("/getImage")
+    public void getImage(HttpSession session, HttpServletResponse response) throws IOException, IOException {
+        //生成验证码
+        String code = VerifyCodeUtils.generateVerifyCode(4);
+        //验证码放入session
+        session.setAttribute("code",code);
+        //验证码存入图片
+        ServletOutputStream os = response.getOutputStream();
+        response.setContentType("image/png");
+        VerifyCodeUtils.outputImage(220,60,os,code);
     }
 
 }
