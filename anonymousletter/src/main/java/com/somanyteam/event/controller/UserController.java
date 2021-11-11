@@ -208,4 +208,9 @@ public class UserController {
 
     }
 
+    @ApiOperation("注销账号")
+    public ResponseMessage deleteAccount(){
+        return null;
+    }
+
 }
