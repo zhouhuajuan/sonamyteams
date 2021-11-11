@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -93,6 +94,7 @@ public class UserServiceImpl implements UserService {
         if (ObjectUtil.isNotNull(existUser)) {
             throw new UserExistException();
         }
+        user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
         user.setPassword(PasswordUtil.encryptPassword(user.getUsername(), user.getPassword(), user.getSalt()));
         user.setCreateTime(new Date());
         user.setUpdateTime(new Date());
@@ -170,5 +172,10 @@ public class UserServiceImpl implements UserService {
         String code = (String) redisTemplate.opsForValue().get("code_"+email);
         //验证码一致，返回true
         return userCode.equals(code);
+    }
+
+    @Override
+    public List<String> getAllUserId() {
+        return null;
     }
 }

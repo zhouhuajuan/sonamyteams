@@ -88,7 +88,7 @@ public class UserController {
         }
 
         BeanUtils.copyProperties(userRegisterReqDTO, user); //邮箱，密码
-        user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
+        //user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
         user.setUsername("偷心盗贼");
         user.setIdentity(0);
         user.setSalt(PasswordUtil.randomSalt());
