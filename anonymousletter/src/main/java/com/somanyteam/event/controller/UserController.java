@@ -18,7 +18,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
@@ -65,13 +68,22 @@ public class UserController {
         if(userLoginReqDTO.getRememberMe() != null && userLoginReqDTO.getRememberMe() == 1) {
             token.setRememberMe(true);
         }
-        subject.login(token);
+        try {
+            subject.login(token);
 
-        User loginUser = (User) subject.getPrincipal();
-        UserLoginResult result = new UserLoginResult();
-        BeanUtils.copyProperties(loginUser, result);
+            User loginUser = (User) subject.getPrincipal();
+            UserLoginResult result = new UserLoginResult();
+            BeanUtils.copyProperties(loginUser, result);
+            return ResponseMessage.newSuccessInstance(result, "登录成功");
+        } catch (AuthenticationException e){
+            String msg = "用户名或密码错误";
+            if (StrUtil.isNotEmpty(e.getMessage())) {
+                msg = e.getMessage();
+            }
+            return ResponseMessage.newErrorInstance("登陆异常: " + msg);
+        }
 
-        return ResponseMessage.newSuccessInstance(result, "登录成功");
+
     }
 
     @ApiOperation(value = "注册")
@@ -202,7 +214,8 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseMessage logout(){
         Subject subject = SecurityUtils.getSubject();
-        if(subject.isAuthenticated()){
+        //正常登录或者使用cookie登录时都可以选择登出
+        if(subject.isAuthenticated() || subject.isRemembered()){
             subject.logout();
             return ResponseMessage.newSuccessInstance("登出成功");
         }else{
@@ -245,7 +258,7 @@ public class UserController {
         Subject subject = SecurityUtils.getSubject();
         User curUser = (User) subject.getPrincipal();
 
-        String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getEmail(), originalPassword, curUser.getSalt());
+        String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getId(), originalPassword, curUser.getSalt());
         if(curUser.getPassword().equals(encryptOldPwd)){
             return ResponseMessage.newErrorInstance("旧密码不正确");
         }
@@ -273,4 +286,27 @@ public class UserController {
             return ResponseMessage.newErrorInstance("获取用户信息失败");
         }
     }
+
+    @ApiOperation("注销账号")
+    @GetMapping("/deleteAccount")
+    public ResponseMessage deleteAccount(){
+        return ResponseMessage.newSuccessInstance(userService.deleteAccount( SecurityUtils.getSubject()));
+    }
+
+    @ApiOperation("测试是用cookie登录还是正常登录")
+    @GetMapping("/test")
+    public ResponseMessage test(){
+        Subject subject = SecurityUtils.getSubject();
+//        User user = (User) subject.getPrincipal();
+
+        if(subject.isAuthenticated()){
+            System.out.println("用户正常登录");
+        }else if(subject.isRemembered()){
+            System.out.println("cookie登录");
+        }else{
+            System.out.println("没登录");
+        }
+        return ResponseMessage.newSuccessInstance("测试");
+    }
+
 }

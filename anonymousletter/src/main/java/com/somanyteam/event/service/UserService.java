@@ -1,6 +1,8 @@
 package com.somanyteam.event.service;
 
 import com.somanyteam.event.entity.User;
+import org.apache.shiro.subject.Subject;
+
 
 import java.text.ParseException;
 import java.util.List;
@@ -25,5 +27,7 @@ public interface UserService {
     int modifyImgUrl(String id,String imgUrl);
 
     User getUserInfo(String id);
+
+    boolean deleteAccount(Subject subject);
 
 }
