@@ -18,9 +18,11 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -53,6 +55,24 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
+    public Integer modifyPassword(User curUser, String newPassword) throws ParseException {
+//        String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getEmail(), userModifyPasswordReqDTO.getOriginalPassword(), curUser.getSalt());
+//        if(!encryptOldPwd.equals(curUser.getPassword())){
+//            throw new UserOldPwdNotMatchException();
+//        }
+        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getEmail(), newPassword, curUser.getSalt());
+        User user = new User();
+        user.setId(curUser.getId());
+        user.setPassword(encryptNewPwd);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = sdf.parse(sdf.format(new Date()));
+        user.setUpdateTime(date);
+        //        if(update >= 1) {
+//            curUser.setPassword(encryptNewPwd);
+//        }
+        return userMapper.updateById(user);
+    }
     @Override
     public int saveUser(User user) {
         if(!user.getEmail().matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
