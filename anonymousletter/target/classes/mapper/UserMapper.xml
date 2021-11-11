@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.somanyteam.event.mapper.UserMapper">
+<!--  <resultMap id="BaseResultMap" type="com.somanyteam.event.entity.User">-->
+<!--    <id column="id" jdbcType="VARCHAR" property="id" />-->
+<!--    <result column="username" jdbcType="VARCHAR" property="username" />-->
+<!--    <result column="identity" jdbcType="INTEGER" property="identity" />-->
+<!--    <result column="password" jdbcType="VARCHAR" property="password" />-->
+<!--    <result column="salt" jdbcType="VARCHAR" property="salt" />-->
+<!--    <result column="email" jdbcType="VARCHAR" property="email" />-->
+<!--    <result column="sex" jdbcType="INTEGER" property="sex" />-->
+<!--    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />-->
+<!--    <result column="profile" jdbcType="VARCHAR" property="profile" />-->
+<!--    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />-->
+<!--    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
+<!--  </resultMap>-->
+<!--  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">-->
+<!--    delete from user-->
+<!--    where id = #{id,jdbcType=VARCHAR}-->
+<!--  </delete>-->
+<!--  <insert id="insert" parameterType="com.somanyteam.event.entity.User">-->
+<!--    insert into user (id, username, identity, -->
+<!--      password, salt, email, -->
+<!--      sex, birthday, profile, -->
+<!--      create_time, update_time)-->
+<!--    values (#{id,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{identity,jdbcType=INTEGER}, -->
+<!--      #{password,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, -->
+<!--      #{sex,jdbcType=INTEGER}, #{birthday,jdbcType=TIMESTAMP}, #{profile,jdbcType=VARCHAR}, -->
+<!--      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})-->
+<!--  </insert>-->
+<!--  <update id="updateByPrimaryKey" parameterType="com.somanyteam.event.entity.User">-->
+<!--    update user-->
+<!--    set username = #{username,jdbcType=VARCHAR},-->
+<!--      identity = #{identity,jdbcType=INTEGER},-->
+<!--      password = #{password,jdbcType=VARCHAR},-->
+<!--      salt = #{salt,jdbcType=VARCHAR},-->
+<!--      email = #{email,jdbcType=VARCHAR},-->
+<!--      sex = #{sex,jdbcType=INTEGER},-->
+<!--      birthday = #{birthday,jdbcType=TIMESTAMP},-->
+<!--      profile = #{profile,jdbcType=VARCHAR},-->
+<!--      create_time = #{createTime,jdbcType=TIMESTAMP},-->
+<!--      update_time = #{updateTime,jdbcType=TIMESTAMP}-->
+<!--    where id = #{id,jdbcType=VARCHAR}-->
+<!--  </update>-->
+<!--  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">-->
+<!--    select id, username, identity, password, salt, email, sex, birthday, profile, create_time, -->
+<!--    update_time-->
+<!--    from user-->
+<!--    where id = #{id,jdbcType=VARCHAR}-->
+<!--  </select>-->
+<!--  <select id="selectAll" resultMap="BaseResultMap">-->
+<!--    select id, username, identity, password, salt, email, sex, birthday, profile, create_time, -->
+<!--    update_time-->
+<!--    from user-->
+<!--  </select>-->
+</mapper>

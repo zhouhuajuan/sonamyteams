@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.somanyteam.event.mapper.AnswerMapper">
+<!--  <resultMap id="BaseResultMap" type="com.somanyteam.event.entity.Answer">-->
+<!--    <id column="id" jdbcType="BIGINT" property="id" />-->
+<!--    <result column="image" jdbcType="VARCHAR" property="image" />-->
+<!--    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />-->
+<!--    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
+<!--    <result column="question_id" jdbcType="LONGVARCHAR" property="questionId" />-->
+<!--    <result column="content" jdbcType="LONGVARCHAR" property="content" />-->
+<!--  </resultMap>-->
+<!--  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
+<!--    delete from answer-->
+<!--    where id = #{id,jdbcType=BIGINT}-->
+<!--  </delete>-->
+<!--  <insert id="insert" parameterType="com.somanyteam.event.entity.Answer">-->
+<!--    insert into answer (id, image, create_time, -->
+<!--      update_time, question_id, content-->
+<!--      )-->
+<!--    values (#{id,jdbcType=BIGINT}, #{image,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, -->
+<!--      #{updateTime,jdbcType=TIMESTAMP}, #{questionId,jdbcType=LONGVARCHAR}, #{content,jdbcType=LONGVARCHAR}-->
+<!--      )-->
+<!--  </insert>-->
+<!--  <update id="updateByPrimaryKey" parameterType="com.somanyteam.event.entity.Answer">-->
+<!--    update answer-->
+<!--    set image = #{image,jdbcType=VARCHAR},-->
+<!--      create_time = #{createTime,jdbcType=TIMESTAMP},-->
+<!--      update_time = #{updateTime,jdbcType=TIMESTAMP},-->
+<!--      question_id = #{questionId,jdbcType=LONGVARCHAR},-->
+<!--      content = #{content,jdbcType=LONGVARCHAR}-->
+<!--    where id = #{id,jdbcType=BIGINT}-->
+<!--  </update>-->
+<!--  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
+<!--    select id, image, create_time, update_time, question_id, content-->
+<!--    from answer-->
+<!--    where id = #{id,jdbcType=BIGINT}-->
+<!--  </select>-->
+<!--  <select id="selectAll" resultMap="BaseResultMap">-->
+<!--    select id, image, create_time, update_time, question_id, content-->
+<!--    from answer-->
+<!--  </select>-->
+</mapper>

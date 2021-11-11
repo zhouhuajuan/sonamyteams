@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.somanyteam.event.mapper.ReportMapper">
+<!--  <resultMap id="BaseResultMap" type="com.somanyteam.event.entity.Report">-->
+<!--    <id column="id" jdbcType="BIGINT" property="id" />-->
+<!--    <result column="complaintant" jdbcType="VARCHAR" property="complaintant" />-->
+<!--    <result column="defendant" jdbcType="VARCHAR" property="defendant" />-->
+<!--    <result column="type" jdbcType="INTEGER" property="type" />-->
+<!--    <result column="status" jdbcType="INTEGER" property="status" />-->
+<!--    <result column="handler" jdbcType="VARCHAR" property="handler" />-->
+<!--    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />-->
+<!--    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
+<!--  </resultMap>-->
+<!--  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
+<!--    delete from report-->
+<!--    where id = #{id,jdbcType=BIGINT}-->
+<!--  </delete>-->
+<!--  <insert id="insert" parameterType="com.somanyteam.event.entity.Report">-->
+<!--    insert into report (id, complaintant, defendant, -->
+<!--      type, status, handler, -->
+<!--      create_time, update_time)-->
+<!--    values (#{id,jdbcType=BIGINT}, #{complaintant,jdbcType=VARCHAR}, #{defendant,jdbcType=VARCHAR}, -->
+<!--      #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{handler,jdbcType=VARCHAR}, -->
+<!--      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})-->
+<!--  </insert>-->
+<!--  <update id="updateByPrimaryKey" parameterType="com.somanyteam.event.entity.Report">-->
+<!--    update report-->
+<!--    set complaintant = #{complaintant,jdbcType=VARCHAR},-->
+<!--      defendant = #{defendant,jdbcType=VARCHAR},-->
+<!--      type = #{type,jdbcType=INTEGER},-->
+<!--      status = #{status,jdbcType=INTEGER},-->
+<!--      handler = #{handler,jdbcType=VARCHAR},-->
+<!--      create_time = #{createTime,jdbcType=TIMESTAMP},-->
+<!--      update_time = #{updateTime,jdbcType=TIMESTAMP}-->
+<!--    where id = #{id,jdbcType=BIGINT}-->
+<!--  </update>-->
+<!--  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
+<!--    select id, complaintant, defendant, type, status, handler, create_time, update_time-->
+<!--    from report-->
+<!--    where id = #{id,jdbcType=BIGINT}-->
+<!--  </select>-->
+<!--  <select id="selectAll" resultMap="BaseResultMap">-->
+<!--    select id, complaintant, defendant, type, status, handler, create_time, update_time-->
+<!--    from report-->
+<!--  </select>-->
+</mapper>
