@@ -1,5 +1,6 @@
 package com.somanyteam.event.controller;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.request.user.UserLoginReqDTO;
 import com.somanyteam.event.dto.request.user.UserModifyPasswordReqDTO;
@@ -10,27 +11,31 @@ import com.somanyteam.event.util.PasswordUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.somanyteam.event.dto.request.user.UserForgetPwdReqDTO;
 import com.somanyteam.event.dto.request.user.UserRegisterReqDTO;
-import com.somanyteam.event.exception.user.ConfirmPwdNotMatchException;
 import com.somanyteam.event.exception.user.UserEnterEmptyException;
-import com.somanyteam.event.exception.user.VerifyCodeNotMatchException;
-import com.somanyteam.event.util.RandomCodeUtil;
 import com.somanyteam.event.util.ResponseMessage;
 import com.somanyteam.event.util.VerifyCodeUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * @author zbr
@@ -42,6 +47,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Value("${upload.img.path}")
+    private String uploadPathImg; //保存在服务器图片目录的路径
 
     @ApiOperation(value = "用户登录")
     @PostMapping("/login")
@@ -78,13 +86,13 @@ public class UserController {
         boolean equals = userRegisterReqDTO.getPassword().equals(userRegisterReqDTO.getConfirmPwd());
         if (!equals){
             //确认密码和密码不一致
-            throw new ConfirmPwdNotMatchException();
+            return ResponseMessage.newErrorInstance("确认密码和密码不一致");
         }
 
         boolean b = userService.checkCode(userRegisterReqDTO.getEmail(), userRegisterReqDTO.getCode());
         if (!b){
             //验证码错误
-            throw new VerifyCodeNotMatchException();
+            return ResponseMessage.newErrorInstance("验证码错误");
         }
 
         BeanUtils.copyProperties(userRegisterReqDTO, user); //邮箱，密码
@@ -101,8 +109,6 @@ public class UserController {
         }
     }
 
-    //82f3fbee2649b2f9a28b3a421f3bda97 修改前密码
-    //f28e3f6beb5cdbe31f73eba5d612682c 修改后密码
     @ApiOperation(value = "忘记密码")
     @PostMapping("/forgetPwd")
     public ResponseMessage forgetPwd(@RequestBody @Validated UserForgetPwdReqDTO userForgetPwdReqDTO) {
@@ -114,13 +120,13 @@ public class UserController {
         boolean equals = userForgetPwdReqDTO.getModifyPwd().equals(userForgetPwdReqDTO.getConfirmPwd());
         if (!equals){
             //确认密码和修改密码不一致
-            throw new ConfirmPwdNotMatchException();
+            return ResponseMessage.newErrorInstance("确认密码和修改密码不一致");
         }
 
         boolean b = userService.checkCode(userForgetPwdReqDTO.getEmail(), userForgetPwdReqDTO.getCode());
         if (!b){
             //验证码错误
-            throw new VerifyCodeNotMatchException();
+            return ResponseMessage.newErrorInstance("验证码错误");
         }
 
         int i = userService.forgetPwd(userForgetPwdReqDTO.getEmail(), userForgetPwdReqDTO.getModifyPwd());
@@ -128,6 +134,22 @@ public class UserController {
             return ResponseMessage.newSuccessInstance("找回密码成功");
         } else {
             return ResponseMessage.newErrorInstance("找回密码失败");
+        }
+    }
+
+    @ApiOperation(value = "拿userid")
+    @PostMapping("/getAllUserId")
+    public ResponseMessage getAllUserId() {
+        //拿到验证码，为空则发送邮件失败
+        Set<String> allUserId = userService.getAllUserId();
+        if (ObjectUtil.isNull(allUserId)) {
+            return ResponseMessage.newErrorInstance("失败");
+        } else {
+            //返回前端验证码，前端判断验证码是否输入正确
+            for (String s:allUserId) {
+                System.out.println(s);
+            }
+            return ResponseMessage.newSuccessInstance("成功");
         }
     }
 
@@ -141,6 +163,38 @@ public class UserController {
         } else {
             //返回前端验证码，前端判断验证码是否输入正确
             return ResponseMessage.newSuccessInstance("发送成功",code);
+        }
+    }
+
+    // /e094be639937a02d32fe42f1ade7bffc
+    @ApiOperation("上传头像")
+    @PostMapping("/uploadPhoto")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", value = "选择需要上传的图片", required = true, paramType = "query"),
+    })
+    public ResponseMessage uploadPhoto(@RequestPart("file") MultipartFile file) {
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        try {
+            //保存图片的名字为用户id+图片名称+上传图片时间
+            String originalFileName = file.getOriginalFilename();
+            String fileName =  loginUser.getId()+ originalFileName+(new Date());
+
+            //加密后的图片名
+            String md5FileName = new Md5Hash(fileName).toHex();
+
+            //保存进服务器图片目录的路径
+            String filePath = uploadPathImg+md5FileName+originalFileName.substring(originalFileName.lastIndexOf("."));;
+            //File.separator 相当于/或者\
+            FileUtil.writeBytes(file.getBytes(), filePath);
+
+            if (userService.modifyImgUrl(loginUser.getId(),filePath) > 0) {
+                return ResponseMessage.newSuccessInstance("上传图像成功");
+            } else {
+                return ResponseMessage.newErrorInstance("上传图像失败");
+            }
+        } catch (Exception e) {
+            //logger.error("上传图像失败: {}", e.getMessage());
+            return ResponseMessage.newErrorInstance("上传图像失败");
         }
     }
 
@@ -208,4 +262,15 @@ public class UserController {
 
     }
 
+    @ApiOperation(value = "获取用户信息")
+    @PostMapping("/getUserInfo")
+    public ResponseMessage getUserInfo(){
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User userInfo = userService.getUserInfo(loginUser.getId());
+        if(!ObjectUtil.isEmpty(userInfo)){
+            return ResponseMessage.newSuccessInstance(userInfo,"获取用户信息成功");
+        }else{
+            return ResponseMessage.newErrorInstance("获取用户信息失败");
+        }
+    }
 }

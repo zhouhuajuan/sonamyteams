@@ -12,6 +12,7 @@ import com.somanyteam.event.service.UserService;
 
 import com.somanyteam.event.util.PasswordUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
+import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.MailSendException;
@@ -21,7 +22,9 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -94,8 +97,16 @@ public class UserServiceImpl implements UserService {
         if (ObjectUtil.isNotNull(existUser)) {
             throw new UserExistException();
         }
-        user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
-        user.setPassword(PasswordUtil.encryptPassword(user.getUsername(), user.getPassword(), user.getSalt()));
+
+        String random = RandomCodeUtil.getRandom();
+        Set<String> allUserId = getAllUserId();
+        if (allUserId.contains(random)){
+            //已经有用户的id为random，不能给新注册的用户分配这个随机id
+            throw new UserIdRepeatException();
+        }
+
+        user.setId(random); //生成一个随机数
+        user.setPassword(PasswordUtil.encryptPassword(user.getId(), user.getPassword(), user.getSalt()));
         user.setCreateTime(new Date());
         user.setUpdateTime(new Date());
         return userMapper.insert(user);
@@ -175,7 +186,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<String> getAllUserId() {
-        return null;
+    public Set<String> getAllUserId() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.select("id");
+        //将所有用户的id查询出来保存为list集合
+        List<User> users = userMapper.selectList(wrapper);
+        Set<String> set = new HashSet<>();
+        for (User user : users) {
+            set.add(user.getId());
+        }
+        return set;
+    }
+
+    @Override
+    public int modifyImgUrl(String id, String imgUrl) {
+        if (StrUtil.isEmpty(id) || StrUtil.isEmpty(imgUrl)){
+            throw new UserEnterEmptyException();
+        }
+
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        User existUser = userMapper.selectOne(wrapper);
+        if (ObjectUtil.isNull(existUser)) {
+            throw new UserNotExistException();
+        }
+
+        existUser.setImgUrl(imgUrl);
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id",id);
+        return userMapper.update(existUser, updateWrapper);
+    }
+
+    @Override
+    public User getUserInfo(String id) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        User existUser = userMapper.selectOne(wrapper);
+        if (ObjectUtil.isNull(existUser)) {
+            throw new UserNotExistException();
+        }
+        return existUser;
     }
 }

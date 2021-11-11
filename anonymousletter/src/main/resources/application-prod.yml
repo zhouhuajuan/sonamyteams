@@ -31,3 +31,8 @@ logging:
   # 日志输出级别
   level:
     ROOT: info
+
+# 自评报告
+upload:
+  img:
+    path: E:\

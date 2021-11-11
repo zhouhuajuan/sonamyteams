@@ -4,6 +4,7 @@ import com.somanyteam.event.entity.User;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
 
@@ -19,6 +20,10 @@ public interface UserService {
 
     boolean checkCode(String email,String userCode);
 
-    List<String> getAllUserId();
+    Set<String> getAllUserId();
+
+    int modifyImgUrl(String id,String imgUrl);
+
+    User getUserInfo(String id);
 
 }
