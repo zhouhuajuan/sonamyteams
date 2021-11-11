@@ -93,6 +93,7 @@ public class UserServiceImpl implements UserService {
         if (ObjectUtil.isNotNull(existUser)) {
             throw new UserExistException();
         }
+        user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
         user.setPassword(PasswordUtil.encryptPassword(user.getUsername(), user.getPassword(), user.getSalt()));
         user.setCreateTime(new Date());
         user.setUpdateTime(new Date());
