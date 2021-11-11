@@ -62,8 +62,11 @@ public class ShiroConfig {
         filterMap.put("/doc.html", "anon");
         filterMap.put("/doc.html#/**", "anon");
         filterMap.put("/webjars/**", "anon");
-        // 设置所有接口需要认证访问
+        //设置用户放行
+        //注销账户需登录后才能注销，cookie状态下不能注销
+        filterMap.put("/user/deleteAccount", "authc");
         filterMap.put("/user/**", "user");
+        // 设置所有接口需要认证访问
         filterMap.put("/**", "authc");
 //        filterMap.put("/**", "anon");
         return filterMap;

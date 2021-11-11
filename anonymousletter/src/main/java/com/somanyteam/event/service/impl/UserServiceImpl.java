@@ -12,6 +12,8 @@ import com.somanyteam.event.service.UserService;
 
 import com.somanyteam.event.util.PasswordUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.MailSendException;
@@ -52,7 +54,7 @@ public class UserServiceImpl implements UserService {
         if(ObjectUtil.isNull(user)){
             throw new UserNotExistException();
         }
-        PasswordUtil.matches(user, password);
+        PasswordUtil.validate(user, password);
         return user;
     }
 
@@ -62,7 +64,7 @@ public class UserServiceImpl implements UserService {
 //        if(!encryptOldPwd.equals(curUser.getPassword())){
 //            throw new UserOldPwdNotMatchException();
 //        }
-        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getEmail(), newPassword, curUser.getSalt());
+        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
         User user = new User();
         user.setId(curUser.getId());
         user.setPassword(encryptNewPwd);
@@ -177,5 +179,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<String> getAllUserId() {
         return null;
+    }
+
+    /**
+     * 注销账户
+     * @param subject
+     * @return
+     */
+    @Override
+    public boolean deleteAccount(Subject subject) {
+
+        User curUser = (User) subject.getPrincipal();
+
+        int del = userMapper.deleteById(curUser.getId());
+        if(del <= 0){
+            throw new UserNotExistException();
+        }else{
+            //用户登出，session失效
+            subject.logout();
+        }
+        return true;
     }
 }

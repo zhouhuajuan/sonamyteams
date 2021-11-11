@@ -1,6 +1,8 @@
 package com.somanyteam.event.service;
 
 import com.somanyteam.event.entity.User;
+import org.apache.shiro.subject.Subject;
+
 
 import java.text.ParseException;
 import java.util.List;
@@ -20,5 +22,7 @@ public interface UserService {
     boolean checkCode(String email,String userCode);
 
     List<String> getAllUserId();
+
+    boolean deleteAccount(Subject subject);
 
 }
