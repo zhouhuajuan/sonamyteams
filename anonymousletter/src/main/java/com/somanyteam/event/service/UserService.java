@@ -1,5 +1,6 @@
 package com.somanyteam.event.service;
 
+import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
 import com.somanyteam.event.entity.User;
 import org.apache.shiro.subject.Subject;
 
@@ -24,5 +25,7 @@ public interface UserService {
     List<String> getAllUserId();
 
     boolean deleteAccount(Subject subject);
+
+    boolean updateInfo(UserUpdateInfoReqDTO dto, User curUser) throws ParseException;
 
 }
