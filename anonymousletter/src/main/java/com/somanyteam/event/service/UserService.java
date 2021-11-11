@@ -3,6 +3,7 @@ package com.somanyteam.event.service;
 import com.somanyteam.event.entity.User;
 
 import java.text.ParseException;
+import java.util.List;
 
 public interface UserService {
 
@@ -17,5 +18,7 @@ public interface UserService {
     String sendEmail(String email);
 
     boolean checkCode(String email,String userCode);
+
+    List<String> getAllUserId();
 
 }
