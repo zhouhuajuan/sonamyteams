@@ -149,21 +149,19 @@ public class UserController {
         }
     }
 
-    @ApiOperation(value = "拿userid")
-    @PostMapping("/getAllUserId")
-    public ResponseMessage getAllUserId() {
-        //拿到验证码，为空则发送邮件失败
-        Set<String> allUserId = userService.getAllUserId();
-        if (ObjectUtil.isNull(allUserId)) {
-            return ResponseMessage.newErrorInstance("失败");
-        } else {
-            //返回前端验证码，前端判断验证码是否输入正确
-            for (String s:allUserId) {
-                System.out.println(s);
-            }
-            return ResponseMessage.newSuccessInstance("成功");
-        }
-    }
+//    @ApiOperation(value = "拿userid")
+//    @PostMapping("/getAllUserId")
+//    public ResponseMessage getAllUserId() {
+//        Set<String> allUserId = userService.getAllUserId();
+//        if (ObjectUtil.isNull(allUserId)) {
+//            return ResponseMessage.newErrorInstance("失败");
+//        } else {
+//            for (String s:allUserId) {
+//                System.out.println(s);
+//            }
+//            return ResponseMessage.newSuccessInstance("成功");
+//        }
+//    }
 
     @ApiOperation(value = "发送邮件")
     @PostMapping("/sendEmail")
@@ -178,7 +176,7 @@ public class UserController {
         }
     }
 
-    // /e094be639937a02d32fe42f1ade7bffc
+    //static/827ce27cbd5edaf1d3249552c3cb7911.png
     @ApiOperation("上传头像")
     @PostMapping("/uploadPhoto")
     @ApiImplicitParams({

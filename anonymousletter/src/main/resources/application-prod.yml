@@ -35,4 +35,4 @@ logging:
 # 自评报告
 upload:
   img:
-    path: E:\
+    path: static/
