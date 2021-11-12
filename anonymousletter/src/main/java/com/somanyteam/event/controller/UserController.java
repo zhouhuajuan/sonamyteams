@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.request.user.UserLoginReqDTO;
 import com.somanyteam.event.dto.request.user.UserModifyPasswordReqDTO;
 import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
+import com.somanyteam.event.dto.result.user.UserGetInfoResult;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.UserService;
@@ -276,11 +277,13 @@ public class UserController {
 
     @ApiOperation(value = "获取用户信息")
     @PostMapping("/getUserInfo")
-    public ResponseMessage getUserInfo(){
+    public ResponseMessage getUserInfo() throws ParseException {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         User userInfo = userService.getUserInfo(loginUser.getId());
+        UserGetInfoResult result = new UserGetInfoResult();
+        BeanUtils.copyProperties(userInfo,result);
         if(!ObjectUtil.isEmpty(userInfo)){
-            return ResponseMessage.newSuccessInstance(userInfo,"获取用户信息成功");
+            return ResponseMessage.newSuccessInstance(result,"获取用户信息成功");
         }else{
             return ResponseMessage.newErrorInstance("获取用户信息失败");
         }

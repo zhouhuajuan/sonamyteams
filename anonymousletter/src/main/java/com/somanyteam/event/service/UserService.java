@@ -27,7 +27,7 @@ public interface UserService {
 
     int modifyImgUrl(String id,String imgUrl);
 
-    User getUserInfo(String id);
+    User getUserInfo(String id) throws ParseException;
 
     boolean deleteAccount(Subject subject);
 

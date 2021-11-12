@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserInfo(String id) {
+    public User getUserInfo(String id) throws ParseException {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("id", id);
         User existUser = userMapper.selectOne(wrapper);

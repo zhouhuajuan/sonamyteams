@@ -1,5 +1,7 @@
 package com.somanyteam.event;
 
+import com.somanyteam.event.entity.User;
+import com.somanyteam.event.service.UserService;
 import com.somanyteam.event.util.EmailUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import redis.clients.jedis.Jedis;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +31,9 @@ class AnonymousletterApplicationTests {
 
     @Autowired
     JavaMailSender javaMailSender;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     TemplateEngine templateEngine;
@@ -104,5 +110,13 @@ class AnonymousletterApplicationTests {
         //获取
         String name = jedis.get("code_zhj15767394098@163.com");
         System.out.println(name);
+    }
+
+    @Test
+    public void test2() throws ParseException {
+        User info1 = userService.getUserInfo("IKFS8R");
+        User info2 = userService.getUserInfo("lPgc60");
+        System.out.println(info1);
+        System.out.println(info2);
     }
 }
