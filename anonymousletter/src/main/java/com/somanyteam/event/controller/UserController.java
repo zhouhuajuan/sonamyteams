@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.request.user.UserLoginReqDTO;
 import com.somanyteam.event.dto.request.user.UserModifyPasswordReqDTO;
+import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.UserService;
@@ -305,6 +306,13 @@ public class UserController {
             System.out.println("没登录");
         }
         return ResponseMessage.newSuccessInstance("测试");
+    }
+
+
+    @ApiOperation("修改用户信息")
+    @PostMapping("/updateInfo")
+    public ResponseMessage updateInfo(@RequestBody UserUpdateInfoReqDTO dto) throws ParseException {
+        return ResponseMessage.newSuccessInstance(userService.updateInfo(dto, (User) SecurityUtils.getSubject().getPrincipal()));
     }
 
 }

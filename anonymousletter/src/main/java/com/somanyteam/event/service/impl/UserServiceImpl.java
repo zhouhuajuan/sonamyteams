@@ -4,7 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
 import com.somanyteam.event.entity.User;
+import com.somanyteam.event.exception.CommonException;
 import com.somanyteam.event.exception.user.*;
 import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.UserService;
@@ -15,6 +17,7 @@ import com.somanyteam.event.util.RandomCodeUtil;
 import io.netty.util.internal.StringUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.MailSendException;
@@ -246,6 +249,35 @@ public class UserServiceImpl implements UserService {
         }else{
             //用户登出，session失效
             subject.logout();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean updateInfo(UserUpdateInfoReqDTO dto, User curUser) throws ParseException {
+        if(!StrUtil.isEmpty(dto.getUsername())){
+            if(dto.getUsername().matches(".*[!`~';.,/?@$%^&*()-+=]{1,}.*") || dto.getUsername().length() > 20){
+                throw new CommonException("用户名格式不正确，长度应小于等于20，不含有特殊字符");
+            }
+        }
+        if(!StrUtil.isEmpty(dto.getProfile())){
+            if(dto.getProfile().length() > 50){
+                throw new CommonException("简介长度应小于等于50");
+            }
+        }
+
+        User user = new User();
+        BeanUtils.copyProperties(dto, user);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = sdf.parse(sdf.format(new Date()));
+        user.setUpdateTime(date);
+        user.setId(curUser.getId());
+
+        int update = userMapper.updateById(user);
+
+        if(update < 1){
+            throw new CommonException("修改用户信息失败");
         }
         return true;
     }
