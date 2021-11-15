@@ -26,6 +26,12 @@ spring:
     restart:
       enabled: true
 
+# Swagger
+swagger:
+  # host
+  host: 8.134.33.6:40000
+  enable: true
+
 # 日志配置
 logging:
   # 日志输出级别
