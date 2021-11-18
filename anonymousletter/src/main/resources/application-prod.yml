@@ -26,11 +26,6 @@ spring:
     restart:
       enabled: true
 
-# Swagger
-swagger:
-  # host
-  host: 8.134.33.6:40000
-  enable: true
 
 # 日志配置
 logging:
@@ -42,3 +37,15 @@ logging:
 upload:
   img:
     path: /photo/
+
+
+# swagger配置
+springfox:
+  documentation:
+    swagger:
+      v2:
+        host: 8.134.33.6:8081
+        enabled: true
+    swagger-ui:
+      base-url: http://8.134.33.6:8081/swagger-ui/index.html#
+
