@@ -259,7 +259,7 @@ public class UserController {
         User curUser = (User) subject.getPrincipal();
 
         String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getId(), originalPassword, curUser.getSalt());
-        if(curUser.getPassword().equals(encryptOldPwd)){
+        if(!curUser.getPassword().equals(encryptOldPwd)){
             return ResponseMessage.newErrorInstance("旧密码不正确");
         }
 
@@ -272,6 +272,7 @@ public class UserController {
         }else{
            return ResponseMessage.newErrorInstance("修改失败");
         }
+        
 
     }
 
