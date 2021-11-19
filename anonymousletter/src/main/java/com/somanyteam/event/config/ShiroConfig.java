@@ -56,8 +56,9 @@ public class ShiroConfig {
         filterMap.put("/user/logout", "anon");
         // 设置swagger-ui无需认证
         filterMap.put("/swagger-ui/**", "anon");
+        filterMap.put("/swagger-ui.html", "anon");
         filterMap.put("/swagger-resources/**", "anon");
-        filterMap.put("/v3/api-docs/**", "anon");
+        //filterMap.put("/v3/api-docs/**", "anon");
         filterMap.put("/webjars/springfox-swagger-ui/**", "anon");
 
         filterMap.put("/doc.html", "anon");
