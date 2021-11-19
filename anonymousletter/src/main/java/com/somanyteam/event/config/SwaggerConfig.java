@@ -21,17 +21,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 
     @Bean
-    public Docket api(Environment environment) {
+    public Docket api() {
 
         //设置要显示的swagger环境
-        Profiles profile = Profiles.of("dev","test","prod");
+//        Profiles profile = Profiles.of("dev","test","prod");
+//
+//        //通过environment.acceptsProfiles判断是否处在自己设定的环境当中
+//        boolean flag = environment.acceptsProfiles(profile);
 
-        //通过environment.acceptsProfiles判断是否处在自己设定的环境当中
-        boolean flag = environment.acceptsProfiles(profile);
-
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 // 注入文档信息
-                .enable(flag)
+                //.enable(flag)
                 .apiInfo(apiInfo())
                 .select()
                 // 对所有api进行监控

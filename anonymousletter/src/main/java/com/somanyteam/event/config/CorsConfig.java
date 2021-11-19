@@ -72,13 +72,13 @@ public class CorsConfig extends WebMvcConfigurationSupport {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        /*registry.
+        registry.
                 addResourceHandler("/swagger-ui/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/")
-                .resourceChain(false);*/
-        registry.
+                .resourceChain(false);
+       /* registry.
                 addResourceHandler("/swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
+                .addResourceLocations("classpath:/META-INF/resources/");*/
         registry
                 .addResourceHandler("/doc.html")
                 .addResourceLocations("classpath:/META-INF/resources/")

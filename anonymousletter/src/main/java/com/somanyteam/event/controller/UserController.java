@@ -174,16 +174,13 @@ public class UserController {
             return ResponseMessage.newErrorInstance("发送失败");
         } else {
             //返回前端验证码，前端判断验证码是否输入正确
-            return ResponseMessage.newSuccessInstance("发送成功",code);
+            return ResponseMessage.newSuccessInstance("发送成功");
         }
     }
 
     //static/827ce27cbd5edaf1d3249552c3cb7911.png
     @ApiOperation("上传头像")
     @PostMapping("/uploadPhoto")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "选择需要上传的图片", required = true, paramType = "query"),
-    })
     public ResponseMessage uploadPhoto(@RequestPart("file") MultipartFile file) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         try {

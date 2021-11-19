@@ -47,10 +47,15 @@ upload:
 #        host: 8.134.33.6:8081
 #        enabled: true
 # Swagger
-swagger:
+# swagger:
   # host
   #host: 120.24.160.104:40000
-  enable: true
+#  enable: true
 #    swagger-ui:
 #      base-url: http://8.134.33.6:8081/swagger-ui/index.html#
+
+#swagger:
+#  # host
+  host: 8.134.33.6:40000
+  enable: true
 
