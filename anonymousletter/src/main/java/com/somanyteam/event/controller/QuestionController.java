@@ -1,5 +1,6 @@
 package com.somanyteam.event.controller;
 
+
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.QuestionService;
@@ -23,6 +24,9 @@ import java.util.List;
  * @author: 周华娟
  * @create: 2021-11-19 20:34
  **/
+
+
+
 @Api(tags = "问题相关接口")
 @RestController
 @RequestMapping("/question")
@@ -59,4 +63,5 @@ public class QuestionController {
             return ResponseMessage.newErrorInstance("删除失败");
         }
     }
+
 }
