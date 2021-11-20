@@ -1,13 +1,20 @@
 package com.somanyteam.event.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.entity.Question;
+import com.somanyteam.event.entity.User;
 import com.somanyteam.event.exception.question.UserIdIsEmptyException;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.service.QuestionService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,5 +65,39 @@ public class QuestionServiceImpl implements QuestionService {
 //        }
 //        //int i = questionMapper.deleteById(id);
         return i;
+    }
+
+    /**
+     * 获取已回答问题列表
+     * @return
+     */
+    @Override
+    public List<VariousQuestionsListResult> getAnsweredQuestion(User curUser) {
+        //获取父问题及子问题全部回答了的父问题list
+        List<Question> allAnsweredParentQuestion = questionMapper.getAllAnsweredParentQuestion(curUser.getId());
+
+        //获取父问题下存在未回答子问题的父问题list
+        List<Question> notAllAnsweredParentQuestion = questionMapper.getNotAllAnsweredParentQuestion(curUser.getId());
+        List<VariousQuestionsListResult> resultList = new ArrayList<>();
+
+        for(Question question : allAnsweredParentQuestion) {
+            VariousQuestionsListResult result = new VariousQuestionsListResult();
+            BeanUtils.copyProperties(question, result);
+            result.setNewFlag(0);
+            resultList.add(result);
+        }
+
+        for(Question question : notAllAnsweredParentQuestion){
+            VariousQuestionsListResult result = new VariousQuestionsListResult();
+            BeanUtils.copyProperties(question, result);
+            //存在未回答的子问题，newFlag为1
+            result.setNewFlag(1);
+            resultList.add(result);
+        }
+
+        //对问题列表进行按时间进行排序，由最新的时间降序排
+        CollectionUtil.sort(resultList, VariousQuestionsListResult::compareTo);
+
+        return resultList;
     }
 }

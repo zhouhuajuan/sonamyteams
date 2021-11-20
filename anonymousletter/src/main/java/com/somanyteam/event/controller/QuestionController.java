@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,6 +65,13 @@ public class QuestionController {
         }else {
             return ResponseMessage.newErrorInstance("删除失败");
         }
+    }
+
+    @ApiOperation("获取已回答问题")
+    @GetMapping("/getAnsweredQuestion")
+    public ResponseMessage<List<VariousQuestionsListResult>> getAnsweredQuestion(){
+        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getAnsweredQuestion((User) subject.getPrincipal()), "获取成功");
     }
 
 }
