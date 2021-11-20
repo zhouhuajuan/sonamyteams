@@ -30,4 +30,10 @@ public interface QuestionService {
      */
     List<VariousQuestionsListResult> getPublicQuestions(String userId);
 
+    /**
+     * 获取已收到回答的问题列表
+     * @param curUser 用户身份
+     * @return
+     */
+    List<VariousQuestionsListResult> getReceivedAnswerQuestionList(User curUser);
 }

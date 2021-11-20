@@ -39,4 +39,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
 
     List<VariousQuestionsListResult> getPublicQuestions(String userId);
 
+    List<Question> getReceivedAnswerQuestionList(String userId);
+
 }

@@ -81,6 +81,19 @@
         select id,content,update_time from question where a_id = #{userId,jdbcType=VARCHAR}
             and answer_status = 0 and parent_question is null order by update_time
     </select>
+    <select id="getReceivedAnswerQuestionList" resultType="com.somanyteam.event.entity.Question">
+        select q.id,m.update_time,q.content
+        from question q
+        join (select q.parent_question,max(a.update_time) as update_time
+            from answer a join question q on a.question_id = q.id
+            group by q.parent_question)m on m.parent_question = q.id
+        where not exists
+            (select 1 from question  x
+                where not exists
+            (select 1 from answer a where a.question_id = x.id )
+            and x.parent_question = q.id
+        ) and q.parent_question = q.id and q.q_id = #{userId} order by update_time desc;
+    </select>
     <delete id="deleteQuestion">
         delete from answer where question_id in
             (select id from question where id = #{id,jdbcType=BIGINT}

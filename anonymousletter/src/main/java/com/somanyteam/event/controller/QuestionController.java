@@ -84,4 +84,13 @@ public class QuestionController {
         }
     }
 
+    @ApiOperation("获取已收到回答问题的列表")
+    @GetMapping("/getReceivedAnswerQuestionList")
+    public ResponseMessage<List<VariousQuestionsListResult>> getReceivedAnswerQuestionList(){
+        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getReceivedAnswerQuestionList((User) subject.getPrincipal()), "获取成功");
+    }
+    
+
+
 }

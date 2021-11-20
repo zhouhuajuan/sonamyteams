@@ -15,6 +15,7 @@ import com.somanyteam.event.service.QuestionService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -62,6 +63,28 @@ public class QuestionServiceImpl implements QuestionService {
             throw new UserIdIsEmptyException();
         }
         return questionMapper.getPublicQuestions(userId);
+    }
+
+    /**
+     * 获取已收到回答的问题列表
+     * @param curUser 用户身份
+     * @return
+     */
+    @Override
+    public List<VariousQuestionsListResult> getReceivedAnswerQuestionList(User curUser) {
+
+        List<Question> questionList = questionMapper.getReceivedAnswerQuestionList(curUser.getId());
+
+        List<VariousQuestionsListResult> resultList = new ArrayList<>();
+
+        for(Question question : questionList){
+            VariousQuestionsListResult result = new VariousQuestionsListResult();
+            BeanUtils.copyProperties(question, result);
+            result.setNewFlag(0);
+            resultList.add(result);
+        }
+        return resultList;
+
     }
 
     /**
