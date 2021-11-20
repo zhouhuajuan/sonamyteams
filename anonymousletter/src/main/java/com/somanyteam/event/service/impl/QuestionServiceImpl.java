@@ -1,9 +1,7 @@
 package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.somanyteam.event.entity.Question;
+import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.exception.question.UserIdIsEmptyException;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.service.QuestionService;
@@ -25,12 +23,12 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionMapper questionMapper;
 
     @Override
-    public List<Question> getUnansweredQuestion(String userId) {
+    public List<VariousQuestionsListResult> getUnansweredQuestion(String userId) {
         if (StrUtil.isEmpty(userId)){
             //获取不到用户id
             throw new UserIdIsEmptyException();
         }
-        return null;
+        return questionMapper.getUnansweredQuestion(userId);
     }
 
     @Override

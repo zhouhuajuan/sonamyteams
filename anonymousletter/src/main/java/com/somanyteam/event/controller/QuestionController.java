@@ -1,6 +1,7 @@
 package com.somanyteam.event.controller;
 
 
+import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.QuestionService;
@@ -36,12 +37,13 @@ public class QuestionController {
     private QuestionService questionService;
 
     @ApiOperation("获取所有未回答问题")
-    @GetMapping("/getUnansweredQuestion/{userId}")
-    public ResponseMessage getUnansweredQuestion(@ApiParam(value = "用户id") @PathVariable("userId") String userId) {
-//        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
-//        String loginUserId = loginUser.getId(); //当前登录用户的id
+    @GetMapping("/getUnansweredQuestion")
+    public ResponseMessage getUnansweredQuestion() {
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser.getId(); //当前登录用户的id
 
-        List<Question> questionList = questionService.getUnansweredQuestion(userId);
+        List<VariousQuestionsListResult> questionList = questionService.getUnansweredQuestion(loginUserId);
+
         if (questionList.isEmpty()){
             return ResponseMessage.newSuccessInstance("当前用户没有未回答的问题");
         }else {

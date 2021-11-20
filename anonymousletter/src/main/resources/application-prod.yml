@@ -40,12 +40,12 @@ upload:
 
 
 # swagger配置
-#springfox:
-#  documentation:
-#    swagger:
-#      v2:
-#        host: 8.134.33.6:8081
-#        enabled: true
+springfox:
+  documentation:
+    swagger:
+      v2:
+        host: 8.134.33.6
+        enabled: true
 # Swagger
 # swagger:
   # host
