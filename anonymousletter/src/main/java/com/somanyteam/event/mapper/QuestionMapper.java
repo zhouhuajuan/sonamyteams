@@ -34,4 +34,9 @@ public interface QuestionMapper extends BaseMapper<Question> {
      * @return
      */
     List<Question> getNotAllAnsweredParentQuestion(String userId);
+
+    int deleteQuestion(String userId,String id);
+
+    List<VariousQuestionsListResult> getPublicQuestions(String userId);
+
 }

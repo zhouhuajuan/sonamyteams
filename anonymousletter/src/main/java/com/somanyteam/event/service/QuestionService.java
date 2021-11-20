@@ -22,4 +22,12 @@ public interface QuestionService {
      * @return 已回答问题列表
      */
     List<VariousQuestionsListResult> getAnsweredQuestion(User curUser);
+
+    /**
+     * 获取公开父问题列表
+     * @param userId 用户id
+     * @return List<VariousQuestionsListResult>
+     */
+    List<VariousQuestionsListResult> getPublicQuestions(String userId);
+
 }

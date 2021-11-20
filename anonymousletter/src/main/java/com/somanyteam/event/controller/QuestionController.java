@@ -2,7 +2,6 @@ package com.somanyteam.event.controller;
 
 
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
-import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.QuestionService;
 import com.somanyteam.event.util.ResponseMessage;
@@ -13,11 +12,9 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -26,8 +23,6 @@ import java.util.List;
  * @author: 周华娟
  * @create: 2021-11-19 20:34
  **/
-
-
 
 @Api(tags = "问题相关接口")
 @RestController
@@ -53,13 +48,12 @@ public class QuestionController {
     }
 
     @ApiOperation("删除问题(被提问者)")
-    @GetMapping("/deleteQuestion/{userId}")
-    public ResponseMessage deleteQuestion(@ApiParam(value = "用户id") @PathVariable("userId") String userId
-            ,@ApiParam(value = "问题id") String id) {
-//        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
-//        String loginUserId = loginUser.getId(); //当前登录用户的id
+    @GetMapping("/deleteQuestion")
+    public ResponseMessage deleteQuestion(@ApiParam(value = "问题id") String id) {
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser.getId(); //当前登录用户的id
 
-        int i = questionService.deleteQuestion(userId, id);
+        int i = questionService.deleteQuestion(loginUserId, id);
         if (i>0){
             return ResponseMessage.newSuccessInstance("删除成功");
         }else {
@@ -72,6 +66,22 @@ public class QuestionController {
     public ResponseMessage<List<VariousQuestionsListResult>> getAnsweredQuestion(){
         Subject subject = SecurityUtils.getSubject();
         return ResponseMessage.newSuccessInstance(questionService.getAnsweredQuestion((User) subject.getPrincipal()), "获取成功");
+    }
+
+
+    @ApiOperation("获取公开父问题列表")
+    @GetMapping("/getPublicQuestions")
+    public ResponseMessage getPublicQuestions() {
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser.getId();
+
+        List<VariousQuestionsListResult> publicQuestions = questionService.getPublicQuestions(loginUserId);
+        if (publicQuestions.isEmpty()){
+            return ResponseMessage.newSuccessInstance("公开父问题列表为空");
+        }else {
+            System.out.println(publicQuestions);
+            return ResponseMessage.newSuccessInstance(publicQuestions);
+        }
     }
 
 }
