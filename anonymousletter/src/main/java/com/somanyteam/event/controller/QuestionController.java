@@ -8,6 +8,7 @@ import com.somanyteam.event.util.ResponseMessage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,14 @@ public class QuestionController {
         }
     }
 
+    @ApiOperation("获取已回答问题")
+    @GetMapping("/getAnsweredQuestion")
+    public ResponseMessage<List<VariousQuestionsListResult>> getAnsweredQuestion(){
+        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getAnsweredQuestion((User) subject.getPrincipal()), "获取成功");
+    }
+
+
     @ApiOperation("获取公开父问题列表")
     @GetMapping("/getPublicQuestions")
     public ResponseMessage getPublicQuestions() {
@@ -88,4 +97,12 @@ public class QuestionController {
 
         return null;
     }
+
+    @ApiOperation("获取已收到回答问题的列表")
+    @GetMapping("/getReceivedAnswerQuestionList")
+    public ResponseMessage<List<VariousQuestionsListResult>> getReceivedAnswerQuestionList(){
+        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getReceivedAnswerQuestionList((User) subject.getPrincipal()), "获取成功");
+    }
+
 }
