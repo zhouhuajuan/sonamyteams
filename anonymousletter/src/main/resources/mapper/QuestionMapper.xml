@@ -53,11 +53,17 @@
         select id,content,update_time from question q where not exists (select 1 from answer a
         where a.question_id = q.id) and parent_question is null and a_id = #{userId,jdbcType=VARCHAR} order by update_time
     </select>
+    <select id="getPublicQuestions" resultType="com.somanyteam.event.dto.result.question.VariousQuestionsListResult"
+            parameterType="java.lang.String">
+        select id,content,update_time from question where a_id = #{userId,jdbcType=VARCHAR}
+            and answer_status = 0 and parent_question is null order by update_time
+    </select>
     <delete id="deleteQuestion">
         delete from answer where question_id in
-                                 (select id from question where id = #{id,jdbcType=BIGINT}
-                                 or parent_question = #{id,jdbcType=BIGINT});
-        delete from question where id = #{id,jdbcType=BIGINT} or parent_question = #{id,jdbcType=BIGINT}
-                                and a_id = #{userId,jdbcType=VARCHAR};
+            (select id from question where id = #{id,jdbcType=BIGINT}
+            or parent_question = #{id,jdbcType=BIGINT});
+        delete from question where id = #{id,jdbcType=BIGINT}
+            or parent_question = #{id,jdbcType=BIGINT}
+            and a_id = #{userId,jdbcType=VARCHAR};
     </delete>
 </mapper>

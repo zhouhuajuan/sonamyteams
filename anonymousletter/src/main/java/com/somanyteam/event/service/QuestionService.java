@@ -14,4 +14,11 @@ public interface QuestionService {
     List<VariousQuestionsListResult> getUnansweredQuestion(String userId);
 
     int deleteQuestion(String userId,String id);
+
+    /**
+     * 获取公开父问题列表
+     * @param userId 用户id
+     * @return List<VariousQuestionsListResult>
+     */
+    List<VariousQuestionsListResult> getPublicQuestions(String userId);
 }

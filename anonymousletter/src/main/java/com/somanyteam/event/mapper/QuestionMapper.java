@@ -21,4 +21,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
     List<VariousQuestionsListResult> getUnansweredQuestion(String userId);
 
     int deleteQuestion(String userId,String id);
+
+    List<VariousQuestionsListResult> getPublicQuestions(String userId);
 }

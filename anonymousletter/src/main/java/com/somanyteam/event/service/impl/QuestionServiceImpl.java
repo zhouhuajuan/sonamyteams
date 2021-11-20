@@ -45,4 +45,13 @@ public class QuestionServiceImpl implements QuestionService {
 
         return questionMapper.deleteQuestion(userId, id);
     }
+
+    @Override
+    public List<VariousQuestionsListResult> getPublicQuestions(String userId) {
+        if (StrUtil.isEmpty(userId)){
+            //获取不到用户id
+            throw new UserIdIsEmptyException();
+        }
+        return questionMapper.getPublicQuestions(userId);
+    }
 }
