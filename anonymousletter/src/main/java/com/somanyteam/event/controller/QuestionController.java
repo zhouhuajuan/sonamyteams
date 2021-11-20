@@ -7,12 +7,9 @@ import com.somanyteam.event.service.QuestionService;
 import com.somanyteam.event.util.ResponseMessage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,8 +44,8 @@ public class QuestionController {
     }
 
     @ApiOperation("删除问题(被提问者)")
-    @GetMapping("/deleteQuestion")
-    public ResponseMessage deleteQuestion(@ApiParam(value = "问题id") String id) {
+    @PostMapping("/deleteQuestion")
+    public ResponseMessage deleteQuestion(@RequestParam("问题id") String id) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId(); //当前登录用户的id
 
@@ -73,5 +70,22 @@ public class QuestionController {
             System.out.println(publicQuestions);
             return ResponseMessage.newSuccessInstance(publicQuestions);
         }
+    }
+
+    @ApiOperation("添加问题(提问者)")
+    @PostMapping("/addQuestion")
+    public ResponseMessage addQuestion(@RequestParam("被提问者id") String answerId) {
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser.getId();
+        //1.先判断自己是不是被她拉黑了
+            //拉黑则不能向她提问，也看不见她的提问箱
+
+        //2.判断是不是父问题
+            //夫问题直接提问
+            //子问题的话要先看上一个问题有没有回答，没有回答就不能提问
+
+        //3.添加问题成功后邮箱提醒
+
+        return null;
     }
 }
