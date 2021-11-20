@@ -68,6 +68,7 @@ public class ShiroConfig {
         //注销账户需登录后才能注销，cookie状态下不能注销
         filterMap.put("/user/deleteAccount", "authc");
         filterMap.put("/user/**", "user");
+        filterMap.put("/question/**", "user");
         // 设置所有接口需要认证访问
         filterMap.put("/**", "authc");
 //        filterMap.put("/**", "anon");

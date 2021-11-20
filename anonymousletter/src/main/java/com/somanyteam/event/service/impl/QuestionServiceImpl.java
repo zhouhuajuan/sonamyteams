@@ -2,6 +2,7 @@ package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.exception.question.QuestionIdEmptyException;
 import com.somanyteam.event.exception.question.UserIdIsEmptyException;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.service.QuestionService;
@@ -37,26 +38,11 @@ public class QuestionServiceImpl implements QuestionService {
             //获取不到用户id
             throw new UserIdIsEmptyException();
         }
-
         if (StrUtil.isEmpty(id)){
             //获取不到问题id
-
+            throw new QuestionIdEmptyException();
         }
 
-        int i = 0;
-
-//        QueryWrapper<Question> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("aId",userId);
-//        queryWrapper.eq("parentQuestion","");
-//        List<Question> questionList = questionMapper.selectList(queryWrapper);
-//        for (Question question: questionList) {
-//            if (question.getId().equals(id)){
-//                i = questionMapper.deleteById(id);
-//                //还要删除父问题的子问题以及父子问题的回答
-//                //现在只是删除了父问题
-//            }
-//        }
-//        //int i = questionMapper.deleteById(id);
-        return i;
+        return questionMapper.deleteQuestion(userId, id);
     }
 }

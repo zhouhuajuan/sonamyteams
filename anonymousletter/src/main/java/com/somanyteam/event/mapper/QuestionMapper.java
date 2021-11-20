@@ -19,4 +19,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
 //    int updateByPrimaryKey(Question record);
 
     List<VariousQuestionsListResult> getUnansweredQuestion(String userId);
+
+    int deleteQuestion(String userId,String id);
 }
