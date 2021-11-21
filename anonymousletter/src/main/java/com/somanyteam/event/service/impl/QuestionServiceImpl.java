@@ -88,6 +88,25 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
+     * 获取未回答问题列表
+     * @param curUser 用户身份
+     * @return
+     */
+    @Override
+    public List<VariousQuestionsListResult> getUnreceivedAnswerQuestionList(User curUser) {
+        List<Question> unreceivedAnswerQuestionList = questionMapper.getUnreceivedAnswerQuestionList(curUser.getId());
+        List<VariousQuestionsListResult> resultList = new ArrayList<>();
+
+        for(Question question : unreceivedAnswerQuestionList){
+            VariousQuestionsListResult result = new VariousQuestionsListResult();
+            BeanUtils.copyProperties(question, result);
+            result.setNewFlag(0);
+            resultList.add(result);
+        }
+        return resultList;
+    }
+
+    /**
      * 获取已回答问题列表
      * @return
      */

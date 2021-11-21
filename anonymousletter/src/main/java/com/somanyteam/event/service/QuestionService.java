@@ -36,4 +36,11 @@ public interface QuestionService {
      * @return
      */
     List<VariousQuestionsListResult> getReceivedAnswerQuestionList(User curUser);
+
+    /**
+     * 获取未收到回答的问题列表
+     * @param curUser 用户身份
+     * @return
+     */
+    List<VariousQuestionsListResult> getUnreceivedAnswerQuestionList(User curUser);
 }

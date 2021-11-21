@@ -94,6 +94,13 @@
             and x.parent_question = q.id
         ) and q.parent_question = q.id and q.q_id = #{userId} order by update_time desc;
     </select>
+    <select id="getUnreceivedAnswerQuestionList" resultType="com.somanyteam.event.entity.Question">
+        select p.id,p.content,q.update_time from question q
+         join question p on q.parent_question = p.id
+        where not exists(
+	        select 1 from answer a where a.question_id = q.id
+        ) and p.q_id = #{userId} order by q.update_time desc;
+    </select>
     <delete id="deleteQuestion">
         delete from answer where question_id in
             (select id from question where id = #{id,jdbcType=BIGINT}

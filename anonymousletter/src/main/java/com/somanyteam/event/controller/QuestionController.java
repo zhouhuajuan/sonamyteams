@@ -90,7 +90,14 @@ public class QuestionController {
         Subject subject = SecurityUtils.getSubject();
         return ResponseMessage.newSuccessInstance(questionService.getReceivedAnswerQuestionList((User) subject.getPrincipal()), "获取成功");
     }
-    
+
+    @ApiOperation("获取未收到回答问题的列表")
+    @GetMapping("/getUnreceivedAnswerQuestionList")
+    public ResponseMessage<List<VariousQuestionsListResult>> getUnreceivedAnswerQuestionList(){
+        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getUnreceivedAnswerQuestionList((User) subject.getPrincipal()));
+    }
+
 
 
 }
