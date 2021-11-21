@@ -39,28 +39,13 @@ public interface QuestionMapper extends BaseMapper<Question> {
     //真删除
     int deleteQuestion(String userId,long id);
 
-//    //假删除
-//    int updateDelFlag(String userId,long id);
-
     List<VariousQuestionsListResult> getPublicQuestions(String userId);
 
     List<Question> getReceivedAnswerQuestionList(String userId);
 
     List<Question> getUnreceivedAnswerQuestionList(String userId);
 
-    int getQuestionCount(long id,String q_id,String a_id);
-
     int getAnswerCount(long id,String q_id,String a_id);
-
-    int insertQuestion(Question question);
-
-    Question selectQuestionById(long id);
-
-    Question selectQuestionByCreateTime(String q_id, String a_id, Date createTime);
-
-    int updateQuestion(Question question);
-
-    List<Question> getAllQuestion(long id,String a_id);
 
     List<Answer> getAllAnswer(long id,String a_id);
 }

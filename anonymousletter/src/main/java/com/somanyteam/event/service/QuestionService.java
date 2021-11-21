@@ -60,8 +60,6 @@ public interface QuestionService {
 
     Question addQuestion(QuestionAddReqDTO questionAddReqDTO,String userId);
 
-    int insertQuestion(Question question);
-
     void sendEmail(String a_id);
 
     List<Question> getAllQuestion(long id,String a_id);

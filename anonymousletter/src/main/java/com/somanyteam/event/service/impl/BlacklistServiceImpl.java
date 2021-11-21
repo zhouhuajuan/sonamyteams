@@ -1,7 +1,9 @@
 package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.somanyteam.event.entity.Blacklist;
+import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.mapper.BlacklistMapper;
 import com.somanyteam.event.service.BlacklistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +19,12 @@ public class BlacklistServiceImpl implements BlacklistService {
     @Autowired
     private BlacklistMapper blacklistMapper;
 
-    @Override
-    public int gotBlacklisted(String complaintant, String defendant) {
-        if (StrUtil.isEmpty(complaintant)||StrUtil.isEmpty(defendant)){
-            //
-        }
-        Blacklist blacklist = blacklistMapper.gotBlacklisted(complaintant, defendant);
-        return (blacklist == null ? 0 : 1);
-    }
+//    @Override
+//    public int gotBlacklisted(String complaintant, String defendant) {
+//        QueryWrapper<Blacklist> wrapper = new QueryWrapper<>();
+//        wrapper.eq("complaintant", complaintant);
+//        wrapper.eq("defendant", defendant);
+//        Blacklist blacklist = blacklistMapper.selectOne(wrapper);
+//        return (blacklist == null ? 0 : 1);
+//    }
 }

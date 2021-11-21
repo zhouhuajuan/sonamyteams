@@ -78,9 +78,11 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuestionIdEmptyException();
         }
 
-        Question question = questionMapper.selectQuestionById(id);
+        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        Question question = questionMapper.selectOne(wrapper);
         question.setDelFlag((byte) 1);
-        int i = questionMapper.updateQuestion(question);
+        int i = questionMapper.updateById(question);
         int i1 = questionMapper.deleteQuestion(userId, id);
         return (i==1 && i1==1 ) ? 1 : 0;
     }
@@ -140,7 +142,11 @@ public class QuestionServiceImpl implements QuestionService {
         if (id == 0 || StrUtil.isEmpty(q_id) || StrUtil.isEmpty(a_id)){
             throw new QuestionEnterEmptyException();
         }
-        int questionCount = questionMapper.getQuestionCount(id, q_id, a_id);
+        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        wrapper.eq("q_id", q_id);
+        wrapper.eq("a_id", a_id);
+        int questionCount = questionMapper.selectCount(wrapper);
         int answerCount = questionMapper.getAnswerCount(id, q_id, a_id);
         return (questionCount==answerCount ? 1 : 0);
     }
@@ -150,7 +156,10 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = new Question();
 
         //1.先判断自己是不是被她拉黑了
-        Blacklist blacklist = blacklistMapper.gotBlacklisted(questionAddReqDTO.getAId(), userId);
+        QueryWrapper<Blacklist> wrapper = new QueryWrapper<>();
+        wrapper.eq("complaintant", questionAddReqDTO.getAId());
+        wrapper.eq("defendant", userId);
+        Blacklist blacklist = blacklistMapper.selectOne(wrapper);
         if (!ObjectUtil.isEmpty(blacklist)){
             throw new QuestionGotBlackListException();
         }
@@ -166,20 +175,17 @@ public class QuestionServiceImpl implements QuestionService {
 
             question.setQId(userId);
             question.setAId(questionAddReqDTO.getAId());
-            Question question1 = questionMapper.selectQuestionById(questionAddReqDTO.getParentQuestion());
-            question.setAnswerStatus(question1.getAnswerStatus());
+            QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
+            wrapper.eq("id", questionAddReqDTO.getParentQuestion());
+            Question father_question = questionMapper.selectOne(wrapper1);
+            question.setAnswerStatus(father_question.getAnswerStatus());
             Date date = new Date();
             question.setCreateTime(date);
             question.setUpdateTime(date);
             question.setContent(questionAddReqDTO.getContent());
             question.setParentQuestion(questionAddReqDTO.getParentQuestion());
             question.setDelFlag((byte) 0);
-            int i2 = insertQuestion(question);
-            if (i2 == 1){
-                return question;
-            }else {
-                return null;
-            }
+            return questionMapper.insert(question) == 1 ? question : null;
         }else {
             question.setQId(userId);
             question.setAId(questionAddReqDTO.getAId());
@@ -189,31 +195,15 @@ public class QuestionServiceImpl implements QuestionService {
             question.setUpdateTime(date);
             question.setContent(questionAddReqDTO.getContent());
             question.setDelFlag((byte) 0);
-            System.out.println(question);
-            int i2 = insertQuestion(question);
-            System.out.println(i2);
-            if (i2 == 1){
-//                GetQuestionByCreateTimeReqDTO dto = new GetQuestionByCreateTimeReqDTO();
-//                BeanUtils.copyProperties(date, dto);
-//                System.out.println("date1:-->"+dto.getCreateTime());
-                Question question1 = questionMapper.selectQuestionByCreateTime(userId,
-                        questionAddReqDTO.getAId(), date);
-                question.setParentQuestion(question1.getId());
-                questionMapper.updateQuestion(question);
-                System.out.println(question);
+            int insert = questionMapper.insert(question);
+            if (insert == 1){
+                question.setParentQuestion(question.getId());
+                questionMapper.updateById(question);
                 return question;
             }else {
                 return null;
             }
         }
-    }
-
-    @Override
-    public int insertQuestion(Question question) {
-        if (ObjectUtil.isEmpty(question)){
-            throw new QuestionEnterEmptyException();
-        }
-        return questionMapper.insertQuestion(question);
     }
 
     @Override
@@ -237,7 +227,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> getAllQuestion(long id,String a_id) {
-        return questionMapper.getAllQuestion(id,a_id);
+        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        wrapper.eq("a_id", a_id);
+        wrapper.eq("del_flag", 0);
+        return questionMapper.selectList(wrapper);
     }
 
     @Override
