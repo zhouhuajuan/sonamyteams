@@ -100,9 +100,9 @@ public class QuestionController {
         }else {
             QuestionAddResult result = new QuestionAddResult();
             BeanUtils.copyProperties(question1,result);
+            questionService.sendEmail(questionAddReqDTO.getAId());
             return ResponseMessage.newSuccessInstance(result,"添加问题成功");
         }
-        //3.添加问题成功后邮箱提醒
     }
 
     @ApiOperation("获取已收到回答问题的列表")
@@ -119,6 +119,13 @@ public class QuestionController {
         return ResponseMessage.newSuccessInstance(questionService.getUnreceivedAnswerQuestionList((User) subject.getPrincipal()));
     }
 
+    @ApiOperation("获取父问题和答案及以下的子问题和答案")
+    @PostMapping("/getQuestionAndAnswer")
+    public ResponseMessage getQuestionAndAnswer(long id) {
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser.getId();
 
+        return null;
+    }
 
 }

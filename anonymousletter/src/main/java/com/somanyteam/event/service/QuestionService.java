@@ -60,4 +60,6 @@ public interface QuestionService {
     Question addQuestion(QuestionAddReqDTO questionAddReqDTO,String userId);
 
     int insertQuestion(Question question);
+
+    int sendEmail(String a_id);
 }

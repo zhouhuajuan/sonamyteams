@@ -3,6 +3,7 @@ package com.somanyteam.event.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.somanyteam.event.constant.CommonConstant;
 import com.somanyteam.event.dto.request.question.GetQuestionByCreateTimeReqDTO;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
@@ -14,12 +15,20 @@ import com.somanyteam.event.entity.User;
 
 import com.somanyteam.event.exception.question.*;
 
+import com.somanyteam.event.exception.user.UserEmailNotMatchException;
+import com.somanyteam.event.exception.user.UserEnterEmptyException;
 import com.somanyteam.event.mapper.BlacklistMapper;
 import com.somanyteam.event.mapper.QuestionMapper;
+import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.QuestionService;
 
+import com.somanyteam.event.util.RandomCodeUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.mail.MailSendException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -27,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: somanyteams
@@ -42,6 +52,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     private BlacklistMapper blacklistMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Override
     public List<VariousQuestionsListResult> getUnansweredQuestion(String userId) {
@@ -199,6 +215,29 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuestionEnterEmptyException();
         }
         return questionMapper.insertQuestion(question);
+    }
+
+    @Override
+    public int sendEmail(String a_id) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", a_id);
+        User existUser = userMapper.selectOne(wrapper);
+
+        int count;
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setSubject("匿名信邮箱验证");
+        msg.setFrom("1247054987@qq.com");
+        msg.setTo(existUser.getEmail()); // 设置邮件接收者，可以有多个接收者
+        msg.setSentDate(new Date());
+        msg.setText("hello，您有新消息提示");
+        try {
+            javaMailSender.send(msg);
+            count = 1;
+        }catch (MailSendException e){
+            System.out.println(e);
+            count = 0;
+        }
+        return count;
     }
 
     /**
