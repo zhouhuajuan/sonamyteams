@@ -112,6 +112,6 @@ public class QuestionController {
         return ResponseMessage.newSuccessInstance(questionService.getUnreceivedAnswerQuestionList((User) subject.getPrincipal()));
     }
 
-    
+
 
 }

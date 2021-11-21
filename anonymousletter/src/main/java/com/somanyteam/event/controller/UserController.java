@@ -8,6 +8,7 @@ import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
 import com.somanyteam.event.dto.result.user.UserGetInfoResult;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
+import com.somanyteam.event.enums.UserType;
 import com.somanyteam.event.service.UserService;
 import com.somanyteam.event.util.PasswordUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -112,7 +113,7 @@ public class UserController {
         BeanUtils.copyProperties(userRegisterReqDTO, user); //邮箱，密码
         //user.setId(RandomCodeUtil.getRandom()); //随机生成一个随机数
         user.setUsername("偷心盗贼");
-        user.setIdentity(0);
+        user.setIdentity(UserType.NORMAL.getCode());
         user.setSalt(PasswordUtil.randomSalt());
         user.setImgUrl("https://8.134.33.6/photo/a.png");//默认头像图片链接
 

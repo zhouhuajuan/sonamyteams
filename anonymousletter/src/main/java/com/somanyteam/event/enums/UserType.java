@@ -5,14 +5,14 @@ import lombok.Getter;
 @Getter
 public enum UserType {
 
-    NORMAL("0", "普通用户"),
-    MANAGER("1", "管理员");
+    NORMAL((byte)0, "普通用户"),
+    MANAGER((byte)1, "管理员");
 
-    private final String code;
+    private final Byte code;
 
     private final String type;
 
-    UserType(String code, String type) {
+    UserType(Byte code, String type) {
         this.code = code;
         this.type = type;
     }

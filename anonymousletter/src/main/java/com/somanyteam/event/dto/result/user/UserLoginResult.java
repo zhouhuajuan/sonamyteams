@@ -15,7 +15,7 @@ public class UserLoginResult {
     private String username;
 
     @ApiModelProperty("身份 0-普通用户 1-管理员")
-    private Integer identity;
+    private Byte identity;
 
     @ApiModelProperty("头像链接")
     private String imgUrl;

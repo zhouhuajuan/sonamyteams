@@ -31,7 +31,7 @@ public class VariousQuestionsListResult implements Comparable<VariousQuestionsLi
     private Date updateTime;
 
     @ApiModelProperty("new标志位，默认为0，在已回答接口接口中，若为1，则表示父问题下存在未回答子问题，若为0，表示父问题及子问题全部已回答")
-    private Integer newFlag;
+    private Byte newFlag;
 
 
     @Override

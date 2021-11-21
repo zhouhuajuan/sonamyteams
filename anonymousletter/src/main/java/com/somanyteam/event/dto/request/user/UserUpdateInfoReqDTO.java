@@ -16,7 +16,7 @@ public class UserUpdateInfoReqDTO {
     private String username;
 
     @ApiModelProperty(value = "性别,0-男 1-女 可不填", required = true)
-    private Integer sex;
+    private Byte sex;
 
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

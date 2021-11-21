@@ -2,6 +2,7 @@ package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.somanyteam.event.constant.CommonConstant;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 
 import com.somanyteam.event.entity.Question;
@@ -80,7 +81,7 @@ public class QuestionServiceImpl implements QuestionService {
         for(Question question : questionList){
             VariousQuestionsListResult result = new VariousQuestionsListResult();
             BeanUtils.copyProperties(question, result);
-            result.setNewFlag(0);
+            result.setNewFlag(CommonConstant.NO);
             resultList.add(result);
         }
         return resultList;
@@ -100,7 +101,7 @@ public class QuestionServiceImpl implements QuestionService {
         for(Question question : unreceivedAnswerQuestionList){
             VariousQuestionsListResult result = new VariousQuestionsListResult();
             BeanUtils.copyProperties(question, result);
-            result.setNewFlag(0);
+            result.setNewFlag(CommonConstant.NO);
             resultList.add(result);
         }
         return resultList;
@@ -122,7 +123,7 @@ public class QuestionServiceImpl implements QuestionService {
         for(Question question : allAnsweredParentQuestion) {
             VariousQuestionsListResult result = new VariousQuestionsListResult();
             BeanUtils.copyProperties(question, result);
-            result.setNewFlag(0);
+            result.setNewFlag(CommonConstant.NO);
             resultList.add(result);
         }
 
@@ -130,7 +131,7 @@ public class QuestionServiceImpl implements QuestionService {
             VariousQuestionsListResult result = new VariousQuestionsListResult();
             BeanUtils.copyProperties(question, result);
             //存在未回答的子问题，newFlag为1
-            result.setNewFlag(1);
+            result.setNewFlag(CommonConstant.YES);
             resultList.add(result);
         }
 
