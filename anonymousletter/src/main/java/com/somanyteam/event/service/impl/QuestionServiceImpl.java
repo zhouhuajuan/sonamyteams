@@ -82,7 +82,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
-     * 获取已收到回答的问题列表
+     * 获取已收到回答的问题列表,父问题以及子问题全部收到回答
      * @param curUser 用户身份
      * @return
      */
@@ -104,7 +104,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
-     * 获取未回答问题列表
+     * 获取未回答问题列表,父问题未收到回答或者父问题下存在未收到回答的子问题
      * @param curUser 用户身份
      * @return
      */
