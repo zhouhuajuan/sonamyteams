@@ -14,7 +14,13 @@ public interface QuestionService {
      */
     List<VariousQuestionsListResult> getUnansweredQuestion(String userId);
 
-    int deleteQuestion(String userId,String id);
+    /**
+     * 假删除问题
+     * @param userId 用户id
+     * @param id 问题id
+     * @return int
+     */
+    int deleteQuestion(String userId,long id);
 
     /**
      * 获取已回答问题
@@ -33,14 +39,23 @@ public interface QuestionService {
     /**
      * 获取已收到回答的问题列表
      * @param curUser 用户身份
-     * @return
+     * @return List<VariousQuestionsListResult>
      */
     List<VariousQuestionsListResult> getReceivedAnswerQuestionList(User curUser);
 
     /**
      * 获取未收到回答的问题列表
      * @param curUser 用户身份
-     * @return
+     * @return List<VariousQuestionsListResult>
      */
     List<VariousQuestionsListResult> getUnreceivedAnswerQuestionList(User curUser);
+
+    /**
+     * 获取父问题以及子问题的总数量
+     * @param id 父问题id
+     * @param q_id 提问者id
+     * @param a_id 回答者id
+     * @return int
+     */
+    int getQuestionCount(long id,String q_id,String a_id);
 }

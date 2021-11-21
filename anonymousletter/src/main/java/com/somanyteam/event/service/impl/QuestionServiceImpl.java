@@ -16,7 +16,6 @@ import com.somanyteam.event.service.QuestionService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,7 +43,22 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int deleteQuestion(String userId, String id) {
+    public int deleteQuestion(String userId, long id) {
+        if (StrUtil.isEmpty(userId)){
+            //获取不到用户id
+            throw new UserIdIsEmptyException();
+        }
+        if (id==0){
+            //获取不到问题id
+            throw new QuestionIdEmptyException();
+        }
+
+        return questionMapper.updateDelFlag(userId, id);
+        //return questionMapper.deleteQuestion(userId, id);
+    }
+
+    /*@Override
+    public int deleteQuestion(String userId, long id) {
         if (StrUtil.isEmpty(userId)){
             //获取不到用户id
             throw new UserIdIsEmptyException();
@@ -54,8 +68,9 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuestionIdEmptyException();
         }
 
-        return questionMapper.deleteQuestion(userId, id);
-    }
+        return questionMapper.updateDelFlag(userId, id);
+
+    }*/
 
     @Override
     public List<VariousQuestionsListResult> getPublicQuestions(String userId) {
@@ -105,6 +120,11 @@ public class QuestionServiceImpl implements QuestionService {
             resultList.add(result);
         }
         return resultList;
+    }
+
+    @Override
+    public int getQuestionCount(long id, String q_id, String a_id) {
+        return questionMapper.getQuestionCount(id, q_id, a_id);
     }
 
     /**

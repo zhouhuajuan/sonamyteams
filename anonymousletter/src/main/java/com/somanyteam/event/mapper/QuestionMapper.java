@@ -24,23 +24,36 @@ public interface QuestionMapper extends BaseMapper<Question> {
     /**
      * 获取已回答列表：获取父问题以及子问题都回答的父问题列表
      * @param userId 用户id
-     * @return
+     * @return List<Question>
      */
     List<Question> getAllAnsweredParentQuestion(String userId);
 
     /**
      * 获取已回答列表：获取父问题下存在未回答子问题的父问题列表
      * @param userId 用户id
-     * @return
+     * @return List<Question>
      */
     List<Question> getNotAllAnsweredParentQuestion(String userId);
 
-    int deleteQuestion(String userId,String id);
+    //真删除
+    int deleteQuestion(String userId,long id);
+
+    //假删除
+    int updateDelFlag(String userId,long id);
 
     List<VariousQuestionsListResult> getPublicQuestions(String userId);
 
     List<Question> getReceivedAnswerQuestionList(String userId);
 
     List<Question> getUnreceivedAnswerQuestionList(String userId);
+
+    /**
+     * 获取父问题以及子问题的总数量
+     * @param id 父问题id
+     * @param q_id 提问者id
+     * @param a_id 回答者id
+     * @return int
+     */
+    int getQuestionCount(long id,String q_id,String a_id);
 
 }

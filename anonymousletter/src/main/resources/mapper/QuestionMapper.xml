@@ -51,9 +51,9 @@
     <select id="getUnansweredQuestion" resultType="com.somanyteam.event.dto.result.question.VariousQuestionsListResult"
             parameterType="java.lang.String">
         select id,content,update_time from question q where not exists (select 1 from answer a
-        where a.question_id = q.id) and parent_question = id and a_id = #{userId,jdbcType=VARCHAR} order by update_time desc
+        where a.question_id = q.id) and parent_question = id and a_id = #{userId,jdbcType=VARCHAR}
+        and del_flag = 0 order by update_time desc
     </select>
-
     <select id="getAllAnsweredParentQuestion" resultType="com.somanyteam.event.entity.Question">
        select x.id,x.content,m.update_time
         from question x
@@ -75,11 +75,10 @@
 	        select 1 from answer a where a.question_id = q.id
         ) and q.parent_question != q.id and q.a_id = #{userId};
     </select>
-
     <select id="getPublicQuestions" resultType="com.somanyteam.event.dto.result.question.VariousQuestionsListResult"
             parameterType="java.lang.String">
         select id,content,update_time from question where a_id = #{userId,jdbcType=VARCHAR}
-            and answer_status = 0 and parent_question = id order by update_time desc
+            and answer_status = 0 and parent_question = id and del_flag = 0 order by update_time desc
     </select>
     <select id="getReceivedAnswerQuestionList" resultType="com.somanyteam.event.entity.Question">
         select q.id,m.update_time,q.content
@@ -101,9 +100,17 @@
 	        select 1 from answer a where a.question_id = q.id
         ) and p.q_id = #{userId} order by q.update_time desc;
     </select>
+    <select id="getQuestionCount" resultType="java.lang.Integer">
+        select count(*) from question where a_id = #{a_id,jdbcType=VARCHAR}
+        and q_id = #{q_id,jdbcType=VARCHAR} and id = #{id,jdbcType=BIGINT}
+    </select>
+
     <delete id="deleteQuestion">
         delete question,answer from question left join answer on question.id=answer.question_id
         where question.parent_question = #{id,jdbcType=BIGINT} and question.a_id = #{userId,jdbcType=VARCHAR}
     </delete>
 
+    <update id="updateDelFlag">
+        update question set del_flag = 1 where a_id = #{userId,jdbcType=VARCHAR} and parent_question = #{id,jdbcType=BIGINT}
+    </update>
 </mapper>

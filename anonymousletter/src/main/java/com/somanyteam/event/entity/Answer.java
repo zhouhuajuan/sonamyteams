@@ -11,7 +11,7 @@ public class Answer {
 
     private Date updateTime;
 
-    private String questionId;
+    private long questionId;
 
     private String content;
 
@@ -47,12 +47,12 @@ public class Answer {
         this.updateTime = updateTime;
     }
 
-    public String getQuestionId() {
+    public long getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(String questionId) {
-        this.questionId = questionId == null ? null : questionId.trim();
+    public void setQuestionId(long questionId) {
+        this.questionId = questionId;
     }
 
     public String getContent() {

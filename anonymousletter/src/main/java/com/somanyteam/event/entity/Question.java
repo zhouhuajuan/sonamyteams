@@ -20,7 +20,7 @@ public class Question {
 
     private String content;
 
-    private String parentQuestion;
+    private long parentQuestion;
 
     private Byte delFlag;
 
