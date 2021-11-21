@@ -14,4 +14,6 @@ public interface BlacklistMapper extends BaseMapper<Blacklist> {
 //    List<Blacklist> selectAll();
 //
 //    int updateByPrimaryKey(Blacklist record);
+
+    Blacklist gotBlacklisted(String complaintant,String defendant);
 }

@@ -7,6 +7,8 @@ public class Blacklist {
 
     private String complaintant;
 
+    private String defendant;
+
     private Long questionId;
 
     private Date createTime;
@@ -25,6 +27,14 @@ public class Blacklist {
 
     public void setComplaintant(String complaintant) {
         this.complaintant = complaintant == null ? null : complaintant.trim();
+    }
+
+    public String getDefendant() {
+        return defendant;
+    }
+
+    public void setDefendant(String defendant) {
+        this.defendant = defendant == null ? null : defendant.trim();
     }
 
     public Long getQuestionId() {

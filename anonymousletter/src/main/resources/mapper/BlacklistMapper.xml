@@ -33,4 +33,8 @@
 <!--    select id, complaintant, question_id, create_time-->
 <!--    from blacklist-->
 <!--  </select>-->
+    <select id="gotBlacklisted" resultType="com.somanyteam.event.entity.Blacklist">
+        select * from blacklist where complaintant = #{complaintant,jdbcType=VARCHAR}
+            and defendant = #{defendant,jdbcType=VARCHAR}
+    </select>
 </mapper>
