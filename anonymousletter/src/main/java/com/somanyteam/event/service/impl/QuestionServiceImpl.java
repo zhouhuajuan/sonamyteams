@@ -23,6 +23,7 @@ import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.QuestionService;
 
+import com.somanyteam.event.util.EmailUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,17 +213,9 @@ public class QuestionServiceImpl implements QuestionService {
         wrapper.eq("id", a_id);
         User existUser = userMapper.selectOne(wrapper);
 
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setSubject("匿名信邮箱验证");
-        msg.setFrom("1247054987@qq.com");
-        msg.setTo(existUser.getEmail()); // 设置邮件接收者，可以有多个接收者
-        msg.setSentDate(new Date());
-        msg.setText("hello，您有新消息提示");
-        try {
-            javaMailSender.send(msg);
-        }catch (MailSendException e){
-            System.out.println(e);
-        }
+        String content = "hello，您有新消息提示。";
+        EmailUtil emailUtil = new EmailUtil();
+        emailUtil.sendEmail(existUser.getEmail(), content);
     }
 
     @Override

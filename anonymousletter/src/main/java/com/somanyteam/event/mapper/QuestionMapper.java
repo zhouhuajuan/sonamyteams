@@ -5,7 +5,6 @@ import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Question;
 
-import java.util.Date;
 import java.util.List;
 
 public interface QuestionMapper extends BaseMapper<Question> {

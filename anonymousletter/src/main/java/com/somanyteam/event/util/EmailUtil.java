@@ -1,11 +1,16 @@
 package com.somanyteam.event.util;
 
+import cn.hutool.core.util.StrUtil;
+import com.somanyteam.event.exception.user.UserEmailNotMatchException;
+import com.somanyteam.event.exception.user.UserEnterEmptyException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: somanyteams
@@ -15,16 +20,33 @@ import java.util.Date;
  **/
 public class EmailUtil {
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     // 发送邮件
-    public static SimpleMailMessage sendEmail(String email) {
-        SimpleMailMessage msg = new SimpleMailMessage();    //构建一个邮件对象
-        String code = RandomCodeUtil.getRandom();
-        msg.setSubject("匿名信邮箱验证"); // 设置邮件主题
-        msg.setFrom("1247054987@qq.com"); // 设置邮箱发送者
+    public int sendEmail(String email,String content) {
+        if (StrUtil.isEmpty(email) || StrUtil.isEmpty(content)){
+            throw new UserEnterEmptyException();
+        }
+        if(!email.matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
+            throw new UserEmailNotMatchException();
+        }
+
+        int count = 0;
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setSubject("匿名信邮箱验证");
+        msg.setFrom("1247054987@qq.com");
         msg.setTo(email); // 设置邮件接收者，可以有多个接收者
-        msg.setSentDate(new Date());    // 设置邮件发送日期
-        msg.setText("hello 欢迎访问匿名信网站，您的验证码为："+code);   // 设置邮件的正文
-        return msg;
+        msg.setSentDate(new Date());
+        msg.setText(content);
+        try {
+            javaMailSender.send(msg);
+            count = 1;
+        }catch (MailSendException e){
+            System.out.println(e);
+            count = 0;
+        }
+        return count;
     }
 
 }
