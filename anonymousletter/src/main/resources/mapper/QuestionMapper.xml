@@ -115,6 +115,14 @@
         select * from question where q_id = #{q_id,jdbcType=VARCHAR} and a_id = #{a_id,jdbcType=VARCHAR} and create_time
         = #{createTime,jdbcType=TIMESTAMP}
     </select>
+    <select id="getAllAnswer" resultType="com.somanyteam.event.entity.Answer">
+        select * from answer where question_id in (select id from question where parent_question =
+        #{id,jdbcType=BIGINT} and a_id = #{a_id,jdbcType=VARCHAR} and del_flag = 0) order by update_time
+    </select>
+    <select id="getAllQuestion" resultType="com.somanyteam.event.entity.Question">
+        select * from question where parent_question = #{id,jdbcType=BIGINT} and a_id = #{a_id,jdbcType=VARCHAR}
+        and del_flag = 0 order by update_time
+    </select>
 
     <delete id="deleteQuestion">
         delete answer from question left join answer on question.id=answer.question_id

@@ -3,7 +3,9 @@ package com.somanyteam.event.controller;
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 import com.somanyteam.event.dto.result.question.QuestionAddResult;
+import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.QuestionService;
@@ -55,8 +57,6 @@ public class QuestionController {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId(); //当前登录用户的id
 
-        //这里删除问题是假删除，将del_flag置为1即可
-
         int i = questionService.deleteQuestion(loginUserId, id);
         if (i>0){
             return ResponseMessage.newSuccessInstance("删除成功");
@@ -71,7 +71,6 @@ public class QuestionController {
         Subject subject = SecurityUtils.getSubject();
         return ResponseMessage.newSuccessInstance(questionService.getAnsweredQuestion((User) subject.getPrincipal()), "获取成功");
     }
-
 
     @ApiOperation("获取公开父问题列表")
     @GetMapping("/getPublicQuestions")
@@ -124,8 +123,12 @@ public class QuestionController {
     public ResponseMessage getQuestionAndAnswer(long id) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId();
-
-        return null;
+        List<Question> allQuestion = questionService.getAllQuestion(id,loginUserId);
+        List<Answer> allAnswer = questionService.getAllAnswer(id,loginUserId);
+        QuestionAndAnswerResult result = new QuestionAndAnswerResult();
+        result.setAllQuestion(allQuestion);
+        result.setAllAnswer(allAnswer);
+        return ResponseMessage.newSuccessInstance(result);
     }
 
 }

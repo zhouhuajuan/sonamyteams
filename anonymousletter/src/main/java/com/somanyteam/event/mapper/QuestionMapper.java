@@ -2,6 +2,7 @@ package com.somanyteam.event.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Question;
 
 import java.util.Date;
@@ -58,4 +59,8 @@ public interface QuestionMapper extends BaseMapper<Question> {
     Question selectQuestionByCreateTime(String q_id, String a_id, Date createTime);
 
     int updateQuestion(Question question);
+
+    List<Question> getAllQuestion(long id,String a_id);
+
+    List<Answer> getAllAnswer(long id,String a_id);
 }

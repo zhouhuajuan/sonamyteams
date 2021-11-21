@@ -9,6 +9,7 @@ import com.somanyteam.event.dto.request.question.GetQuestionByCreateTimeReqDTO;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 
+import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Blacklist;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
@@ -71,11 +72,9 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public int deleteQuestion(String userId, long id) {
         if (StrUtil.isEmpty(userId)){
-            //获取不到用户id
             throw new UserIdIsEmptyException();
         }
         if (id==0){
-            //获取不到问题id
             throw new QuestionIdEmptyException();
         }
 
@@ -218,12 +217,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int sendEmail(String a_id) {
+    public void sendEmail(String a_id) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("id", a_id);
         User existUser = userMapper.selectOne(wrapper);
 
-        int count;
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setSubject("匿名信邮箱验证");
         msg.setFrom("1247054987@qq.com");
@@ -232,12 +230,19 @@ public class QuestionServiceImpl implements QuestionService {
         msg.setText("hello，您有新消息提示");
         try {
             javaMailSender.send(msg);
-            count = 1;
         }catch (MailSendException e){
             System.out.println(e);
-            count = 0;
         }
-        return count;
+    }
+
+    @Override
+    public List<Question> getAllQuestion(long id,String a_id) {
+        return questionMapper.getAllQuestion(id,a_id);
+    }
+
+    @Override
+    public List<Answer> getAllAnswer(long id,String a_id) {
+        return questionMapper.getAllAnswer(id,a_id);
     }
 
     /**

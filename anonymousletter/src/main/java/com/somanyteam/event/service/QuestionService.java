@@ -2,6 +2,7 @@ package com.somanyteam.event.service;
 
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 
@@ -61,5 +62,9 @@ public interface QuestionService {
 
     int insertQuestion(Question question);
 
-    int sendEmail(String a_id);
+    void sendEmail(String a_id);
+
+    List<Question> getAllQuestion(long id,String a_id);
+
+    List<Answer> getAllAnswer(long id,String a_id);
 }
