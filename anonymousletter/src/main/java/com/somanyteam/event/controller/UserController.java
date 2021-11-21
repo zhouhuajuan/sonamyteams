@@ -9,6 +9,7 @@ import com.somanyteam.event.dto.result.user.UserGetInfoResult;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.UserType;
+import com.somanyteam.event.exception.user.FileNotMatchException;
 import com.somanyteam.event.service.UserService;
 import com.somanyteam.event.util.PasswordUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -187,6 +188,11 @@ public class UserController {
         try {
             //保存图片的名字为用户id+图片名称+上传图片时间
             String originalFileName = file.getOriginalFilename();
+            String houzui = originalFileName.substring(originalFileName.lastIndexOf("."));
+            if (!houzui.equals(".png") || !houzui.equals(".jpg")){
+                //文件格式不对
+                throw new FileNotMatchException();
+            }
             String fileName =  loginUser.getId()+ originalFileName+(new Date());
 
             //加密后的图片名

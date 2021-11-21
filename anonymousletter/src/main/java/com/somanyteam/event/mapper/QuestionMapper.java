@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.entity.Question;
 
+import java.util.Date;
 import java.util.List;
 
 public interface QuestionMapper extends BaseMapper<Question> {
@@ -19,7 +20,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
 //    int updateByPrimaryKey(Question record);
 
     List<VariousQuestionsListResult> getUnansweredQuestion(String userId);
-
 
     /**
      * 获取已回答列表：获取父问题以及子问题都回答的父问题列表
@@ -38,8 +38,8 @@ public interface QuestionMapper extends BaseMapper<Question> {
     //真删除
     int deleteQuestion(String userId,long id);
 
-    //假删除
-    int updateDelFlag(String userId,long id);
+//    //假删除
+//    int updateDelFlag(String userId,long id);
 
     List<VariousQuestionsListResult> getPublicQuestions(String userId);
 
@@ -47,13 +47,15 @@ public interface QuestionMapper extends BaseMapper<Question> {
 
     List<Question> getUnreceivedAnswerQuestionList(String userId);
 
-    /**
-     * 获取父问题以及子问题的总数量
-     * @param id 父问题id
-     * @param q_id 提问者id
-     * @param a_id 回答者id
-     * @return int
-     */
     int getQuestionCount(long id,String q_id,String a_id);
 
+    int getAnswerCount(long id,String q_id,String a_id);
+
+    int insertQuestion(Question question);
+
+    Question selectQuestionById(long id);
+
+    Question selectQuestionByCreateTime(String q_id, String a_id, Date createTime);
+
+    int updateQuestion(Question question);
 }

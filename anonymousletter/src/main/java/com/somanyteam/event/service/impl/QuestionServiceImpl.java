@@ -1,16 +1,20 @@
 package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.constant.CommonConstant;
+import com.somanyteam.event.dto.request.question.GetQuestionByCreateTimeReqDTO;
+import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 
+import com.somanyteam.event.entity.Blacklist;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 
-import com.somanyteam.event.exception.question.QuestionIdEmptyException;
+import com.somanyteam.event.exception.question.*;
 
-import com.somanyteam.event.exception.question.UserIdIsEmptyException;
+import com.somanyteam.event.mapper.BlacklistMapper;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.service.QuestionService;
 
@@ -18,7 +22,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,6 +39,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private BlacklistMapper blacklistMapper;
 
     @Override
     public List<VariousQuestionsListResult> getUnansweredQuestion(String userId) {
@@ -53,24 +63,12 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuestionIdEmptyException();
         }
 
-        return questionMapper.updateDelFlag(userId, id);
-        //return questionMapper.deleteQuestion(userId, id);
+        Question question = questionMapper.selectQuestionById(id);
+        question.setDelFlag((byte) 1);
+        int i = questionMapper.updateQuestion(question);
+        int i1 = questionMapper.deleteQuestion(userId, id);
+        return (i==1 && i1==1 ) ? 1 : 0;
     }
-
-    /*@Override
-    public int deleteQuestion(String userId, long id) {
-        if (StrUtil.isEmpty(userId)){
-            //获取不到用户id
-            throw new UserIdIsEmptyException();
-        }
-        if (StrUtil.isEmpty(id)){
-            //获取不到问题id
-            throw new QuestionIdEmptyException();
-        }
-
-        return questionMapper.updateDelFlag(userId, id);
-
-    }*/
 
     @Override
     public List<VariousQuestionsListResult> getPublicQuestions(String userId) {
@@ -123,8 +121,84 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int getQuestionCount(long id, String q_id, String a_id) {
-        return questionMapper.getQuestionCount(id, q_id, a_id);
+    public int answerAllQuestion(long id, String q_id, String a_id) {
+        if (id == 0 || StrUtil.isEmpty(q_id) || StrUtil.isEmpty(a_id)){
+            throw new QuestionEnterEmptyException();
+        }
+        int questionCount = questionMapper.getQuestionCount(id, q_id, a_id);
+        int answerCount = questionMapper.getAnswerCount(id, q_id, a_id);
+        return (questionCount==answerCount ? 1 : 0);
+    }
+
+    @Override
+    public Question addQuestion(QuestionAddReqDTO questionAddReqDTO, String userId) {
+        Question question = new Question();
+
+        //1.先判断自己是不是被她拉黑了
+        Blacklist blacklist = blacklistMapper.gotBlacklisted(questionAddReqDTO.getAId(), userId);
+        if (!ObjectUtil.isEmpty(blacklist)){
+            throw new QuestionGotBlackListException();
+        }
+
+        //2.判断是不是父问题
+        if (questionAddReqDTO.getParentQuestion()!=0){
+            //判断是否所有问题都回答完
+            int i1 = answerAllQuestion(questionAddReqDTO.getParentQuestion(),
+                    userId, questionAddReqDTO.getAId());
+            if (i1 == 0){
+                throw new QuestionNotAnsweredException();
+            }
+
+            question.setQId(userId);
+            question.setAId(questionAddReqDTO.getAId());
+            Question question1 = questionMapper.selectQuestionById(questionAddReqDTO.getParentQuestion());
+            question.setAnswerStatus(question1.getAnswerStatus());
+            Date date = new Date();
+            question.setCreateTime(date);
+            question.setUpdateTime(date);
+            question.setContent(questionAddReqDTO.getContent());
+            question.setParentQuestion(questionAddReqDTO.getParentQuestion());
+            question.setDelFlag((byte) 0);
+            int i2 = insertQuestion(question);
+            if (i2 == 1){
+                return question;
+            }else {
+                return null;
+            }
+        }else {
+            question.setQId(userId);
+            question.setAId(questionAddReqDTO.getAId());
+            question.setAnswerStatus((byte) 0);
+            Date date = new Date();
+            question.setCreateTime(date);
+            question.setUpdateTime(date);
+            question.setContent(questionAddReqDTO.getContent());
+            question.setDelFlag((byte) 0);
+            System.out.println(question);
+            int i2 = insertQuestion(question);
+            System.out.println(i2);
+            if (i2 == 1){
+//                GetQuestionByCreateTimeReqDTO dto = new GetQuestionByCreateTimeReqDTO();
+//                BeanUtils.copyProperties(date, dto);
+//                System.out.println("date1:-->"+dto.getCreateTime());
+                Question question1 = questionMapper.selectQuestionByCreateTime(userId,
+                        questionAddReqDTO.getAId(), date);
+                question.setParentQuestion(question1.getId());
+                questionMapper.updateQuestion(question);
+                System.out.println(question);
+                return question;
+            }else {
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public int insertQuestion(Question question) {
+        if (ObjectUtil.isEmpty(question)){
+            throw new QuestionEnterEmptyException();
+        }
+        return questionMapper.insertQuestion(question);
     }
 
     /**
