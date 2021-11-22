@@ -60,7 +60,6 @@ public class QuestionController {
     public ResponseMessage deleteQuestion(@RequestParam("问题id") Long id) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId(); //当前登录用户的id
-
         int i = questionService.deleteQuestion(loginUserId, id);
         if (i>0){
             return ResponseMessage.newSuccessInstance("删除成功");
@@ -136,12 +135,8 @@ public class QuestionController {
     public ResponseMessage getQuestionAndAnswer(Long id) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId();
-        List<Question> allQuestion = questionService.getAllQuestion(id,loginUserId);
-        List<Answer> allAnswer = questionService.getAllAnswer(id,loginUserId);
-        QuestionAndAnswerResult result = new QuestionAndAnswerResult();
-        result.setAllQuestion(allQuestion);
-        result.setAllAnswer(allAnswer);
-        return ResponseMessage.newSuccessInstance(result);
+        QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(id, loginUserId);
+        return ResponseMessage.newSuccessInstance(res);
     }
 
 }

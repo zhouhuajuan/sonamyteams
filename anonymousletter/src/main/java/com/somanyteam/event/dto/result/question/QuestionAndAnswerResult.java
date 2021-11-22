@@ -1,7 +1,5 @@
 package com.somanyteam.event.dto.result.question;
 
-import com.somanyteam.event.entity.Answer;
-import com.somanyteam.event.entity.Question;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,8 +17,8 @@ import java.util.List;
 public class QuestionAndAnswerResult {
 
     @ApiModelProperty(value = "所有问题", required = true)
-    private List<Question> allQuestion;
+    private List<QuestionResult> allQuestion;
 
     @ApiModelProperty(value = "所有答案", required = true)
-    private List<Answer> allAnswer;
+    private List<AnswerResult> allAnswer;
 }

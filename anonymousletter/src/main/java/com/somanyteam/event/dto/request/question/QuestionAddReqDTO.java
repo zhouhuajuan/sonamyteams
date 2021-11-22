@@ -24,7 +24,6 @@ public class QuestionAddReqDTO {
     @ApiModelProperty(value = "问题内容", required = true)
     private String content;
 
-    //如果是新创建的提问，那么父问题id为0，若为子问题，那么传入父问题id
     @ApiModelProperty(value = "父问题id", required = true)
-    private long parentQuestion;
+    private Long parentQuestion;
 }

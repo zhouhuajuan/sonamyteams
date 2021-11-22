@@ -8,6 +8,9 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.somanyteam.event.constant.CommonConstant;
 import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
+import com.somanyteam.event.dto.result.question.AnswerResult;
+import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
+import com.somanyteam.event.dto.result.question.QuestionResult;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 
 import com.somanyteam.event.entity.Answer;
@@ -200,7 +203,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         //2.判断是不是父问题
-        if (questionAddReqDTO.getParentQuestion()!=0){
+        if (questionAddReqDTO.getParentQuestion() != null){
             //判断是否所有问题都回答完
             int i1 = answerAllQuestion(questionAddReqDTO.getParentQuestion(),
                     userId, questionAddReqDTO.getAId());
@@ -257,17 +260,40 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<Question> getAllQuestion(Long id,String aId) {
+    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, String aId) {
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
-        wrapper.eq("parent_question", id);
-        wrapper.eq("a_id", aId);
-        wrapper.eq("del_flag", 0);
-        return questionMapper.selectList(wrapper);
-    }
+        wrapper.eq("id", id);
+        Question question1 = questionMapper.selectOne(wrapper);
 
-    @Override
-    public List<Answer> getAllAnswer(Long id,String aId) {
-        return questionMapper.getAllAnswer(id,aId);
+        QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("parent_question", question1.getParentQuestion());
+        wrapper1.eq("a_id", aId);
+        wrapper1.eq("del_flag", 0);
+        List<Question> questionList = questionMapper.selectList(wrapper1);
+
+        List<QuestionResult> allQuestion = new ArrayList<>();
+        QuestionResult result1 = new QuestionResult();
+        List<AnswerResult> allAnswer = new ArrayList<>();
+        AnswerResult result2 = new AnswerResult();
+
+        QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
+        List<Long> idList = new ArrayList<>();
+        for (Question question : questionList) {
+            idList.add(question.getId());
+            BeanUtils.copyProperties(question,result1);
+            allQuestion.add(result1);
+        }
+        queryWrapper.in("question_id", idList);
+        List<Answer> answerList = answerMapper.selectList(queryWrapper);
+        for (Answer answer: answerList) {
+            BeanUtils.copyProperties(answer,result2);
+            allAnswer.add(result2);
+        }
+
+        QuestionAndAnswerResult result = new QuestionAndAnswerResult();
+        result.setAllQuestion(allQuestion);
+        result.setAllAnswer(allAnswer);
+        return result;
     }
 
     @Override
