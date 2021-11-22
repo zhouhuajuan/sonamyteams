@@ -57,7 +57,7 @@ public class QuestionController {
 
     @ApiOperation("删除问题(被提问者)")
     @PostMapping("/deleteQuestion")
-    public ResponseMessage deleteQuestion(@RequestParam("问题id") long id) {
+    public ResponseMessage deleteQuestion(@RequestParam("问题id") Long id) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId(); //当前登录用户的id
 
@@ -133,7 +133,7 @@ public class QuestionController {
     }
     @ApiOperation("获取父问题和答案及以下的子问题和答案")
     @PostMapping("/getQuestionAndAnswer")
-    public ResponseMessage getQuestionAndAnswer(long id) {
+    public ResponseMessage getQuestionAndAnswer(Long id) {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId();
         List<Question> allQuestion = questionService.getAllQuestion(id,loginUserId);

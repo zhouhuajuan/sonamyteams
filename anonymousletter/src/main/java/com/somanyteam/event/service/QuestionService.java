@@ -28,7 +28,7 @@ public interface QuestionService {
      * @param id 问题id
      * @return int
      */
-    int deleteQuestion(String userId,long id);
+    int deleteQuestion(String userId,Long id);
 
     /**
      * 获取已回答问题
@@ -73,14 +73,14 @@ public interface QuestionService {
      */
     Long addOrUpdateAnswer(MultipartFile[] multipartFiles, User curUser, AddOrUpdateAnswerReqDTO dto) throws IOException;
 
-    int answerAllQuestion(long id,String qId,String aId);
+    int answerAllQuestion(Long id,String qId,String aId);
 
     Question addQuestion(QuestionAddReqDTO questionAddReqDTO,String userId);
 
     int sendEmail(String aId);
 
-    List<Question> getAllQuestion(long id,String aId);
+    List<Question> getAllQuestion(Long id,String aId);
 
-    List<Answer> getAllAnswer(long id,String aId);
+    List<Answer> getAllAnswer(Long id,String aId);
 
 }

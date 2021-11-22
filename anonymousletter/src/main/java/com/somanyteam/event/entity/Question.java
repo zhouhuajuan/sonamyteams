@@ -23,7 +23,7 @@ public class Question {
 
     private String content;
 
-    private long parentQuestion;
+    private Long parentQuestion;
 
     private Byte delFlag;
 

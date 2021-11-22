@@ -99,7 +99,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int deleteQuestion(String userId, long id) {
+    public int deleteQuestion(String userId, Long id) {
         if (StrUtil.isEmpty(userId)){
             throw new UserIdIsEmptyException();
         }
@@ -107,13 +107,19 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuestionIdEmptyException();
         }
 
+        int count = 0;
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", id);
-        Question question = questionMapper.selectOne(wrapper);
-        question.setDelFlag((byte) 1);
-        int i = questionMapper.updateById(question);
+        wrapper.eq("parent_question", id);
+        List<Question> questionList = questionMapper.selectList(wrapper);
+        for (Question question : questionList) {
+            question.setDelFlag((byte) 1);
+            int i = questionMapper.updateById(question);
+            if (i==1){
+                count++;
+            }
+        }
         int i1 = questionMapper.deleteQuestion(userId, id);
-        return (i==1 && i1==1 ) ? 1 : 0;
+        return (count==questionList.size() && i1==1 ) ? 1 : 0;
     }
 
     @Override
@@ -167,7 +173,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int answerAllQuestion(long id, String qId, String aId) {
+    public int answerAllQuestion(Long id, String qId, String aId) {
         if (id == 0 || StrUtil.isEmpty(qId) || StrUtil.isEmpty(aId)){
             throw new QuestionEnterEmptyException();
         }
@@ -246,7 +252,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<Question> getAllQuestion(long id,String aId) {
+    public List<Question> getAllQuestion(Long id,String aId) {
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
         wrapper.eq("parent_question", id);
         wrapper.eq("a_id", aId);
@@ -255,7 +261,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<Answer> getAllAnswer(long id,String aId) {
+    public List<Answer> getAllAnswer(Long id,String aId) {
         return questionMapper.getAllAnswer(id,aId);
     }
 

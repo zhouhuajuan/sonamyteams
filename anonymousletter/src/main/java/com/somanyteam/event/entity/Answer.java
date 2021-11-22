@@ -16,7 +16,7 @@ public class Answer {
 
     private Date updateTime;
 
-    private long questionId;
+    private Long questionId;
 
     private String content;
 
