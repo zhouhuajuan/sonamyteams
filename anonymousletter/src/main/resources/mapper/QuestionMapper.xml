@@ -66,14 +66,14 @@
 	        select 1 from (select * from question q where q.parent_question = x.id or x.id = q.id)y where not exists(
 		    select 1 from answer z where z.question_id = y.id
         )
-    ) and x.parent_question = x.id and x.a_id = #{userId} and del_flag = 0;
+    ) and x.parent_question = x.id and x.a_id = #{userId} and x.del_flag = 0;
     </select>
     <select id="getNotAllAnsweredParentQuestion" resultType="com.somanyteam.event.entity.Question">
        select p.id , p.content , q.update_time
         from question q join question p on q.parent_question = p.id
          where not exists(
 	        select 1 from answer a where a.question_id = q.id
-        ) and q.parent_question != q.id and del_flag = 0 and q.a_id = #{userId};
+        ) and q.parent_question != q.id and q.del_flag = 0 and q.a_id = #{userId};
     </select>
     <select id="getPublicQuestions" resultType="com.somanyteam.event.dto.result.question.VariousQuestionsListResult"
             parameterType="java.lang.String">
@@ -91,14 +91,14 @@
                 where not exists
             (select 1 from answer a where a.question_id = x.id )
             and x.parent_question = q.id
-        ) and q.parent_question = q.id and del_flag = 0 and q.q_id = #{userId} order by update_time desc;
+        ) and q.parent_question = q.id and q.del_flag = 0 and q.q_id = #{userId} order by update_time desc;
     </select>
     <select id="getUnreceivedAnswerQuestionList" resultType="com.somanyteam.event.entity.Question">
         select p.id,p.content,q.update_time from question q
          join question p on q.parent_question = p.id
         where not exists(
 	        select 1 from answer a where a.question_id = q.id
-        ) and del_flag = 0 and p.q_id = #{userId} order by q.update_time desc;
+        ) and p.del_flag = 0 and p.q_id = #{userId} order by q.update_time desc;
     </select>
     <select id="getAnswerCount" resultType="java.lang.Integer">
         select count(a.id) from answer a,question q where q.parent_question = #{id,jdbcType=BIGINT} and q.a_id =

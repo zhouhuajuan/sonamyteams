@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author: 周华娟
  * @create: 2021-11-09 09:58
  **/
+@Component
 public class EmailUtil {
 
     @Autowired

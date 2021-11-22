@@ -37,6 +37,8 @@ import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.QuestionService;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -66,6 +69,8 @@ import java.util.Map;
  **/
 @Service("questionService")
 public class QuestionServiceImpl implements QuestionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(com.somanyteam.event.service.impl.QuestionServiceImpl.class);
 
     @Autowired
     private QuestionMapper questionMapper;
@@ -84,6 +89,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     private JavaMailSender javaMailSender;
+
+    @Autowired
+    private EmailUtil emailUtil;
 
 
     @Override
@@ -259,7 +267,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Long addOrUpdateAnswer(MultipartFile[] multipartFiles, User curUser, AddOrUpdateAnswerReqDTO dto) throws IOException {
-        //1.判断file的个数，还有大小，格式，生成的链接是什么
 
         String imgUrl = "";
         //如果用户的回答中有图片
@@ -272,6 +279,7 @@ public class QuestionServiceImpl implements QuestionService {
             for (MultipartFile file : multipartFiles) {
 
                 String originalFileName = file.getOriginalFilename();
+                logger.info("文件原路径:{}" + originalFileName);
                 if (!originalFileName.endsWith("png") && !originalFileName.endsWith("jpg")) {
                     throw new CommonException(originalFileName + "文件格式不符合要求，请上传jpg或者png格式的文件");
                 }
@@ -288,7 +296,8 @@ public class QuestionServiceImpl implements QuestionService {
                 String picName = StrUtil.subBefore(originalFileName, ".", true);
 
                 String encryptName = new Md5Hash(curUser.getId() + picName + new Date()).toHex();
-                String filePath = encryptName + originalFileName.substring(originalFileName.lastIndexOf("."));
+                String filePath = imgPath + encryptName + originalFileName.substring(originalFileName.lastIndexOf("."));
+                logger.info("文件加密后路径:{}" + filePath);
 
                 filePaths.add(filePath);
                 fileMap.put(filePath, file);
@@ -308,20 +317,59 @@ public class QuestionServiceImpl implements QuestionService {
         BeanUtils.copyProperties(dto, answer);
         answer.setImage(imgUrl);
         //添加或编辑回答
+        int insertAnswer = 0;
+        int updateAnswer = 0;
         if(answer.getId() == null){
-            answerMapper.insert(answer);
+             insertAnswer = answerMapper.insert(answer);
         } else{
-            answerMapper.updateById(answer);
+             updateAnswer = answerMapper.updateById(answer);
         }
+        if(insertAnswer <= 0 && updateAnswer <= 0){
+            throw new CommonException("添加或编辑回答失败");
+        }
+
         //更新问题
         Question question = new Question();
         question.setId(dto.getQuestionId());
         question.setAnswerStatus(dto.getAnswerStatus());
-        questionMapper.updateById(question);
+        int updateQuestion = questionMapper.updateById(question);
+        if(updateQuestion <= 0){
+            throw new CommonException("问题更新失败");
+        }
 
-        //TODO 邮件通知提问者
+
+        //1. 提问的内容，时间，提问者邮箱，
+        Question question1 = questionMapper.selectById(dto.getQuestionId());
+        User questionUser = userMapper.selectById(question1.getQId());
+
+        //判断是否是编辑回答
+        boolean isUpdate = (dto.getId() != null);
+        String msg = sendUpdateAnswerEmail(isUpdate,questionUser, curUser, question1);
+        emailUtil.sendEmail(questionUser.getEmail(), msg);
 
         return answer.getId();
+    }
+
+    private String sendUpdateAnswerEmail(boolean isUpdate, User questionUser, User answerUser, Question question){
+        StringBuilder sb = new StringBuilder();
+        sb.append(questionUser.getUsername()).append(":");
+        sb.append("\n");
+        sb.append(answerUser.getUsername()).append(" ");
+        //如果是编辑回答
+        if(isUpdate){
+            sb.append("编辑");
+        }
+        sb.append("回答了你在");
+        Date updateTime = question.getUpdateTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String formatDate = sdf.format(updateTime);
+
+        sb.append(formatDate).append("提问的\"");
+        sb.append(question.getContent()).append("\"问题");
+        sb.append("\n\n").append(sdf.format(new Date()));
+
+        logger.info("添加或更新回答发送邮件内容:{}" + sb.toString());
+        return sb.toString();
     }
 
     /**

@@ -56,6 +56,6 @@ springfox:
 
 #swagger:
 #  # host
-  host: 8.134.33.6:40000
-  enable: true
+#  host: 8.134.33.6:40000
+#  enable: true
 
