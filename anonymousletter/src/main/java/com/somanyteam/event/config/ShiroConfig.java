@@ -69,6 +69,7 @@ public class ShiroConfig {
         filterMap.put("/user/deleteAccount", "authc");
         filterMap.put("/user/**", "user");
         filterMap.put("/question/**", "user");
+        filterMap.put("/blacklist/**", "user");
         // 设置所有接口需要认证访问
         filterMap.put("/**", "authc");
 //        filterMap.put("/**", "anon");

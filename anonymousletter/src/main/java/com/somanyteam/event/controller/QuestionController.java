@@ -45,14 +45,8 @@ public class QuestionController {
     public ResponseMessage getUnansweredQuestion() {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId(); //当前登录用户的id
-
         List<VariousQuestionsListResult> questionList = questionService.getUnansweredQuestion(loginUserId);
-
-        if (questionList.isEmpty()){
-            return ResponseMessage.newSuccessInstance("当前用户没有未回答的问题");
-        }else {
-            return ResponseMessage.newSuccessInstance(questionList);
-        }
+        return (questionList.isEmpty() ? ResponseMessage.newSuccessInstance("当前用户没有未回答的问题") : ResponseMessage.newSuccessInstance(questionList));
     }
 
     @ApiOperation("删除问题(被提问者)")
@@ -61,11 +55,7 @@ public class QuestionController {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId(); //当前登录用户的id
         int i = questionService.deleteQuestion(loginUserId, id);
-        if (i>0){
-            return ResponseMessage.newSuccessInstance("删除成功");
-        }else {
-            return ResponseMessage.newErrorInstance("删除失败");
-        }
+        return (i==1 ? ResponseMessage.newSuccessInstance("删除成功") : ResponseMessage.newErrorInstance("删除失败"));
     }
 
     @ApiOperation("获取已回答问题")
@@ -79,12 +69,7 @@ public class QuestionController {
     @GetMapping("/getPublicQuestions/{userId}")
     public ResponseMessage getPublicQuestions(@PathVariable("userId")String userId) {
         List<VariousQuestionsListResult> publicQuestions = questionService.getPublicQuestions(userId);
-        if (publicQuestions.isEmpty()){
-            return ResponseMessage.newSuccessInstance("公开父问题列表为空");
-        }else {
-            System.out.println(publicQuestions);
-            return ResponseMessage.newSuccessInstance(publicQuestions);
-        }
+        return (publicQuestions.isEmpty() ? ResponseMessage.newSuccessInstance("公开父问题列表为空") : ResponseMessage.newSuccessInstance(publicQuestions));
     }
 
     @ApiOperation("添加问题(提问者)")
