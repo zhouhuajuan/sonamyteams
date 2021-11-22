@@ -136,7 +136,11 @@ public class QuestionController {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId();
         QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(id, loginUserId);
-        return ResponseMessage.newSuccessInstance(res);
+        if (res == null){
+            return ResponseMessage.newErrorInstance("获取问题答案失败");
+        }else {
+            return ResponseMessage.newSuccessInstance(res,"获取问题答案成功");
+        }
     }
 
 }
