@@ -76,12 +76,9 @@ public class QuestionController {
     }
 
     @ApiOperation("获取公开父问题列表")
-    @GetMapping("/getPublicQuestions")
-    public ResponseMessage getPublicQuestions() {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
-        String loginUserId = loginUser.getId();
-
-        List<VariousQuestionsListResult> publicQuestions = questionService.getPublicQuestions(loginUserId);
+    @GetMapping("/getPublicQuestions/{userId}")
+    public ResponseMessage getPublicQuestions(@PathVariable("userId")String userId) {
+        List<VariousQuestionsListResult> publicQuestions = questionService.getPublicQuestions(userId);
         if (publicQuestions.isEmpty()){
             return ResponseMessage.newSuccessInstance("公开父问题列表为空");
         }else {

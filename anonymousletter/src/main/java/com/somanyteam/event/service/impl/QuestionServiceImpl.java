@@ -121,8 +121,8 @@ public class QuestionServiceImpl implements QuestionService {
                 count++;
             }
         }
-        int i1 = questionMapper.deleteQuestion(userId, id);
-        return (count==questionList.size() && i1==1 ) ? 1 : 0;
+        //int i1 = questionMapper.deleteQuestion(userId, id);
+        return (count==questionList.size() ? 1 : 0);
     }
 
     @Override
@@ -261,14 +261,14 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, String aId) {
-        QueryWrapper<Question> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", id);
-        Question question1 = questionMapper.selectOne(wrapper);
+//        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+//        wrapper.eq("id", id);
+//        Question question1 = questionMapper.selectOne(wrapper);
 
         QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
-        wrapper1.eq("parent_question", question1.getParentQuestion());
+        wrapper1.eq("parent_question", id);
         wrapper1.eq("a_id", aId);
-        wrapper1.eq("del_flag", 0);
+//        wrapper1.eq("del_flag", 0);
         List<Question> questionList = questionMapper.selectList(wrapper1);
         if (questionList == null){
             return null;
