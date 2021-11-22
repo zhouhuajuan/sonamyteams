@@ -38,7 +38,9 @@ import com.somanyteam.event.mapper.BlacklistMapper;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.QuestionService;
+import org.apache.commons.collections.ListUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.mockito.internal.util.collections.ListUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -347,7 +349,7 @@ public class QuestionServiceImpl implements QuestionService {
             }
 
             JSONArray array = JSONUtil.parseArray(filePaths);
-           imgUrl = array.toString();
+            imgUrl = array.toString();
         }
         Answer answer = new Answer();
         BeanUtils.copyProperties(dto, answer);
@@ -356,19 +358,19 @@ public class QuestionServiceImpl implements QuestionService {
         int insertAnswer = 0;
         int updateAnswer = 0;
         if(answer.getId() == null){
-             insertAnswer = answerMapper.insert(answer);
+            insertAnswer = answerMapper.insert(answer);
         } else{
-             updateAnswer = answerMapper.updateById(answer);
+            updateAnswer = answerMapper.updateById(answer);
         }
         if(insertAnswer <= 0 && updateAnswer <= 0){
             throw new CommonException("添加或编辑回答失败");
         }
 
-        //更新问题
-        Question question = new Question();
-        question.setId(dto.getQuestionId());
-        question.setAnswerStatus(dto.getAnswerStatus());
-        int updateQuestion = questionMapper.updateById(question);
+        //更新问题,把该问题以及其父问题其余子问题的answerStatus都进行修改
+//        Question question = new Question();
+//        question.setId(dto.getQuestionId());
+//        question.setAnswerStatus(dto.getAnswerStatus());
+        int updateQuestion = questionMapper.updateAllAnswerStatusById(dto.getQuestionId(), dto.getAnswerStatus());
         if(updateQuestion <= 0){
             throw new CommonException("问题更新失败");
         }

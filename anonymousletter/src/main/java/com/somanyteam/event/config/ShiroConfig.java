@@ -80,18 +80,18 @@ public class ShiroConfig {
     /**
      * 自定义Realm
      */
-   @Bean
-   public UserRealm userRealm(){
-       UserRealm userRealm = new UserRealm();
-       //开启缓存管理
+    @Bean
+    public UserRealm userRealm(){
+        UserRealm userRealm = new UserRealm();
+        //开启缓存管理
 //       userRealm.setCacheManager(new RedisCacheManager());
 //       userRealm.setCachingEnabled(true);//开启全局缓存
 //       userRealm.setAuthenticationCachingEnabled(true);//认证认证缓存
 //       userRealm.setAuthenticationCacheName("authenticationCache");
 //       userRealm.setAuthorizationCachingEnabled(true);//开启授权缓存
 //       userRealm.setAuthorizationCacheName("authorizationCache");
-       return userRealm;
-   }
+        return userRealm;
+    }
 
     /**
      * 安全管理器

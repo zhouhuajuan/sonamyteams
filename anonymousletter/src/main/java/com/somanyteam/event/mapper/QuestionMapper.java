@@ -47,4 +47,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
     int getAnswerCount(Long id,String qId,String aId);
 
     List<Answer> getAllAnswer(Long id,String aId);
+
+    int updateAllAnswerStatusById(Long id, Byte answerStatus);
 }

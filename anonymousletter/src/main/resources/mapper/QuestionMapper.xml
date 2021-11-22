@@ -1,53 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.somanyteam.event.mapper.QuestionMapper">
+    <update id="updateAllAnswerStatusById">
+        update question set answer_status = #{answerStatus}
+         where parent_question in
+        (select parent_question from
+            (select parent_question from question where id = #{id})x
+         );
+    </update>
     <!--    <resultMap id="BaseResultMap" type="com.somanyteam.event.dto.result.question.VariousQuestionsListResult">&ndash;&gt;-->
-<!--        <id column="id" jdbcType="BIGINT" property="id" />-->
-<!--        <result column="content" jdbcType="LONGVARCHAR" property="content" />-->
-<!--        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
-<!--    </resultMap>-->
-<!--    <resultMap id="BaseResultMap" type="com.somanyteam.event.entity.Question">-->
-<!--        <id column="id" jdbcType="BIGINT" property="id" />-->
-<!--        <result column="q_id" jdbcType="VARCHAR" property="qId" />-->
-<!--        <result column="a_id" jdbcType="VARCHAR" property="aId" />-->
-<!--        <result column="answer_status" jdbcType="INTEGER" property="answerStatus" />-->
-<!--        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />-->
-<!--        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
-<!--        <result column="content" jdbcType="LONGVARCHAR" property="content" />-->
-<!--        <result column="parent_question" jdbcType="LONGVARCHAR" property="parentQuestion" />-->
-<!--    </resultMap>-->
-<!--    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
-<!--        delete from question-->
-<!--        where id = #{id,jdbcType=BIGINT}-->
-<!--    </delete>-->
-<!--    <insert id="insert" parameterType="com.somanyteam.event.entity.Question">-->
-<!--        insert into question (id, q_id, a_id,-->
-<!--          answer_status, create_time, update_time,-->
-<!--          content, parent_question)-->
-<!--        values (#{id,jdbcType=BIGINT}, #{qId,jdbcType=VARCHAR}, #{aId,jdbcType=VARCHAR},-->
-<!--          #{answerStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},-->
-<!--          #{content,jdbcType=LONGVARCHAR}, #{parentQuestion,jdbcType=LONGVARCHAR})-->
-<!--    </insert>-->
-<!--    <update id="updateByPrimaryKey" parameterType="com.somanyteam.event.entity.Question">-->
-<!--        update question-->
-<!--        set q_id = #{qId,jdbcType=VARCHAR},-->
-<!--          a_id = #{aId,jdbcType=VARCHAR},-->
-<!--          answer_status = #{answerStatus,jdbcType=INTEGER},-->
-<!--          create_time = #{createTime,jdbcType=TIMESTAMP},-->
-<!--          update_time = #{updateTime,jdbcType=TIMESTAMP},-->
-<!--          content = #{content,jdbcType=LONGVARCHAR},-->
-<!--          parent_question = #{parentQuestion,jdbcType=LONGVARCHAR}-->
-<!--        where id = #{id,jdbcType=BIGINT}-->
-<!--    </update>-->
-<!--    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
-<!--        select id, q_id, a_id, answer_status, create_time, update_time, content, parent_question-->
-<!--        from question-->
-<!--        where id = #{id,jdbcType=BIGINT}-->
-<!--    </select>-->
-<!--    <select id="selectAll" resultMap="BaseResultMap">-->
-<!--        select id, q_id, a_id, answer_status, create_time, update_time, content, parent_question-->
-<!--        from question-->
-<!--    </select>-->
+    <!--        <id column="id" jdbcType="BIGINT" property="id" />-->
+    <!--        <result column="content" jdbcType="LONGVARCHAR" property="content" />-->
+    <!--        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
+    <!--    </resultMap>-->
+    <!--    <resultMap id="BaseResultMap" type="com.somanyteam.event.entity.Question">-->
+    <!--        <id column="id" jdbcType="BIGINT" property="id" />-->
+    <!--        <result column="q_id" jdbcType="VARCHAR" property="qId" />-->
+    <!--        <result column="a_id" jdbcType="VARCHAR" property="aId" />-->
+    <!--        <result column="answer_status" jdbcType="INTEGER" property="answerStatus" />-->
+    <!--        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />-->
+    <!--        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
+    <!--        <result column="content" jdbcType="LONGVARCHAR" property="content" />-->
+    <!--        <result column="parent_question" jdbcType="LONGVARCHAR" property="parentQuestion" />-->
+    <!--    </resultMap>-->
+    <!--    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
+    <!--        delete from question-->
+    <!--        where id = #{id,jdbcType=BIGINT}-->
+    <!--    </delete>-->
+    <!--    <insert id="insert" parameterType="com.somanyteam.event.entity.Question">-->
+    <!--        insert into question (id, q_id, a_id,-->
+    <!--          answer_status, create_time, update_time,-->
+    <!--          content, parent_question)-->
+    <!--        values (#{id,jdbcType=BIGINT}, #{qId,jdbcType=VARCHAR}, #{aId,jdbcType=VARCHAR},-->
+    <!--          #{answerStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},-->
+    <!--          #{content,jdbcType=LONGVARCHAR}, #{parentQuestion,jdbcType=LONGVARCHAR})-->
+    <!--    </insert>-->
+    <!--    <update id="updateByPrimaryKey" parameterType="com.somanyteam.event.entity.Question">-->
+    <!--        update question-->
+    <!--        set q_id = #{qId,jdbcType=VARCHAR},-->
+    <!--          a_id = #{aId,jdbcType=VARCHAR},-->
+    <!--          answer_status = #{answerStatus,jdbcType=INTEGER},-->
+    <!--          create_time = #{createTime,jdbcType=TIMESTAMP},-->
+    <!--          update_time = #{updateTime,jdbcType=TIMESTAMP},-->
+    <!--          content = #{content,jdbcType=LONGVARCHAR},-->
+    <!--          parent_question = #{parentQuestion,jdbcType=LONGVARCHAR}-->
+    <!--        where id = #{id,jdbcType=BIGINT}-->
+    <!--    </update>-->
+    <!--    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
+    <!--        select id, q_id, a_id, answer_status, create_time, update_time, content, parent_question-->
+    <!--        from question-->
+    <!--        where id = #{id,jdbcType=BIGINT}-->
+    <!--    </select>-->
+    <!--    <select id="selectAll" resultMap="BaseResultMap">-->
+    <!--        select id, q_id, a_id, answer_status, create_time, update_time, content, parent_question-->
+    <!--        from question-->
+    <!--    </select>-->
     <select id="getUnansweredQuestion" resultType="com.somanyteam.event.dto.result.question.VariousQuestionsListResult"
             parameterType="java.lang.String">
         select id,content,update_time from question q where not exists (select 1 from answer a
@@ -109,8 +116,8 @@
         #{id,jdbcType=BIGINT} and a_id = #{aId,jdbcType=VARCHAR} and del_flag = 0) order by update_time
     </select>
 
-<!--    <delete id="deleteQuestion">-->
-<!--        delete answer from question left join answer on question.id=answer.question_id-->
-<!--        where question.parent_question = #{id,jdbcType=BIGINT} and question.a_id = #{userId,jdbcType=VARCHAR}-->
-<!--    </delete>-->
+    <!--    <delete id="deleteQuestion">-->
+    <!--        delete answer from question left join answer on question.id=answer.question_id-->
+    <!--        where question.parent_question = #{id,jdbcType=BIGINT} and question.a_id = #{userId,jdbcType=VARCHAR}-->
+    <!--    </delete>-->
 </mapper>
