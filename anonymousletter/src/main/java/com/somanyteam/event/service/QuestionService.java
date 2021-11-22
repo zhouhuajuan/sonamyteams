@@ -1,7 +1,12 @@
 package com.somanyteam.event.service;
 
 import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
+
+import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
+
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.entity.Answer;
+import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,13 +59,10 @@ public interface QuestionService {
     List<VariousQuestionsListResult> getUnreceivedAnswerQuestionList(User curUser);
 
     /**
-     * 获取父问题以及子问题的总数量
-     * @param id 父问题id
-     * @param q_id 提问者id
-     * @param a_id 回答者id
-     * @return int
+     * 判断是否全部问题都已回答
      */
-    int getQuestionCount(long id,String q_id,String a_id);
+
+//    int getQuestionCount(long id,String q_id,String a_id);
 
     /**
      * 添加或者更新回答
@@ -70,4 +72,15 @@ public interface QuestionService {
      * @return 问题id
      */
     Long addOrUpdateAnswer(MultipartFile[] multipartFiles, User curUser, AddOrUpdateAnswerReqDTO dto) throws IOException;
+
+    int answerAllQuestion(long id,String q_id,String a_id);
+
+    Question addQuestion(QuestionAddReqDTO questionAddReqDTO,String userId);
+
+    void sendEmail(String a_id);
+
+    List<Question> getAllQuestion(long id,String a_id);
+
+    List<Answer> getAllAnswer(long id,String a_id);
+
 }

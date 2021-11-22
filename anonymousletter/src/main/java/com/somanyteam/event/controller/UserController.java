@@ -9,6 +9,7 @@ import com.somanyteam.event.dto.result.user.UserGetInfoResult;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.UserType;
+import com.somanyteam.event.exception.user.FileNotMatchException;
 import com.somanyteam.event.service.UserService;
 import com.somanyteam.event.util.PasswordUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -152,29 +153,14 @@ public class UserController {
         }
     }
 
-//    @ApiOperation(value = "拿userid")
-//    @PostMapping("/getAllUserId")
-//    public ResponseMessage getAllUserId() {
-//        Set<String> allUserId = userService.getAllUserId();
-//        if (ObjectUtil.isNull(allUserId)) {
-//            return ResponseMessage.newErrorInstance("失败");
-//        } else {
-//            for (String s:allUserId) {
-//                System.out.println(s);
-//            }
-//            return ResponseMessage.newSuccessInstance("成功");
-//        }
-//    }
-
     @ApiOperation(value = "发送邮件")
     @PostMapping("/sendEmail")
     public ResponseMessage sendEmail(String email) {
-        //拿到验证码，为空则发送邮件失败
-        String code = userService.sendEmail(email);
-        if (StrUtil.isEmpty(code)) {
+        String content = "hello 欢迎访问匿名信网站，您的验证码为:";
+        int i = userService.sendEmail(email,content);
+        if (i==0) {
             return ResponseMessage.newErrorInstance("发送失败");
         } else {
-            //返回前端验证码，前端判断验证码是否输入正确
             return ResponseMessage.newSuccessInstance("发送成功");
         }
     }
@@ -187,6 +173,11 @@ public class UserController {
         try {
             //保存图片的名字为用户id+图片名称+上传图片时间
             String originalFileName = file.getOriginalFilename();
+            String houzui = originalFileName.substring(originalFileName.lastIndexOf("."));
+            if (!houzui.equals(".png") || !houzui.equals(".jpg")){
+                //文件格式不对
+                throw new FileNotMatchException();
+            }
             String fileName =  loginUser.getId()+ originalFileName+(new Date());
 
             //加密后的图片名

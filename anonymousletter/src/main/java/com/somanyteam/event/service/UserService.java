@@ -19,7 +19,7 @@ public interface UserService {
 
     int forgetPwd(String email,String modifyPwd);
 
-    String sendEmail(String email);
+    int sendEmail(String email,String content);
 
     boolean checkCode(String email,String userCode);
 

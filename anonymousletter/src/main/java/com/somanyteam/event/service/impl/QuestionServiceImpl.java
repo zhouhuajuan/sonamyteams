@@ -1,6 +1,7 @@
 package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
@@ -19,20 +20,34 @@ import com.somanyteam.event.exception.question.QuestionIdEmptyException;
 
 import com.somanyteam.event.exception.question.UserIdIsEmptyException;
 import com.somanyteam.event.mapper.AnswerMapper;
-import com.somanyteam.event.mapper.QuestionMapper;
-import com.somanyteam.event.service.QuestionService;
 
+import cn.hutool.core.util.ObjectUtil;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
+
+import com.somanyteam.event.entity.Blacklist;
+
+
+import com.somanyteam.event.exception.question.*;
+
+import com.somanyteam.event.mapper.BlacklistMapper;
+
+import com.somanyteam.event.mapper.QuestionMapper;
+import com.somanyteam.event.mapper.UserMapper;
+import com.somanyteam.event.service.QuestionService;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import com.somanyteam.event.util.EmailUtil;
+
+import org.springframework.mail.javamail.JavaMailSender;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -40,6 +55,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
 
 /**
  * @program: somanyteams
@@ -59,6 +76,16 @@ public class QuestionServiceImpl implements QuestionService {
     @Value("${upload.img.path}")
     private String imgPath;
 
+    @Autowired
+    private BlacklistMapper blacklistMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+
     @Override
     public List<VariousQuestionsListResult> getUnansweredQuestion(String userId) {
         if (StrUtil.isEmpty(userId)){
@@ -71,32 +98,20 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public int deleteQuestion(String userId, long id) {
         if (StrUtil.isEmpty(userId)){
-            //获取不到用户id
             throw new UserIdIsEmptyException();
         }
         if (id==0){
-            //获取不到问题id
             throw new QuestionIdEmptyException();
         }
 
-        return questionMapper.updateDelFlag(userId, id);
-        //return questionMapper.deleteQuestion(userId, id);
+        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        Question question = questionMapper.selectOne(wrapper);
+        question.setDelFlag((byte) 1);
+        int i = questionMapper.updateById(question);
+        int i1 = questionMapper.deleteQuestion(userId, id);
+        return (i==1 && i1==1 ) ? 1 : 0;
     }
-
-    /*@Override
-    public int deleteQuestion(String userId, long id) {
-        if (StrUtil.isEmpty(userId)){
-            //获取不到用户id
-            throw new UserIdIsEmptyException();
-        }
-        if (StrUtil.isEmpty(id)){
-            //获取不到问题id
-            throw new QuestionIdEmptyException();
-        }
-
-        return questionMapper.updateDelFlag(userId, id);
-
-    }*/
 
     @Override
     public List<VariousQuestionsListResult> getPublicQuestions(String userId) {
@@ -149,8 +164,97 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int getQuestionCount(long id, String q_id, String a_id) {
-        return questionMapper.getQuestionCount(id, q_id, a_id);
+    public int answerAllQuestion(long id, String q_id, String a_id) {
+        if (id == 0 || StrUtil.isEmpty(q_id) || StrUtil.isEmpty(a_id)){
+            throw new QuestionEnterEmptyException();
+        }
+        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        wrapper.eq("q_id", q_id);
+        wrapper.eq("a_id", a_id);
+        int questionCount = questionMapper.selectCount(wrapper);
+        int answerCount = questionMapper.getAnswerCount(id, q_id, a_id);
+        return (questionCount==answerCount ? 1 : 0);
+    }
+
+    @Override
+    public Question addQuestion(QuestionAddReqDTO questionAddReqDTO, String userId) {
+        Question question = new Question();
+
+        //1.先判断自己是不是被她拉黑了
+        QueryWrapper<Blacklist> wrapper = new QueryWrapper<>();
+        wrapper.eq("complaintant", questionAddReqDTO.getAId());
+        wrapper.eq("defendant", userId);
+        Blacklist blacklist = blacklistMapper.selectOne(wrapper);
+        if (!ObjectUtil.isEmpty(blacklist)){
+            throw new QuestionGotBlackListException();
+        }
+
+        //2.判断是不是父问题
+        if (questionAddReqDTO.getParentQuestion()!=0){
+            //判断是否所有问题都回答完
+            int i1 = answerAllQuestion(questionAddReqDTO.getParentQuestion(),
+                    userId, questionAddReqDTO.getAId());
+            if (i1 == 0){
+                throw new QuestionNotAnsweredException();
+            }
+
+            question.setQId(userId);
+            question.setAId(questionAddReqDTO.getAId());
+            QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
+            wrapper.eq("id", questionAddReqDTO.getParentQuestion());
+            Question father_question = questionMapper.selectOne(wrapper1);
+            question.setAnswerStatus(father_question.getAnswerStatus());
+            Date date = new Date();
+            question.setCreateTime(date);
+            question.setUpdateTime(date);
+            question.setContent(questionAddReqDTO.getContent());
+            question.setParentQuestion(questionAddReqDTO.getParentQuestion());
+            question.setDelFlag((byte) 0);
+            return questionMapper.insert(question) == 1 ? question : null;
+        }else {
+            question.setQId(userId);
+            question.setAId(questionAddReqDTO.getAId());
+            question.setAnswerStatus((byte) 0);
+            Date date = new Date();
+            question.setCreateTime(date);
+            question.setUpdateTime(date);
+            question.setContent(questionAddReqDTO.getContent());
+            question.setDelFlag((byte) 0);
+            int insert = questionMapper.insert(question);
+            if (insert == 1){
+                question.setParentQuestion(question.getId());
+                questionMapper.updateById(question);
+                return question;
+            }else {
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public void sendEmail(String a_id) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", a_id);
+        User existUser = userMapper.selectOne(wrapper);
+
+        String content = "hello，您有新消息提示。";
+        EmailUtil emailUtil = new EmailUtil();
+        emailUtil.sendEmail(existUser.getEmail(), content);
+    }
+
+    @Override
+    public List<Question> getAllQuestion(long id,String a_id) {
+        QueryWrapper<Question> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        wrapper.eq("a_id", a_id);
+        wrapper.eq("del_flag", 0);
+        return questionMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<Answer> getAllAnswer(long id,String a_id) {
+        return questionMapper.getAllAnswer(id,a_id);
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.UserService;
 
 
+import com.somanyteam.event.util.EmailUtil;
 import com.somanyteam.event.util.PasswordUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
 import io.netty.util.internal.StringUtil;
@@ -146,36 +147,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String sendEmail(String email) {
-        int count;
-        if (StrUtil.isEmpty(email)){
-            throw new UserEnterEmptyException();
-        }
-        if(!email.matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
-            throw new UserEmailNotMatchException();
-        }
-        SimpleMailMessage msg = new SimpleMailMessage();
+    public int sendEmail(String email,String content) {
         String code = RandomCodeUtil.getRandom();
-        msg.setSubject("匿名信邮箱验证");
-        msg.setFrom("1247054987@qq.com");
-        msg.setTo(email); // 设置邮件接收者，可以有多个接收者
-        msg.setSentDate(new Date());
-        msg.setText("hello 欢迎访问匿名信网站，您的验证码为："+code);
-        try {
-            javaMailSender.send(msg);
+        String text = content + code;
+        EmailUtil emailUtil = new EmailUtil();
+        int i = emailUtil.sendEmail(email, text);
+        if (i == 1){
+            //发送成功
             redisTemplate.opsForValue().set("code_"+email,code);
             redisTemplate.expire("code_"+email,10, TimeUnit.MINUTES);
-            count = 1;
-        }catch (MailSendException e){
-            System.out.println(e);
-            count = 0;
-        }
-
-        if (count == 1){
-            //发送成功
-            return code;
+            return i;
         }else {
-            return null;
+            return 0;
         }
     }
 
