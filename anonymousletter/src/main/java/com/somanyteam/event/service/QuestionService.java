@@ -80,6 +80,6 @@ public interface QuestionService {
 
     int sendEmail(Question question,String aId);
 
-    QuestionAndAnswerResult getAllQuestionAndAnswer(Long id,String aId);
+    QuestionAndAnswerResult getAllQuestionAndAnswer(Long id,String aId,Boolean flag);
 
 }

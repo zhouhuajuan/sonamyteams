@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "拉黑相关接口")
 @RestController
 @RequestMapping("/blacklist")
-public class BlackListController {
+public class BlacklistController {
 
     @Autowired
     private BlacklistService blacklistService;

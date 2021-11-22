@@ -222,7 +222,7 @@ public class QuestionServiceImpl implements QuestionService {
             question.setUpdateTime(date);
             question.setContent(questionAddReqDTO.getContent());
             question.setParentQuestion(questionAddReqDTO.getParentQuestion());
-            question.setDelFlag((byte) 0);
+//            question.setDelFlag((byte) 1);
             return questionMapper.insert(question) == 1 ? question : null;
         }else {
             question.setQId(userId);
@@ -232,7 +232,7 @@ public class QuestionServiceImpl implements QuestionService {
             question.setCreateTime(date);
             question.setUpdateTime(date);
             question.setContent(questionAddReqDTO.getContent());
-            question.setDelFlag((byte) 0);
+//            question.setDelFlag((byte) 1);
             int insert = questionMapper.insert(question);
             if (insert == 1){
                 question.setParentQuestion(question.getId());
@@ -260,15 +260,17 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, String aId) {
+    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, String aId,Boolean flag) {
 //        QueryWrapper<Question> wrapper = new QueryWrapper<>();
 //        wrapper.eq("id", id);
 //        Question question1 = questionMapper.selectOne(wrapper);
-
         QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
+        if (flag){
+            wrapper1.eq("del_flag",0);
+        }
+
         wrapper1.eq("parent_question", id);
         wrapper1.eq("a_id", aId);
-//        wrapper1.eq("del_flag", 0);
         List<Question> questionList = questionMapper.selectList(wrapper1);
         if (questionList == null){
             return null;
