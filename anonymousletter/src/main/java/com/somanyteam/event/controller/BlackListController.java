@@ -29,11 +29,7 @@ public class BlackListController {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId();
         int i = blacklistService.addBlacklist(id, loginUserId);
-        if (i>0){
-            return ResponseMessage.newSuccessInstance("拉入黑名单成功");
-        }else {
-            return ResponseMessage.newErrorInstance("拉入黑名单失败");
-        }
+        return i>0 ? ResponseMessage.newSuccessInstance("拉入黑名单成功") : ResponseMessage.newErrorInstance("拉入黑名单失败");
     }
 
     @ApiOperation("根据问题把某用户从黑名单移除")
@@ -42,11 +38,7 @@ public class BlackListController {
         User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
         String loginUserId = loginUser.getId();
         int i = blacklistService.deleteBlacklist(id, loginUserId);
-        if (i>0){
-            return ResponseMessage.newSuccessInstance("移除黑名单成功");
-        }else {
-            return ResponseMessage.newErrorInstance("移除黑名单失败");
-        }
+        return i>0 ? ResponseMessage.newSuccessInstance("移除黑名单成功") : ResponseMessage.newErrorInstance("移除黑名单失败");
     }
 
 }

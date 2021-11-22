@@ -1,7 +1,6 @@
 package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.somanyteam.event.entity.Blacklist;
 import com.somanyteam.event.entity.Question;
