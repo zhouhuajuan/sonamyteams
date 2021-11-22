@@ -5,6 +5,7 @@ import com.somanyteam.event.entity.Blacklist;
 import com.somanyteam.event.mapper.BlacklistMapper;
 import com.somanyteam.event.service.BlacklistService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @program: somanyteams
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author: 周华娟
  * @create: 2021-11-21 10:42
  **/
+@Service
 public class BlacklistServiceImpl implements BlacklistService {
 
     @Autowired

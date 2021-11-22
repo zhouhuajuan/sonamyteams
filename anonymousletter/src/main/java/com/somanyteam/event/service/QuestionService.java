@@ -1,8 +1,11 @@
 package com.somanyteam.event.service;
 
+import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface QuestionService {
@@ -58,4 +61,13 @@ public interface QuestionService {
      * @return int
      */
     int getQuestionCount(long id,String q_id,String a_id);
+
+    /**
+     * 添加或者更新回答
+     * @param multipartFiles 图片
+     * @param curUser 用户身份
+     * @param dto dto
+     * @return 问题id
+     */
+    Long addOrUpdateAnswer(MultipartFile[] multipartFiles, User curUser, AddOrUpdateAnswerReqDTO dto) throws IOException;
 }

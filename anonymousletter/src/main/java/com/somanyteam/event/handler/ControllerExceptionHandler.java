@@ -19,6 +19,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseMessage<Object> runTimeExceptionHandler(RuntimeException e){
 //        ResponseMessage<Object> responseMessage;
+        e.printStackTrace();
         logger.info("异常信息:" +e.getMessage());
         return ResponseMessage.newErrorInstance(e.getMessage());
 

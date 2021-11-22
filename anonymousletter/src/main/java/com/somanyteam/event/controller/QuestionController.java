@@ -1,6 +1,7 @@
 package com.somanyteam.event.controller;
 
 
+import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.entity.User;
@@ -14,7 +15,9 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -136,5 +139,14 @@ public class QuestionController {
     }
 
 
+    @ApiOperation("添加或者编辑回答")
+    @PostMapping("/addOrUpdateAnswer")
+    public ResponseMessage<Long> addOrUpdateAnswer(MultipartFile[] multipartFiles,  AddOrUpdateAnswerReqDTO dto) throws IOException {
+        Subject subject = SecurityUtils.getSubject();
+//        System.out.println(multipartFiles.length);
+//        System.out.println(dto);
+        return ResponseMessage.newSuccessInstance(questionService.addOrUpdateAnswer(multipartFiles, (User) subject.getPrincipal(), dto), "获取成功");
+//        return ResponseMessage.newSuccessInstance("200");
+    }
 
 }
