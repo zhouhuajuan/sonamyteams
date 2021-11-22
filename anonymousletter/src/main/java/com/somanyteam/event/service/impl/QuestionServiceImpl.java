@@ -270,6 +270,9 @@ public class QuestionServiceImpl implements QuestionService {
         wrapper1.eq("a_id", aId);
         wrapper1.eq("del_flag", 0);
         List<Question> questionList = questionMapper.selectList(wrapper1);
+        if (questionList == null){
+            return null;
+        }
 
         List<QuestionResult> allQuestion = new ArrayList<>();
         QuestionResult result1 = new QuestionResult();
