@@ -36,7 +36,7 @@ public interface QuestionMapper extends BaseMapper<Question> {
     List<Question> getNotAllAnsweredParentQuestion(String userId);
 
     //真删除
-    int deleteQuestion(String userId,long id);
+    int deleteQuestion(String userId,Long id);
 
     List<VariousQuestionsListResult> getPublicQuestions(String userId);
 
@@ -44,7 +44,7 @@ public interface QuestionMapper extends BaseMapper<Question> {
 
     List<Question> getUnreceivedAnswerQuestionList(String userId);
 
-    int getAnswerCount(long id,String qId,String aId);
+    int getAnswerCount(Long id,String qId,String aId);
 
-    List<Answer> getAllAnswer(long id,String aId);
+    List<Answer> getAllAnswer(Long id,String aId);
 }
