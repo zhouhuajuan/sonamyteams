@@ -33,17 +33,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-
 @Service("userService")
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
     @Autowired
-    private JavaMailSender javaMailSender;
+    private RedisTemplate redisTemplate;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private EmailUtil emailUtil;
 
     @Override
     public User login(String email, String password) {
@@ -150,7 +149,6 @@ public class UserServiceImpl implements UserService {
     public int sendEmail(String email,String content) {
         String code = RandomCodeUtil.getRandom();
         String text = content + code;
-        EmailUtil emailUtil = new EmailUtil();
         int i = emailUtil.sendEmail(email, text);
         if (i == 1){
             //发送成功
@@ -218,8 +216,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 注销账户
-     * @param subject
-     * @return
+     * @param subject subject
+     * @return boolean
      */
     @Override
     public boolean deleteAccount(Subject subject) {

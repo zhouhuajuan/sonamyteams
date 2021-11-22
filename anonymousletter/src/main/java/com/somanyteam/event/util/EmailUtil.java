@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -26,6 +27,7 @@ public class EmailUtil {
 
     // 发送邮件
     public int sendEmail(String email,String content) {
+        //JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         if (StrUtil.isEmpty(email) || StrUtil.isEmpty(content)){
             throw new UserEnterEmptyException();
         }
@@ -33,7 +35,7 @@ public class EmailUtil {
             throw new UserEmailNotMatchException();
         }
 
-        int count = 0;
+        int count;
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setSubject("匿名信邮箱验证");
         msg.setFrom("1247054987@qq.com");

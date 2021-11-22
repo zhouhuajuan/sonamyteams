@@ -73,14 +73,14 @@ public interface QuestionService {
      */
     Long addOrUpdateAnswer(MultipartFile[] multipartFiles, User curUser, AddOrUpdateAnswerReqDTO dto) throws IOException;
 
-    int answerAllQuestion(long id,String q_id,String a_id);
+    int answerAllQuestion(long id,String qId,String aId);
 
     Question addQuestion(QuestionAddReqDTO questionAddReqDTO,String userId);
 
-    void sendEmail(String a_id);
+    int sendEmail(String aId);
 
-    List<Question> getAllQuestion(long id,String a_id);
+    List<Question> getAllQuestion(long id,String aId);
 
-    List<Answer> getAllAnswer(long id,String a_id);
+    List<Answer> getAllAnswer(long id,String aId);
 
 }

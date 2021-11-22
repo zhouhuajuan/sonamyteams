@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.somanyteam.event.constant.CommonConstant;
 import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
@@ -88,11 +87,7 @@ public class QuestionServiceImpl implements QuestionService {
     private UserMapper userMapper;
 
     @Autowired
-    private JavaMailSender javaMailSender;
-
-    @Autowired
     private EmailUtil emailUtil;
-
 
     @Override
     public List<VariousQuestionsListResult> getUnansweredQuestion(String userId) {
@@ -172,16 +167,16 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int answerAllQuestion(long id, String q_id, String a_id) {
-        if (id == 0 || StrUtil.isEmpty(q_id) || StrUtil.isEmpty(a_id)){
+    public int answerAllQuestion(long id, String qId, String aId) {
+        if (id == 0 || StrUtil.isEmpty(qId) || StrUtil.isEmpty(aId)){
             throw new QuestionEnterEmptyException();
         }
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", id);
-        wrapper.eq("q_id", q_id);
-        wrapper.eq("a_id", a_id);
+        wrapper.eq("parent_question", id);
+        wrapper.eq("q_id", qId);
+        wrapper.eq("a_id", aId);
         int questionCount = questionMapper.selectCount(wrapper);
-        int answerCount = questionMapper.getAnswerCount(id, q_id, a_id);
+        int answerCount = questionMapper.getAnswerCount(id, qId, aId);
         return (questionCount==answerCount ? 1 : 0);
     }
 
@@ -210,7 +205,7 @@ public class QuestionServiceImpl implements QuestionService {
             question.setQId(userId);
             question.setAId(questionAddReqDTO.getAId());
             QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
-            wrapper.eq("id", questionAddReqDTO.getParentQuestion());
+            wrapper1.eq("id", questionAddReqDTO.getParentQuestion());
             Question father_question = questionMapper.selectOne(wrapper1);
             question.setAnswerStatus(father_question.getAnswerStatus());
             Date date = new Date();
@@ -241,28 +236,27 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void sendEmail(String a_id) {
+    public int sendEmail(String aId) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", a_id);
+        wrapper.eq("id", aId);
         User existUser = userMapper.selectOne(wrapper);
 
         String content = "hello，您有新消息提示。";
-        EmailUtil emailUtil = new EmailUtil();
-        emailUtil.sendEmail(existUser.getEmail(), content);
+        return emailUtil.sendEmail(existUser.getEmail(), content);
     }
 
     @Override
-    public List<Question> getAllQuestion(long id,String a_id) {
+    public List<Question> getAllQuestion(long id,String aId) {
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", id);
-        wrapper.eq("a_id", a_id);
+        wrapper.eq("parent_question", id);
+        wrapper.eq("a_id", aId);
         wrapper.eq("del_flag", 0);
         return questionMapper.selectList(wrapper);
     }
 
     @Override
-    public List<Answer> getAllAnswer(long id,String a_id) {
-        return questionMapper.getAllAnswer(id,a_id);
+    public List<Answer> getAllAnswer(long id,String aId) {
+        return questionMapper.getAllAnswer(id,aId);
     }
 
     @Override
