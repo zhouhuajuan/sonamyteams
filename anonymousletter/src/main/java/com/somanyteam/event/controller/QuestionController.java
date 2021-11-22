@@ -103,7 +103,7 @@ public class QuestionController {
         }else {
             QuestionAddResult result = new QuestionAddResult();
             BeanUtils.copyProperties(question1,result);
-            questionService.sendEmail(questionAddReqDTO.getAId());
+            questionService.sendEmail(question1,questionAddReqDTO.getAId());
             return ResponseMessage.newSuccessInstance(result,"添加问题成功");
         }
     }

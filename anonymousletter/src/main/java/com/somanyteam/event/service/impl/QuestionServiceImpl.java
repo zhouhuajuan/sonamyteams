@@ -242,12 +242,17 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int sendEmail(String aId) {
+    public int sendEmail(Question question,String aId) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("id", aId);
         User existUser = userMapper.selectOne(wrapper);
 
-        String content = "hello，您有新消息提示。";
+        QueryWrapper<User> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("id", question.getQId());
+        User existUser1 = userMapper.selectOne(wrapper1);
+
+        String content = existUser.getUsername()+": hello，您收到了来自"+
+                existUser1.getUsername()+"的提问："+question.getContent();
         return emailUtil.sendEmail(existUser.getEmail(), content);
     }
 

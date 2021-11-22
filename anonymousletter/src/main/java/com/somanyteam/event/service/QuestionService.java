@@ -77,7 +77,7 @@ public interface QuestionService {
 
     Question addQuestion(QuestionAddReqDTO questionAddReqDTO,String userId);
 
-    int sendEmail(String aId);
+    int sendEmail(Question question,String aId);
 
     List<Question> getAllQuestion(Long id,String aId);
 
