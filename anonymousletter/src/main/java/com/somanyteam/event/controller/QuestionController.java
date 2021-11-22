@@ -114,7 +114,7 @@ public class QuestionController {
     }
 
     @ApiOperation("获取父问题和答案及以下的子问题和答案")
-    @PostMapping("/getQuestionAndAnswer/{userId}/{parentId}")
+    @GetMapping("/getQuestionAndAnswer/{userId}/{parentId}")
     public ResponseMessage getQuestionAndAnswer(@PathVariable("userId") String userId,
                                                 @PathVariable("parentId") Long parentId,
                                                 @RequestParam("情景判断") Boolean flag) {

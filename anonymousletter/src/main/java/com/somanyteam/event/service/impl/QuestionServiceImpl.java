@@ -265,7 +265,7 @@ public class QuestionServiceImpl implements QuestionService {
 //        wrapper.eq("id", id);
 //        Question question1 = questionMapper.selectOne(wrapper);
         QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
-        if (flag){
+        if (!flag){
             wrapper1.eq("del_flag",0);
         }
 
