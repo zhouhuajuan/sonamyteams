@@ -11,6 +11,8 @@ public class Report {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private Long questionId;
+
     private String complaintant;
 
     private String defendant;
