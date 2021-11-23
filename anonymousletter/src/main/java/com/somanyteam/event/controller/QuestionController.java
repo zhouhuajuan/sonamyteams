@@ -117,7 +117,7 @@ public class QuestionController {
     @GetMapping("/getQuestionAndAnswer/{parentId}")
     public ResponseMessage getQuestionAndAnswer(@PathVariable("parentId") Long parentId,
                                                 @RequestParam("情景判断") Boolean flag) {
-        QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(parentId, flag);
+        QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(parentId,flag);
         return res==null ? ResponseMessage.newErrorInstance("获取问题答案失败") : ResponseMessage.newSuccessInstance(res,"获取问题答案成功");
     }
 

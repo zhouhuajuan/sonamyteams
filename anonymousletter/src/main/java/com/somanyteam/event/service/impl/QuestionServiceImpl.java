@@ -116,8 +116,10 @@ public class QuestionServiceImpl implements QuestionService {
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
         wrapper.eq("parent_question", id);
         List<Question> questionList = questionMapper.selectList(wrapper);
+        Date date = new Date();
         for (Question question : questionList) {
             question.setDelFlag((byte) 1);
+            question.setUpdateTime(date);
             int i = questionMapper.updateById(question);
             if (i==1){
                 count++;
@@ -256,13 +258,17 @@ public class QuestionServiceImpl implements QuestionService {
         wrapper1.eq("id", question.getQId());
         User existUser1 = userMapper.selectOne(wrapper1);
 
-        String content = existUser.getUsername()+": hello，您收到了来自"+
-                existUser1.getUsername()+"的提问："+question.getContent();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String formatDate = sdf.format(new Date());
+        String content = existUser.getUsername()+": \r\n"
+                + "  hello，您收到了来自"
+                + existUser1.getUsername()+"的提问："+question.getContent()+"。\r\n"
+                +formatDate;
         return emailUtil.sendEmail(existUser.getEmail(), content);
     }
 
     @Override
-    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, Boolean flag) {
+    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id,Boolean flag) {
 //        QueryWrapper<Question> wrapper = new QueryWrapper<>();
 //        wrapper.eq("id", id);
 //        Question question1 = questionMapper.selectOne(wrapper);
@@ -272,27 +278,26 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         wrapper1.eq("parent_question", id);
-//        wrapper1.eq("a_id", aId);
         List<Question> questionList = questionMapper.selectList(wrapper1);
-        if (questionList == null){
+        if (questionList == null || questionList.size() == 0){
             return null;
         }
 
         List<QuestionResult> allQuestion = new ArrayList<>();
-        QuestionResult result1 = new QuestionResult();
         List<AnswerResult> allAnswer = new ArrayList<>();
-        AnswerResult result2 = new AnswerResult();
 
         QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
         List<Long> idList = new ArrayList<>();
         for (Question question : questionList) {
             idList.add(question.getId());
+            QuestionResult result1 = new QuestionResult();
             BeanUtils.copyProperties(question,result1);
             allQuestion.add(result1);
         }
         queryWrapper.in("question_id", idList);
         List<Answer> answerList = answerMapper.selectList(queryWrapper);
         for (Answer answer: answerList) {
+            AnswerResult result2 = new AnswerResult();
             BeanUtils.copyProperties(answer,result2);
             allAnswer.add(result2);
         }
@@ -300,6 +305,17 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionAndAnswerResult result = new QuestionAndAnswerResult();
         result.setAllQuestion(allQuestion);
         result.setAllAnswer(allAnswer);
+
+        Question question = questionList.get(0);
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id",question.getQId());
+        User user = userMapper.selectOne(wrapper);
+        result.setQUsername(user.getUsername());
+
+        QueryWrapper<User> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("id",question.getAId());
+        User user1 = userMapper.selectOne(queryWrapper1);
+        result.setAUsername(user1.getUsername());
         return result;
     }
 

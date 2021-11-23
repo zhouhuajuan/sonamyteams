@@ -1,7 +1,9 @@
 package com.somanyteam.event.controller;
 
-import com.somanyteam.event.dto.result.report.GetHandledReportListResult;
+import com.somanyteam.event.dto.request.report.AddReportReqDTO;
+import com.somanyteam.event.dto.request.report.HandleReportReqDTO;
 import com.somanyteam.event.dto.result.report.GetReportContentResult;
+import com.somanyteam.event.dto.result.report.GetReportListResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.ReportService;
 import com.somanyteam.event.util.ResponseMessage;
@@ -10,10 +12,8 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,12 +25,31 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @ApiOperation("管理员查看自己已处理的举报列表")
-    @GetMapping("/admin/report/handled")
-    public ResponseMessage<List<GetHandledReportListResult>> getHandledReportList(){
+    @ApiOperation("根据type查看自己举报处理列表（0-未处理，1-已处理）")
+    @GetMapping("/admin/report/{type}")
+    public ResponseMessage<List<GetReportListResult>> getHandledReportList(@PathVariable("type") Integer type){
         Subject subject = SecurityUtils.getSubject();
-        return ResponseMessage.newSuccessInstance(reportService.getHandledReportList((User) subject.getPrincipal()), "获取成功");
+        return ResponseMessage.newSuccessInstance(reportService.getReportList((User) subject.getPrincipal(), type), "获取成功");
     }
+
+    @ApiOperation("用户根据问题id进行举报")
+    @PostMapping("/user/report")
+    public ResponseMessage addReport(@RequestBody @Validated AddReportReqDTO addReportReqDTO){
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser == null ? null : loginUser.getId();
+        int i = reportService.addReport(addReportReqDTO, loginUserId);
+        return i>0 ? ResponseMessage.newSuccessInstance("举报成功") : ResponseMessage.newErrorInstance("举报失败");
+    }
+
+    @ApiOperation("处理举报内容")
+    @PostMapping("/admin/report/handle")
+    public ResponseMessage handleReport(@RequestBody @Validated HandleReportReqDTO handleReportReqDTO){
+        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        String loginUserId = loginUser.getId();
+        int i = reportService.handleReport(handleReportReqDTO, loginUserId);
+        return i>0 ? ResponseMessage.newSuccessInstance("处理完成") : ResponseMessage.newErrorInstance("处理失败");
+    }
+
 
     @ApiOperation("管理员查看举报的具体内容")
     @GetMapping("/admin/report/{id}")
@@ -38,7 +57,5 @@ public class ReportController {
 
         return ResponseMessage.newSuccessInstance(reportService.getReportContent(id), "获取成功");
     }
-
-
 
 }

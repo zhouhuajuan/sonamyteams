@@ -21,4 +21,10 @@ public class QuestionAndAnswerResult {
 
     @ApiModelProperty(value = "所有答案", required = true)
     private List<AnswerResult> allAnswer;
+
+    @ApiModelProperty(value = "提问者id")
+    private String qUsername;
+
+    @ApiModelProperty(value = "回答者id")
+    private String aUsername;
 }

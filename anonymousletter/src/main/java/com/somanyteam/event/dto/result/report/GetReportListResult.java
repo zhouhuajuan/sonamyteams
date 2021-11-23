@@ -10,7 +10,7 @@ import java.util.Date;
 
 @ApiModel("查看管理员已处理的举报的结果集")
 @Data
-public class GetHandledReportListResult {
+public class GetReportListResult {
 
     @ApiModelProperty("id")
     private Long id;

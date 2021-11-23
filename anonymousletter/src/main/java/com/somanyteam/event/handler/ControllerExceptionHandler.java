@@ -15,7 +15,6 @@ public class ControllerExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(com.somanyteam.event.handler.ControllerExceptionHandler.class);
 
-
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseMessage<Object> runTimeExceptionHandler(RuntimeException e){
 //        ResponseMessage<Object> responseMessage;
