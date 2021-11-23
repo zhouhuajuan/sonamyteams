@@ -114,11 +114,10 @@ public class QuestionController {
     }
 
     @ApiOperation("获取父问题和答案及以下的子问题和答案")
-    @GetMapping("/getQuestionAndAnswer/{userId}/{parentId}")
-    public ResponseMessage getQuestionAndAnswer(@PathVariable("userId") String userId,
-                                                @PathVariable("parentId") Long parentId,
+    @GetMapping("/getQuestionAndAnswer/{parentId}")
+    public ResponseMessage getQuestionAndAnswer(@PathVariable("parentId") Long parentId,
                                                 @RequestParam("情景判断") Boolean flag) {
-        QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(parentId, userId,flag);
+        QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(parentId, flag);
         return res==null ? ResponseMessage.newErrorInstance("获取问题答案失败") : ResponseMessage.newSuccessInstance(res,"获取问题答案成功");
     }
 

@@ -262,7 +262,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, String aId,Boolean flag) {
+    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, Boolean flag) {
 //        QueryWrapper<Question> wrapper = new QueryWrapper<>();
 //        wrapper.eq("id", id);
 //        Question question1 = questionMapper.selectOne(wrapper);
@@ -272,7 +272,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         wrapper1.eq("parent_question", id);
-        wrapper1.eq("a_id", aId);
+//        wrapper1.eq("a_id", aId);
         List<Question> questionList = questionMapper.selectList(wrapper1);
         if (questionList == null){
             return null;

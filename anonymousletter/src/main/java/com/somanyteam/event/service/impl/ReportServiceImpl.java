@@ -1,15 +1,25 @@
 package com.somanyteam.event.service.impl;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
+import com.somanyteam.event.dto.result.question.QuestionResult;
 import com.somanyteam.event.dto.result.report.GetHandledReportListResult;
+import com.somanyteam.event.dto.result.report.GetReportContentResult;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.Report;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.ReportStatusEnums;
+import com.somanyteam.event.enums.ReportTypeEnums;
+import com.somanyteam.event.exception.CommonException;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.mapper.ReportMapper;
+import com.somanyteam.event.mapper.UserMapper;
+import com.somanyteam.event.service.QuestionService;
 import com.somanyteam.event.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +35,12 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private QuestionService questionService;
 
     /**
      * 获取由该用户处理的举报
@@ -77,5 +93,55 @@ public class ReportServiceImpl implements ReportService {
         return reportListResults;
 
 
+    }
+
+    @Override
+    public GetReportContentResult getReportContent(Long id) {
+        if(id == null) {
+            throw new CommonException("id不能为空");
+        }
+        GetReportContentResult result = new GetReportContentResult();
+        Report report = reportMapper.selectById(id);
+
+        //举报者的id，若为游客举报，则为null
+        String complaintantId = report.getComplaintant();
+        //被举报者id，["",""]的格式，可以有多个被举报者
+        String defendantId = report.getDefendant();
+
+        String complaintantName = "";
+        //如果不是游客
+        if(complaintantId != null){
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.select("username").eq("id", complaintantId);
+            User complaintant = userMapper.selectOne(queryWrapper);
+            complaintantName = complaintant.getUsername();
+        }
+        JSONArray list = JSONUtil.parseArray(defendantId);
+        List<String> defendantList = list.toList(String.class);
+
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.select("username").in("id", defendantList);
+        List<User> defendantUser = userMapper.selectList(userQueryWrapper);
+
+        List<String> defendantUsername = new ArrayList<>();
+        for(User user : defendantUser){
+            defendantUsername.add(user.getUsername());
+        }
+
+        //即使问题被删除了，也返回
+        QuestionAndAnswerResult questionAndAnswer = questionService.getAllQuestionAndAnswer(report.getQuestionId(), true);
+        List<QuestionResult> allQuestion = questionAndAnswer.getAllQuestion();
+        //获取父问题的提问时间
+        QuestionResult parentQuestion = allQuestion.get(0);
+
+        result.setComplaintant(complaintantName);
+        result.setDefendant(defendantUsername);
+        result.setReportTime(report.getCreateTime());
+        result.setStatus(report.getStatus());
+        result.setType(ReportTypeEnums.getTypeByCode(report.getType()).getType());
+        result.setQuestionAndAnswerResult(questionAndAnswer);
+        result.setQuestionTime(parentQuestion.getCreateTime());
+
+        return result;
     }
 }

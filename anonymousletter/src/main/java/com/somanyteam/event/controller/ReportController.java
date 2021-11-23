@@ -1,6 +1,7 @@
 package com.somanyteam.event.controller;
 
 import com.somanyteam.event.dto.result.report.GetHandledReportListResult;
+import com.somanyteam.event.dto.result.report.GetReportContentResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.ReportService;
 import com.somanyteam.event.util.ResponseMessage;
@@ -10,6 +11,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,11 +25,20 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @ApiOperation("查看自己已处理的举报列表")
+    @ApiOperation("管理员查看自己已处理的举报列表")
     @GetMapping("/admin/report/handled")
     public ResponseMessage<List<GetHandledReportListResult>> getHandledReportList(){
         Subject subject = SecurityUtils.getSubject();
         return ResponseMessage.newSuccessInstance(reportService.getHandledReportList((User) subject.getPrincipal()), "获取成功");
     }
+
+    @ApiOperation("管理员查看举报的具体内容")
+    @GetMapping("/admin/report/{id}")
+    public ResponseMessage<GetReportContentResult> getReportContent(@PathVariable("id") Long id){
+
+        return ResponseMessage.newSuccessInstance(reportService.getReportContent(id), "获取成功");
+    }
+
+
 
 }
