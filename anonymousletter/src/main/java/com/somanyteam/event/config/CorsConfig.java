@@ -1,5 +1,6 @@
 package com.somanyteam.event.config;
 
+import com.somanyteam.event.Interceptor.UserTypeInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -22,9 +23,9 @@ public class CorsConfig extends WebMvcConfigurationSupport {
         // 开启发送Cookie和HTTP认证信息
         corsConfiguration.setAllowCredentials(true);
         //设置特殊域名的跨域
-        corsConfiguration.addAllowedOrigin("http://8.134.33.6:8080");
-        corsConfiguration.addAllowedOrigin("http://8.134.33.6:8081");
-        corsConfiguration.addAllowedOrigin("http://8.134.33.6");
+        corsConfiguration.addAllowedOrigin("http://localhost:8080");
+        corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        corsConfiguration.addAllowedOrigin("http://localhost");
         // 允许任何头
         corsConfiguration.addAllowedHeader("*");
         // 允许任何方法
@@ -45,7 +46,7 @@ public class CorsConfig extends WebMvcConfigurationSupport {
         // 设置允许跨域的路径
         registry.addMapping("/**")
                 // 设置允许跨域请求的域名
-                .allowedOrigins("http://8.134.33.6")
+                .allowedOrigins("http://localhost")
                 // 是否允许证书 不再默认开启
                 .allowCredentials(true)
                 // 设置允许的方法
@@ -54,12 +55,12 @@ public class CorsConfig extends WebMvcConfigurationSupport {
                 .maxAge(3600);
 
         registry.addMapping("/**")
-                .allowedOrigins("http://8.134.33.6:8080")
+                .allowedOrigins("http://localhost:8080")
                 .allowCredentials(true)
                 .allowedMethods("*")
                 .maxAge(3600);
         registry.addMapping("/**")
-                .allowedOrigins("http://8.134.33.6:8081")
+                .allowedOrigins("http://localhost:8081")
                 .allowCredentials(true)
                 .allowedMethods("*")
                 .maxAge(3600);
@@ -99,6 +100,9 @@ public class CorsConfig extends WebMvcConfigurationSupport {
     }
 
 
-
-
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+//        super.addInterceptors(registry);
+        registry.addInterceptor(new UserTypeInterceptor()).addPathPatterns("/report/admin/**");
+    }
 }

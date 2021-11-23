@@ -17,7 +17,7 @@ public enum UserType {
         this.type = type;
     }
 
-    public static UserType getTypeByCode(String code){
+    public static UserType getTypeByCode(Byte code){
         for(UserType type: values()){
             if(code.equals(type.getCode())){
                 return type;
