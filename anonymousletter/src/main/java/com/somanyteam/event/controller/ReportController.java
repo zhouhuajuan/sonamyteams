@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Api(tags = "举报相关接口")
-@RequestMapping("/report")
+//@RequestMapping("/report")
 @RestController
 public class ReportController {
 
@@ -24,7 +24,7 @@ public class ReportController {
     private ReportService reportService;
 
     @ApiOperation("查看自己已处理的举报列表")
-    @GetMapping("/admin/handled")
+    @GetMapping("/admin/report/handled")
     public ResponseMessage<List<GetHandledReportListResult>> getHandledReportList(){
         Subject subject = SecurityUtils.getSubject();
         return ResponseMessage.newSuccessInstance(reportService.getHandledReportList((User) subject.getPrincipal()), "获取成功");

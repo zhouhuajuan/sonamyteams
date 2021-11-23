@@ -251,17 +251,16 @@ public class UserController {
         if(!curUser.getPassword().equals(encryptOldPwd)){
             return ResponseMessage.newErrorInstance("旧密码不正确");
         }
-
-        Integer update = userService.modifyPassword(curUser, newPassword);
+        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
+        Integer update = userService.modifyPassword(curUser, encryptNewPwd);
         if(update >= 1){
             System.out.println("新密码:" + newPassword);
             //把新密码放入当用户信息里
-            curUser.setPassword(encryptOldPwd);
+            curUser.setPassword(encryptNewPwd);
            return ResponseMessage.newSuccessInstance("修改成功");
         }else{
            return ResponseMessage.newErrorInstance("修改失败");
         }
-        
 
     }
 

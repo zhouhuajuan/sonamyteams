@@ -103,6 +103,6 @@ public class CorsConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
 //        super.addInterceptors(registry);
-        registry.addInterceptor(new UserTypeInterceptor()).addPathPatterns("/report/admin/**");
+        registry.addInterceptor(new UserTypeInterceptor()).addPathPatterns("/admin/**");
     }
 }

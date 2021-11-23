@@ -70,10 +70,10 @@ public class UserServiceImpl implements UserService {
 //        if(!encryptOldPwd.equals(curUser.getPassword())){
 //            throw new UserOldPwdNotMatchException();
 //        }
-        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
+//        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
         User user = new User();
         user.setId(curUser.getId());
-        user.setPassword(encryptNewPwd);
+        user.setPassword(newPassword);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = sdf.parse(sdf.format(new Date()));
         user.setUpdateTime(date);

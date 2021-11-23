@@ -42,7 +42,7 @@ public class UserRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         UsernamePasswordToken token = (UsernamePasswordToken) principalCollection.getPrimaryPrincipal();
         User user = (User) token.getPrincipal();
-        authorizationInfo.addRole(UserType.getTypeByCode(String.valueOf(user.getIdentity())).getType());
+        authorizationInfo.addRole(UserType.getTypeByCode(user.getIdentity()).getType());
         return authorizationInfo;
     }
 
