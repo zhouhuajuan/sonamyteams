@@ -1,6 +1,7 @@
 package com.somanyteam.event.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -138,7 +139,9 @@ public class ReportServiceImpl implements ReportService {
         List<QuestionResult> allQuestion = questionAndAnswer.getAllQuestion();
         //获取父问题的提问时间
         QuestionResult parentQuestion = allQuestion.get(0);
+        String answerUsername = questionMapper.selectAnswerUsernameByQuestionId(parentQuestion.getId());
 
+        questionAndAnswer.setAUsername(answerUsername);
         result.setComplaintant(complaintantName);
         result.setDefendant(defendantUsername);
         result.setReportTime(report.getCreateTime());

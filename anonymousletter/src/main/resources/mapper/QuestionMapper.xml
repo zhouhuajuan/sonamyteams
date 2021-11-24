@@ -115,6 +115,9 @@
         select * from answer where question_id in (select id from question where parent_question =
         #{id,jdbcType=BIGINT} and a_id = #{aId,jdbcType=VARCHAR} and del_flag = 0) order by update_time
     </select>
+    <select id="selectAnswerUsernameByQuestionId" resultType="java.lang.String">
+        select username from user u join question q on q.a_id = u.id where q.id = #{questionId}
+    </select>
 
     <!--    <delete id="deleteQuestion">-->
     <!--        delete answer from question left join answer on question.id=answer.question_id-->

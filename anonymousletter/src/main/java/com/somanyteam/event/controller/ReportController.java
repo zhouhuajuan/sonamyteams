@@ -26,8 +26,8 @@ public class ReportController {
     private ReportService reportService;
 
     @ApiOperation("根据type查看自己举报处理列表（0-未处理，1-已处理）")
-    @GetMapping("/admin/report/{type}")
-    public ResponseMessage<List<GetReportListResult>> getHandledReportList(@PathVariable("type") Integer type){
+    @GetMapping("/admin/report/list/{type}")
+    public ResponseMessage<List<GetReportListResult>> getReportList(@PathVariable("type") Integer type){
         Subject subject = SecurityUtils.getSubject();
         return ResponseMessage.newSuccessInstance(reportService.getReportList((User) subject.getPrincipal(), type), "获取成功");
     }

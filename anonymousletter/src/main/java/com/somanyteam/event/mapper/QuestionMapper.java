@@ -49,4 +49,11 @@ public interface QuestionMapper extends BaseMapper<Question> {
     List<Answer> getAllAnswer(Long id,String aId);
 
     int updateAllAnswerStatusById(Long id, Byte answerStatus);
+
+    /**
+     * 通过问题id获取回答者的用户名
+     * @param questionId 问题id
+     * @return
+     */
+    String selectAnswerUsernameByQuestionId(Long questionId);
 }
