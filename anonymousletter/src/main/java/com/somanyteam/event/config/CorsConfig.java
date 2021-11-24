@@ -24,7 +24,8 @@ public class CorsConfig extends WebMvcConfigurationSupport {
         corsConfiguration.setAllowCredentials(true);
         //设置特殊域名的跨域
         corsConfiguration.addAllowedOrigin("http://localhost:8080");
-        corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        corsConfiguration.addAllowedOrigin("http://localhost:8082");
+        corsConfiguration.addAllowedOrigin("http://127.0.0.1:5500");
         corsConfiguration.addAllowedOrigin("http://localhost");
         // 允许任何头
         corsConfiguration.addAllowedHeader("*");
@@ -60,7 +61,12 @@ public class CorsConfig extends WebMvcConfigurationSupport {
                 .allowedMethods("*")
                 .maxAge(3600);
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8081")
+                .allowedOrigins("http://localhost:8082")
+                .allowCredentials(true)
+                .allowedMethods("*")
+                .maxAge(3600);
+        registry.addMapping("/**")
+                .allowedOrigins("http://127.0.0.1:5500")
                 .allowCredentials(true)
                 .allowedMethods("*")
                 .maxAge(3600);

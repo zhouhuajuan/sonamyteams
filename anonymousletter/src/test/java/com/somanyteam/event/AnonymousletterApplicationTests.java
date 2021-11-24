@@ -108,7 +108,7 @@ class AnonymousletterApplicationTests {
         String value = jedis.ping();
         System.out.println(value);
         //获取
-        String name = jedis.get("code_zhj15767394098@163.com");
+        String name = jedis.get("code_1913124997@qq.com");
         System.out.println(name);
     }
 

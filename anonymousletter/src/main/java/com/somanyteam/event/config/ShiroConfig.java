@@ -49,6 +49,7 @@ public class ShiroConfig {
         filterMap.put("/user/sendEmail", "anon");
         filterMap.put("/user/register", "anon");
         filterMap.put("/user/forgetPwd", "anon");
+        filterMap.put("/user/getImage", "anon");
         filterMap.put("/user/getAllUserId", "anon");
         filterMap.put("/question/getPublicQuestions/**", "anon");
         filterMap.put("/question/getQuestionAndAnswer/**", "anon");

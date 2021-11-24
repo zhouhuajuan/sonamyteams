@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/vue.js"></script>
+    <title>登录页面</title>
+    <link rel="stylesheet" href="css/login.css"></link>
+</head>
+
+<body>
+    <div id="root">
+        <form class="content" action="#" method="post" name="user">
+            <ul>
+                <li>
+                    <img src="images/logo.jpg" width="80px" class="logo">
+                </li>
+                <li>
+                    <input type="text" placeholder="邮箱登录" class="email" v-model="email" /><br/>
+                </li>
+                <li>
+                    <input type="password" class="pass" placeholder="密码" v-model="password" /><br/>
+                </li>
+                <li>
+                    <input type="text" class="code" placeholder="点击图片刷新验证码" v-model="code" />
+                    <span class="code_verify"><img :src="imgCode" width="66px" height="30px" @click="getImage"></span>
+                </li>
+                <li>
+                    <!-- <input type="submit" value="登录" class="login" /><br/> -->
+                    <input type="button" value="登录" class="login" @click="login" /><br/>
+                </li>
+                <li>
+                    <a href="regist.html" class="regist">注册新用户</a>
+                    <a href="forget.html" class="forget">忘记密码</a>
+                </li>
+            </ul>
+        </form>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    new Vue({
+        el: "#root",
+        data: {
+            email: "",
+            password: "",
+            code: "",
+            remenberMe: 1,
+            // img: "images/logo.jpg"
+            imgCode: 'http://localhost:8082/user/getImage'
+        },
+        methods: {
+            login: function() {
+                // console.log("that.joke");
+                axios.post("http://localhost:8082/user/login", {
+                    email: this.email,
+                    password: this.password,
+                    code: this.code,
+                    remenberMe: 1,
+                }).then(
+                    function(response) {
+                        alert(response.data.message)
+                        console.log(response.data);
+                        // debugger;
+                        if (response.data.status === 200) {
+                            window.location.href = "https://www.smartisan.com/";
+                        } else {
+                            this.imgCode = 'http://localhost:8082/user/getImage?' + Math.random();
+                        }
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            getImage: function() {
+                const num = Math.ceil(Math.random() * 10) // 生成一个随机数（防止缓存）
+                this.imgCode = 'http://localhost:8082/user/getImage?' + num
+
+            }
+        }
+    })
+</script>
+
+</html>

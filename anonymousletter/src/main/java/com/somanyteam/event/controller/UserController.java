@@ -51,7 +51,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
     @Autowired
     private UserService userService;
 

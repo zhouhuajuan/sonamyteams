@@ -1,6 +1,7 @@
 package com.somanyteam.event.test;
 
 import com.somanyteam.event.dto.result.report.UserIdJsonResult;
+import com.somanyteam.event.util.PasswordUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -46,10 +47,12 @@ public class JsonTest {
 //                "在xxx的相关内容中涉嫌违规，现对您进行举报。\r\n"+new Date();
 //        System.out.println(content);
 
-        List<String> list2 = new ArrayList<>();
-        list2.add("123");
-        list2.add("456");
-        String json = com.alibaba.fastjson.JSONArray.toJSONString(list2);
-        System.out.println(json);
+//        List<String> list2 = new ArrayList<>();
+//        list2.add("123");
+//        list2.add("456");
+//        String json = com.alibaba.fastjson.JSONArray.toJSONString(list2);
+//        System.out.println(json);
+        //4d3f22bd25188a6c650b8de79fcc9d97
+//        PasswordUtil.
     }
 }
