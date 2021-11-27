@@ -24,7 +24,8 @@ public class CorsConfig extends WebMvcConfigurationSupport {
         corsConfiguration.setAllowCredentials(true);
         //设置特殊域名的跨域
         corsConfiguration.addAllowedOrigin("http://localhost:8080");
-        corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        //corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        corsConfiguration.addAllowedOrigin("http://localhost:8082");
         corsConfiguration.addAllowedOrigin("http://localhost");
         // 允许任何头
         corsConfiguration.addAllowedHeader("*");
