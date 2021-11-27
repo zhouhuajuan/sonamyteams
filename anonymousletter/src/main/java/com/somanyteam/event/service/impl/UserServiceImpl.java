@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotExistException();
         }
 
-        existUser.setPassword(PasswordUtil.encryptPassword(existUser.getUsername(),
+        existUser.setPassword(PasswordUtil.encryptPassword(existUser.getId(),
                 modifyPwd, existUser.getSalt()));
         existUser.setUpdateTime(new Date());
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();

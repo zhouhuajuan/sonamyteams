@@ -403,7 +403,6 @@ public class QuestionServiceImpl implements QuestionService {
 
         return answer.getId();
     }
-
     private String sendUpdateAnswerEmail(boolean isUpdate, User questionUser, User answerUser, Question question){
         StringBuilder sb = new StringBuilder();
         sb.append(questionUser.getUsername()).append(":");
