@@ -50,6 +50,10 @@ public class ResponseMessage<T> {
         return new ResponseMessage(status, data, null);
     }
 
+    public static ResponseMessage newErrorInstance( int status, String message) {
+        return new ResponseMessage(status, null, message);
+    }
+
     public static int getStatusSuccess() {
         return STATUS_SUCCESS;
     }

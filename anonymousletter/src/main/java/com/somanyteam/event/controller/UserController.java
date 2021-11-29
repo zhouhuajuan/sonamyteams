@@ -1,6 +1,8 @@
 package com.somanyteam.event.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.somanyteam.event.dto.request.user.UserLoginReqDTO;
 import com.somanyteam.event.dto.request.user.UserModifyPasswordReqDTO;
@@ -11,12 +13,15 @@ import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.UserType;
 import com.somanyteam.event.exception.user.FileNotMatchException;
 import com.somanyteam.event.service.UserService;
+import com.somanyteam.event.shiro.AccountProfile;
+import com.somanyteam.event.util.JwtUtils;
 import com.somanyteam.event.util.PasswordUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.somanyteam.event.dto.request.user.UserForgetPwdReqDTO;
 import com.somanyteam.event.dto.request.user.UserRegisterReqDTO;
 import com.somanyteam.event.exception.user.UserEnterEmptyException;
 import com.somanyteam.event.util.ResponseMessage;
+import com.somanyteam.event.util.Result;
 import com.somanyteam.event.util.VerifyCodeUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -27,6 +32,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
@@ -57,37 +63,83 @@ public class UserController {
     @Value("${upload.img.path}")
     private String uploadPathImg; //保存在服务器图片目录的路径
 
-    @ApiOperation(value = "用户登录")
+    @Autowired
+    JwtUtils jwtUtils;
+
     @PostMapping("/login")
-    public ResponseMessage<UserLoginResult> login(@RequestBody @Validated UserLoginReqDTO userLoginReqDTO, HttpSession session){
-//        String rightCode = (String) session.getAttribute("code");
-//
-//        if(!rightCode.equals(userLoginReqDTO.getCode())){
-//            throw new VerifyCodeNotMatchException();
-//        }
+    @ApiOperation("登录")
+    public ResponseMessage login(@Validated @RequestBody UserLoginReqDTO dto, HttpServletResponse response) {
+        User user = userService.getByEmail(dto.getEmail());
+        Assert.notNull(user, "用户不存在");//断言拦截
+        //判断账号密码是否错误 因为是md5加密所以这里md5判断
+        if (!user.getPassword().equals(PasswordUtil.encryptPassword(user.getId(), dto.getPassword(), user.getSalt()))) {
+            //密码不同则抛出异常
+            return ResponseMessage.newErrorInstance("密码不正确");
+        }
+        String jwt = jwtUtils.generateToken(user.getId());
+
+        //将token 放在我们的header里面
+        response.setHeader("Authorization", jwt);
+        response.setHeader("Access-control-Expose-Headers", "Authorization");
+
         Subject subject = SecurityUtils.getSubject();
+        boolean authenticated = subject.isAuthenticated();
+        System.out.println(authenticated);
+        return ResponseMessage.newSuccessInstance(MapUtil.builder()
+                .put("id", user.getId())
+                .put("username", user.getUsername())
+                .put("imgUrl", user.getImgUrl())
+                .put("email", user.getEmail()).map()
 
-        UsernamePasswordToken token  = new UsernamePasswordToken(userLoginReqDTO.getEmail(), userLoginReqDTO.getPassword());
-        if(userLoginReqDTO.getRememberMe() != null && userLoginReqDTO.getRememberMe() == 1) {
-            token.setRememberMe(true);
-        }
-        try {
-            subject.login(token);
-
-            User loginUser = (User) subject.getPrincipal();
-            UserLoginResult result = new UserLoginResult();
-            BeanUtils.copyProperties(loginUser, result);
-            return ResponseMessage.newSuccessInstance(result, "登录成功");
-        } catch (AuthenticationException e){
-            String msg = "用户名或密码错误";
-            if (StrUtil.isNotEmpty(e.getMessage())) {
-                msg = e.getMessage();
-            }
-            return ResponseMessage.newErrorInstance("登陆异常: " + msg);
-        }
-
-
+        );
     }
+
+    //需要认证权限才能退出登录
+    @RequiresAuthentication
+    @GetMapping("/logout")
+    @ApiOperation("登出")
+    public ResponseMessage logout() {
+        System.out.println("=========");
+        Subject subject = SecurityUtils.getSubject();
+        System.out.println(subject.isAuthenticated());
+        AccountProfile accountProfile = (AccountProfile) subject.getPrincipal();
+        System.out.println(accountProfile);
+        //退出登录
+        SecurityUtils.getSubject().logout();
+        return ResponseMessage.newSuccessInstance("登出成功");
+    }
+
+//    @ApiOperation(value = "用户登录")
+//    @PostMapping("/login")
+//    public ResponseMessage<UserLoginResult> login(@RequestBody @Validated UserLoginReqDTO userLoginReqDTO, HttpSession session){
+////        String rightCode = (String) session.getAttribute("code");
+////
+////        if(!rightCode.equals(userLoginReqDTO.getCode())){
+////            throw new VerifyCodeNotMatchException();
+////        }
+//        Subject subject = SecurityUtils.getSubject();
+//
+//        UsernamePasswordToken token  = new UsernamePasswordToken(userLoginReqDTO.getEmail(), userLoginReqDTO.getPassword());
+//        if(userLoginReqDTO.getRememberMe() != null && userLoginReqDTO.getRememberMe() == 1) {
+//            token.setRememberMe(true);
+//        }
+//        try {
+//            subject.login(token);
+//
+//            User loginUser = (User) subject.getPrincipal();
+//            UserLoginResult result = new UserLoginResult();
+//            BeanUtils.copyProperties(loginUser, result);
+//            return ResponseMessage.newSuccessInstance(result, "登录成功");
+//        } catch (AuthenticationException e){
+//            String msg = "用户名或密码错误";
+//            if (StrUtil.isNotEmpty(e.getMessage())) {
+//                msg = e.getMessage();
+//            }
+//            return ResponseMessage.newErrorInstance("登陆异常: " + msg);
+//        }
+//
+//
+//    }
 
     @ApiOperation(value = "注册")
     @PostMapping("/register")
@@ -165,6 +217,7 @@ public class UserController {
     }
 
     //static/827ce27cbd5edaf1d3249552c3cb7911.png
+    @RequiresAuthentication
     @ApiOperation("上传头像")
     @PostMapping("/uploadPhoto")
     public ResponseMessage uploadPhoto(@RequestPart("file") MultipartFile file) {
@@ -198,19 +251,19 @@ public class UserController {
         }
     }
 
-    @ApiOperation(value = "登出")
-    @PostMapping("/logout")
-    public ResponseMessage logout(){
-        Subject subject = SecurityUtils.getSubject();
-        //正常登录或者使用cookie登录时都可以选择登出
-        if(subject.isAuthenticated() || subject.isRemembered()){
-            subject.logout();
-            return ResponseMessage.newSuccessInstance("登出成功");
-        }else{
-            return ResponseMessage.newErrorInstance("登出失败");
-
-        }
-    }
+//    @ApiOperation(value = "登出")
+//    @PostMapping("/logout")
+//    public ResponseMessage logout(){
+//        Subject subject = SecurityUtils.getSubject();
+//        //正常登录或者使用cookie登录时都可以选择登出
+//        if(subject.isAuthenticated() || subject.isRemembered()){
+//            subject.logout();
+//            return ResponseMessage.newSuccessInstance("登出成功");
+//        }else{
+//            return ResponseMessage.newErrorInstance("登出失败");
+//
+//        }
+//    }
 
     @ApiOperation("获取验证码")
     @GetMapping("/getImage")
@@ -225,6 +278,7 @@ public class UserController {
         VerifyCodeUtils.outputImage(220,60,os,code);
     }
 
+    @RequiresAuthentication
     @ApiOperation("修改密码")
     @PostMapping("/modifyPassword")
     public ResponseMessage modifyPassword(@RequestBody UserModifyPasswordReqDTO modifyPasswordReqDTO) throws ParseException {
@@ -263,6 +317,7 @@ public class UserController {
 
     }
 
+    @RequiresAuthentication
     @ApiOperation(value = "获取用户信息")
     @PostMapping("/getUserInfo")
     public ResponseMessage getUserInfo() throws ParseException {
@@ -277,29 +332,31 @@ public class UserController {
         }
     }
 
+    @RequiresAuthentication
     @ApiOperation("注销账号")
     @GetMapping("/deleteAccount")
     public ResponseMessage deleteAccount(){
         return ResponseMessage.newSuccessInstance(userService.deleteAccount( SecurityUtils.getSubject()));
     }
 
-    @ApiOperation("测试是用cookie登录还是正常登录")
-    @GetMapping("/test")
-    public ResponseMessage test(){
-        Subject subject = SecurityUtils.getSubject();
-//        User user = (User) subject.getPrincipal();
+//    @ApiOperation("测试是用cookie登录还是正常登录")
+//    @GetMapping("/test")
+//    public ResponseMessage test(){
+//        Subject subject = SecurityUtils.getSubject();
+////        User user = (User) subject.getPrincipal();
+//
+//        if(subject.isAuthenticated()){
+//            System.out.println("用户正常登录");
+//        }else if(subject.isRemembered()){
+//            System.out.println("cookie登录");
+//        }else{
+//            System.out.println("没登录");
+//        }
+//        return ResponseMessage.newSuccessInstance("测试");
+//    }
 
-        if(subject.isAuthenticated()){
-            System.out.println("用户正常登录");
-        }else if(subject.isRemembered()){
-            System.out.println("cookie登录");
-        }else{
-            System.out.println("没登录");
-        }
-        return ResponseMessage.newSuccessInstance("测试");
-    }
 
-
+    @RequiresAuthentication
     @ApiOperation("修改用户信息")
     @PostMapping("/updateInfo")
     public ResponseMessage updateInfo(@RequestBody UserUpdateInfoReqDTO dto) throws ParseException {

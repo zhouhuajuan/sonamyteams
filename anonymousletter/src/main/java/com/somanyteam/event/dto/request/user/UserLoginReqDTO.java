@@ -19,8 +19,8 @@ public class UserLoginReqDTO {
     @NotBlank(message = "密码不能为空")
     private String password;
 
-    @ApiModelProperty(value = "记住我 0-表示不记住，1表示记住", required = true)
-    private Integer rememberMe;
+//    @ApiModelProperty(value = "记住我 0-表示不记住，1表示记住", required = true)
+//    private Integer rememberMe;
 
     @ApiModelProperty(value = "验证码",required = true)
     private String code;

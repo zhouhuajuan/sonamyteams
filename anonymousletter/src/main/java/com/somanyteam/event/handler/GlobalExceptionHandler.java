@@ -1,4 +1,5 @@
 package com.somanyteam.event.handler;
+import com.somanyteam.event.util.ResponseMessage;
 import com.somanyteam.event.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
@@ -16,33 +17,33 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(value = ShiroException.class)
-    public Result handler(ShiroException e) {
+    public ResponseMessage handler(ShiroException e) {
         log.error("运行时异常：----------------{}", e);
-        return Result.fail(401, e.getMessage(), null);
+        return ResponseMessage.newErrorInstance(401, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public Result handler(MethodArgumentNotValidException e) {
+    public ResponseMessage handler(MethodArgumentNotValidException e) {
         log.error("实体校验异常：----------------{}", e);
         BindingResult bindingResult = e.getBindingResult();
         ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
 
-        return Result.fail(objectError.getDefaultMessage());
+        return ResponseMessage.newErrorInstance(objectError.getDefaultMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = IllegalArgumentException.class)
-    public Result handler(IllegalArgumentException e) {
+    public ResponseMessage handler(IllegalArgumentException e) {
         log.error("Assert异常：----------------{}", e);
-        return Result.fail(e.getMessage());
+        return ResponseMessage.newErrorInstance(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = RuntimeException.class)
-    public Result handler(RuntimeException e) {
+    public ResponseMessage handler(RuntimeException e) {
         log.error("运行时异常：----------------{}", e);
-        return Result.fail(e.getMessage());
+        return ResponseMessage.newErrorInstance(e.getMessage());
     }
 
 }
