@@ -15,6 +15,7 @@ import com.somanyteam.event.util.ResponseMessage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
+    @RequiresAuthentication
     @ApiOperation("获取所有未回答问题")
     @GetMapping("/getUnansweredQuestion")
     public ResponseMessage getUnansweredQuestion() {
@@ -49,6 +51,7 @@ public class QuestionController {
         return (questionList.isEmpty() ? ResponseMessage.newSuccessInstance("当前用户没有未回答的问题") : ResponseMessage.newSuccessInstance(questionList));
     }
 
+    @RequiresAuthentication
     @ApiOperation("删除问题(被提问者)")
     @PostMapping("/deleteQuestion")
     public ResponseMessage deleteQuestion(@RequestParam("问题id") Long id) {
@@ -58,6 +61,7 @@ public class QuestionController {
         return (i==1 ? ResponseMessage.newSuccessInstance("删除成功") : ResponseMessage.newErrorInstance("删除失败"));
     }
 
+    @RequiresAuthentication
     @ApiOperation("获取已回答问题")
     @GetMapping("/getAnsweredQuestion")
     public ResponseMessage<List<VariousQuestionsListResult>> getAnsweredQuestion(){
@@ -89,6 +93,7 @@ public class QuestionController {
         }
     }
 
+    @RequiresAuthentication
     @ApiOperation("获取已收到回答问题的列表")
     @GetMapping("/getReceivedAnswerQuestionList")
     public ResponseMessage<List<VariousQuestionsListResult>> getReceivedAnswerQuestionList(){
@@ -96,6 +101,7 @@ public class QuestionController {
         return ResponseMessage.newSuccessInstance(questionService.getReceivedAnswerQuestionList((User) subject.getPrincipal()), "获取成功");
     }
 
+    @RequiresAuthentication
     @ApiOperation("获取未收到回答问题的列表")
     @GetMapping("/getUnreceivedAnswerQuestionList")
     public ResponseMessage<List<VariousQuestionsListResult>> getUnreceivedAnswerQuestionList(){
@@ -103,7 +109,7 @@ public class QuestionController {
         return ResponseMessage.newSuccessInstance(questionService.getUnreceivedAnswerQuestionList((User) subject.getPrincipal()));
     }
 
-
+    @RequiresAuthentication
     @ApiOperation("添加或者编辑回答")
     @PostMapping("/addOrUpdateAnswer")
     public ResponseMessage<Long> addOrUpdateAnswer(MultipartFile[] multipartFiles,  AddOrUpdateAnswerReqDTO dto) throws IOException {
