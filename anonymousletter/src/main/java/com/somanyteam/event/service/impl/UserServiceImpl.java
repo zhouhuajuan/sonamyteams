@@ -262,4 +262,16 @@ public class UserServiceImpl implements UserService {
         }
         return true;
     }
+
+    @Override
+    public User getById(String id) {
+        return userMapper.selectById(id);
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", email);
+        return userMapper.selectOne(queryWrapper);
+    }
 }

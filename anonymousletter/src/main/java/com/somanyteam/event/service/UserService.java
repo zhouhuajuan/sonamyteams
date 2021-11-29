@@ -33,4 +33,7 @@ public interface UserService {
 
     boolean updateInfo(UserUpdateInfoReqDTO dto, User curUser) throws ParseException;
 
+    User getById(String id);
+
+    User getByEmail(String email);
 }

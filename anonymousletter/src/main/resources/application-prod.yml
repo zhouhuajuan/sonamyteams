@@ -16,11 +16,25 @@ spring:
     username: root
     # 连接数据库的密码
     password: 452454zhjZHJ#
-  redis:
-    host: 8.134.33.6
-    port: 6379
-    # redis密码，默认为空
-    password:
+#  redis:
+#    host: 8.134.33.6
+#    port: 6379
+#    # redis密码，默认为空
+#    password:
+
+shiro-redis:
+  enabled: true
+  redis-manager:
+    host: 8.134.33.6:6379
+#    jedis:
+#      pool:
+#        max-active: 8
+#        max-wait: -1
+#        # 连接池中的最大空闲连接
+#        max-idle: 8
+#        # 连接池中的最小空闲连接
+#        min-idle: 0
+
   # 开启热部署
   devtools:
     restart:
@@ -59,3 +73,8 @@ springfox:
 #  host: 8.134.33.6:40000
 #  enable: true
 
+markerhub:
+  jwt:
+    secret: f4e2e52034348f86b67cde581c0f9eb5
+    expire: 604800
+    header: Authorization
