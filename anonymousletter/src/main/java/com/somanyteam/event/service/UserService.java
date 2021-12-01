@@ -1,7 +1,9 @@
 package com.somanyteam.event.service;
 
+import com.somanyteam.event.dto.request.user.UserModifyPasswordReqDTO;
 import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
 import com.somanyteam.event.entity.User;
+import com.somanyteam.event.shiro.AccountProfile;
 import org.apache.shiro.subject.Subject;
 
 
@@ -13,7 +15,7 @@ public interface UserService {
 
     User login(String email, String password);
 
-    Integer modifyPassword(User curUser, String newPassword) throws ParseException;
+    Integer modifyPassword(AccountProfile curUser, UserModifyPasswordReqDTO dto) throws ParseException;
 
     int saveUser(User user);
 

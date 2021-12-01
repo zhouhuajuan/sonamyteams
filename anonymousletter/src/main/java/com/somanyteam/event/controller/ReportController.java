@@ -7,6 +7,7 @@ import com.somanyteam.event.dto.result.report.GetReportListResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.ReportService;
 import com.somanyteam.event.util.ResponseMessage;
+import com.somanyteam.event.util.ShiroUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
@@ -30,8 +31,8 @@ public class ReportController {
     @ApiOperation("根据type查看自己举报处理列表（0-未处理，1-已处理）")
     @GetMapping("/admin/report/list/{type}")
     public ResponseMessage<List<GetReportListResult>> getReportList(@PathVariable("type") Integer type){
-        Subject subject = SecurityUtils.getSubject();
-        return ResponseMessage.newSuccessInstance(reportService.getReportList((User) subject.getPrincipal(), type), "获取成功");
+//        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(reportService.getReportList(ShiroUtil.getUser(), type), "获取成功");
     }
 
     @ApiOperation("用户根据问题id进行举报")
@@ -47,7 +48,7 @@ public class ReportController {
     @ApiOperation("处理举报内容")
     @PostMapping("/admin/report/handle")
     public ResponseMessage handleReport(@RequestBody @Validated HandleReportReqDTO handleReportReqDTO){
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId();
         int i = reportService.handleReport(handleReportReqDTO, loginUserId);
         return i>0 ? ResponseMessage.newSuccessInstance("处理完成") : ResponseMessage.newErrorInstance("处理失败");

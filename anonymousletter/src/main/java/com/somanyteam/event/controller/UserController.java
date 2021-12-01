@@ -13,6 +13,7 @@ import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.UserType;
 import com.somanyteam.event.exception.user.FileNotMatchException;
 import com.somanyteam.event.service.UserService;
+import com.somanyteam.event.shiro.Account;
 import com.somanyteam.event.shiro.AccountProfile;
 import com.somanyteam.event.util.JwtUtils;
 import com.somanyteam.event.util.PasswordUtil;
@@ -22,6 +23,7 @@ import com.somanyteam.event.dto.request.user.UserRegisterReqDTO;
 import com.somanyteam.event.exception.user.UserEnterEmptyException;
 import com.somanyteam.event.util.ResponseMessage;
 import com.somanyteam.event.util.Result;
+import com.somanyteam.event.util.ShiroUtil;
 import com.somanyteam.event.util.VerifyCodeUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,6 +36,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,9 +85,6 @@ public class UserController {
         response.setHeader("Authorization", jwt);
         response.setHeader("Access-control-Expose-Headers", "Authorization");
 
-        Subject subject = SecurityUtils.getSubject();
-        boolean authenticated = subject.isAuthenticated();
-        System.out.println(authenticated);
         return ResponseMessage.newSuccessInstance(MapUtil.builder()
                 .put("id", user.getId())
                 .put("username", user.getUsername())
@@ -102,8 +102,6 @@ public class UserController {
         System.out.println("=========");
         Subject subject = SecurityUtils.getSubject();
         System.out.println(subject.isAuthenticated());
-        AccountProfile accountProfile = (AccountProfile) subject.getPrincipal();
-        System.out.println(accountProfile);
         //退出登录
         SecurityUtils.getSubject().logout();
         return ResponseMessage.newSuccessInstance("登出成功");
@@ -221,7 +219,9 @@ public class UserController {
     @ApiOperation("上传头像")
     @PostMapping("/uploadPhoto")
     public ResponseMessage uploadPhoto(@RequestPart("file") MultipartFile file) {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+
+        User loginUser = ShiroUtil.getUser();
+
         try {
             //保存图片的名字为用户id+图片名称+上传图片时间
             String originalFileName = file.getOriginalFilename();
@@ -282,34 +282,14 @@ public class UserController {
     @ApiOperation("修改密码")
     @PostMapping("/modifyPassword")
     public ResponseMessage modifyPassword(@RequestBody UserModifyPasswordReqDTO modifyPasswordReqDTO) throws ParseException {
-        String originalPassword = modifyPasswordReqDTO.getOriginalPassword();
-        String newPassword = modifyPasswordReqDTO.getNewPassword();
-        String confirmPassword = modifyPasswordReqDTO.getConfirmPassword();
-        System.out.println("旧密码:" + originalPassword);
 
-        if(StrUtil.isEmpty(originalPassword) || StrUtil.isEmpty(newPassword) || StrUtil.isEmpty(confirmPassword)){
-           return ResponseMessage.newErrorInstance("参数不能为空");
-        }
-        if(!newPassword.equals(confirmPassword)){
-            return ResponseMessage.newErrorInstance("新密码和确认密码不一致");
-        }
-        //匹配8-16位，至少有一个大写字母和一个数字，不能有三个相同的字符，特殊字符包括
-        if(!newPassword.matches("^(?=.*[A-Z])(?=.*[0-9])(?!.*([~!@&%$^\\(\\)#_]).*\\1.*\\1)[a-zA-Z0-9.~!@\";|:`&%$^\\(\\)#_]{8,16}$")){
-            return ResponseMessage.newErrorInstance("新密码不符合格式要求");
-        }
         Subject subject = SecurityUtils.getSubject();
-        User curUser = (User) subject.getPrincipal();
-
-        String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getId(), originalPassword, curUser.getSalt());
-        if(!curUser.getPassword().equals(encryptOldPwd)){
-            return ResponseMessage.newErrorInstance("旧密码不正确");
-        }
-        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
-        Integer update = userService.modifyPassword(curUser, encryptNewPwd);
+        AccountProfile profile = new AccountProfile();
+        Object principal = subject.getPrincipal();
+        BeanUtils.copyProperties(principal, profile);
+        System.out.println(principal);
+        Integer update = userService.modifyPassword(profile, modifyPasswordReqDTO);
         if(update >= 1){
-            System.out.println("新密码:" + newPassword);
-            //把新密码放入当用户信息里
-            curUser.setPassword(encryptNewPwd);
            return ResponseMessage.newSuccessInstance("修改成功");
         }else{
            return ResponseMessage.newErrorInstance("修改失败");
@@ -321,7 +301,9 @@ public class UserController {
     @ApiOperation(value = "获取用户信息")
     @PostMapping("/getUserInfo")
     public ResponseMessage getUserInfo() throws ParseException {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+
+        User loginUser = ShiroUtil.getUser();
+
         User userInfo = userService.getUserInfo(loginUser.getId());
         UserGetInfoResult result = new UserGetInfoResult();
         BeanUtils.copyProperties(userInfo,result);
@@ -360,7 +342,8 @@ public class UserController {
     @ApiOperation("修改用户信息")
     @PostMapping("/updateInfo")
     public ResponseMessage updateInfo(@RequestBody UserUpdateInfoReqDTO dto) throws ParseException {
-        return ResponseMessage.newSuccessInstance(userService.updateInfo(dto, (User) SecurityUtils.getSubject().getPrincipal()));
+
+        return ResponseMessage.newSuccessInstance(userService.updateInfo(dto, ShiroUtil.getUser()));
     }
 
 }

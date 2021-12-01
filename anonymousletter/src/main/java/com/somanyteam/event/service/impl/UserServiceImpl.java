@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.somanyteam.event.dto.request.user.UserModifyPasswordReqDTO;
 import com.somanyteam.event.dto.request.user.UserUpdateInfoReqDTO;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.exception.CommonException;
@@ -12,9 +13,11 @@ import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.UserService;
 
 
+import com.somanyteam.event.shiro.AccountProfile;
 import com.somanyteam.event.util.EmailUtil;
 import com.somanyteam.event.util.PasswordUtil;
 import com.somanyteam.event.util.RandomCodeUtil;
+import com.somanyteam.event.util.ResponseMessage;
 import io.netty.util.internal.StringUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -65,15 +68,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer modifyPassword(User curUser, String newPassword) throws ParseException {
-//        String encryptOldPwd = PasswordUtil.encryptPassword(curUser.getEmail(), userModifyPasswordReqDTO.getOriginalPassword(), curUser.getSalt());
-//        if(!encryptOldPwd.equals(curUser.getPassword())){
-//            throw new UserOldPwdNotMatchException();
-//        }
-//        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
+    public Integer modifyPassword(AccountProfile profile, UserModifyPasswordReqDTO dto) throws ParseException {
+        String originalPassword = dto.getOriginalPassword();
+        String newPassword = dto.getNewPassword();
+        String confirmPassword = dto.getConfirmPassword();
+        System.out.println("旧密码:" + originalPassword);
+
+        if(StrUtil.isEmpty(originalPassword) || StrUtil.isEmpty(newPassword) || StrUtil.isEmpty(confirmPassword)){
+            throw new CommonException("参数不能为空");
+        }
+        if(!newPassword.equals(confirmPassword)){
+            throw new CommonException("新密码和确认密码不一致");
+        }
+        //匹配8-16位，至少有一个大写字母和一个数字，不能有三个相同的字符，特殊字符包括
+        if(!newPassword.matches("^(?=.*[A-Z])(?=.*[0-9])(?!.*([~!@&%$^\\(\\)#_]).*\\1.*\\1)[a-zA-Z0-9.~!@\";|:`&%$^\\(\\)#_]{8,16}$")){
+            throw new CommonException("新密码不符合格式要求");
+        }
+        User curUser = userMapper.selectById(profile.getId());
+        String encryptOldPwd = PasswordUtil.encryptPassword(profile.getId(), dto.getOriginalPassword(), curUser.getSalt());
+
+        if(!encryptOldPwd.equals(curUser.getPassword())){
+            throw new CommonException("旧密码不正确");
+        }
+        String encryptNewPwd = PasswordUtil.encryptPassword(curUser.getId(), newPassword, curUser.getSalt());
         User user = new User();
         user.setId(curUser.getId());
-        user.setPassword(newPassword);
+        user.setPassword(encryptNewPwd);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = sdf.parse(sdf.format(new Date()));
         user.setUpdateTime(date);

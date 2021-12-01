@@ -12,6 +12,7 @@ import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.QuestionService;
 import com.somanyteam.event.util.ResponseMessage;
+import com.somanyteam.event.util.ShiroUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
@@ -45,7 +46,7 @@ public class QuestionController {
     @ApiOperation("获取所有未回答问题")
     @GetMapping("/getUnansweredQuestion")
     public ResponseMessage getUnansweredQuestion() {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId(); //当前登录用户的id
         List<VariousQuestionsListResult> questionList = questionService.getUnansweredQuestion(loginUserId);
         return (questionList.isEmpty() ? ResponseMessage.newSuccessInstance("当前用户没有未回答的问题") : ResponseMessage.newSuccessInstance(questionList));
@@ -55,7 +56,7 @@ public class QuestionController {
     @ApiOperation("删除问题(被提问者)")
     @PostMapping("/deleteQuestion")
     public ResponseMessage deleteQuestion(@RequestParam("问题id") Long id) {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId(); //当前登录用户的id
         int i = questionService.deleteQuestion(loginUserId, id);
         return (i==1 ? ResponseMessage.newSuccessInstance("删除成功") : ResponseMessage.newErrorInstance("删除失败"));
@@ -65,8 +66,8 @@ public class QuestionController {
     @ApiOperation("获取已回答问题")
     @GetMapping("/getAnsweredQuestion")
     public ResponseMessage<List<VariousQuestionsListResult>> getAnsweredQuestion(){
-        Subject subject = SecurityUtils.getSubject();
-        return ResponseMessage.newSuccessInstance(questionService.getAnsweredQuestion((User) subject.getPrincipal()), "获取成功");
+//        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getAnsweredQuestion(ShiroUtil.getUser()), "获取成功");
     }
 
     @ApiOperation("获取公开父问题列表")
@@ -97,32 +98,32 @@ public class QuestionController {
     @ApiOperation("获取已收到回答问题的列表")
     @GetMapping("/getReceivedAnswerQuestionList")
     public ResponseMessage<List<VariousQuestionsListResult>> getReceivedAnswerQuestionList(){
-        Subject subject = SecurityUtils.getSubject();
-        return ResponseMessage.newSuccessInstance(questionService.getReceivedAnswerQuestionList((User) subject.getPrincipal()), "获取成功");
+//        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getReceivedAnswerQuestionList(ShiroUtil.getUser()), "获取成功");
     }
 
     @RequiresAuthentication
     @ApiOperation("获取未收到回答问题的列表")
     @GetMapping("/getUnreceivedAnswerQuestionList")
     public ResponseMessage<List<VariousQuestionsListResult>> getUnreceivedAnswerQuestionList(){
-        Subject subject = SecurityUtils.getSubject();
-        return ResponseMessage.newSuccessInstance(questionService.getUnreceivedAnswerQuestionList((User) subject.getPrincipal()));
+//        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(questionService.getUnreceivedAnswerQuestionList(ShiroUtil.getUser()));
     }
 
     @RequiresAuthentication
     @ApiOperation("添加或者编辑回答")
     @PostMapping("/addOrUpdateAnswer")
     public ResponseMessage<Long> addOrUpdateAnswer(MultipartFile[] multipartFiles,  AddOrUpdateAnswerReqDTO dto) throws IOException {
-        Subject subject = SecurityUtils.getSubject();
+//        Subject subject = SecurityUtils.getSubject();
 
-        return ResponseMessage.newSuccessInstance(questionService.addOrUpdateAnswer(multipartFiles, (User) subject.getPrincipal(), dto), "获取成功");
+        return ResponseMessage.newSuccessInstance(questionService.addOrUpdateAnswer(multipartFiles, ShiroUtil.getUser(), dto), "获取成功");
 //        return ResponseMessage.newSuccessInstance("200");
     }
 
     @ApiOperation("获取父问题和答案及以下的子问题和答案")
     @GetMapping("/getQuestionAndAnswer/{parentId}")
     public ResponseMessage getQuestionAndAnswer(@PathVariable("parentId") Long parentId,
-                                                @RequestParam("情景判断") Boolean flag) {
+                                                @RequestParam("表示是否要获取到被删掉的问题") Boolean flag) {
         QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(parentId,flag);
         return res==null ? ResponseMessage.newErrorInstance("获取问题答案失败") : ResponseMessage.newSuccessInstance(res,"获取问题答案成功");
     }

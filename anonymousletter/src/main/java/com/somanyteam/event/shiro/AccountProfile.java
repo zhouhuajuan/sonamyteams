@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 @Data
 public class AccountProfile implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String id;
 
@@ -14,5 +15,7 @@ public class AccountProfile implements Serializable {
     private String imgUrl;
 
     private String email;
+
+    private Byte identity;
 
 }

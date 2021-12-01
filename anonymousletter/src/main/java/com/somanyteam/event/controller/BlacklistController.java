@@ -4,6 +4,7 @@ import com.somanyteam.event.dto.result.blacklist.GetBlacklistResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.service.BlacklistService;
 import com.somanyteam.event.util.ResponseMessage;
+import com.somanyteam.event.util.ShiroUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
@@ -32,7 +33,7 @@ public class BlacklistController {
     @ApiOperation("根据问题把某用户加入到黑名单")
     @PostMapping("/addBlacklist")
     public ResponseMessage addBlacklist(@RequestParam("问题id") Long id) {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId();
         int i = blacklistService.addBlacklist(id, loginUserId);
         return i>0 ? ResponseMessage.newSuccessInstance("拉入黑名单成功") : ResponseMessage.newErrorInstance("拉入黑名单失败");
@@ -42,7 +43,7 @@ public class BlacklistController {
     @ApiOperation("根据问题把某用户从黑名单移除")
     @PostMapping("/deleteBlacklist")
     public ResponseMessage deleteBlacklist(@RequestParam("问题id") Long id){
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId();
         int i = blacklistService.deleteBlacklist(id, loginUserId);
         return i>0 ? ResponseMessage.newSuccessInstance("移除黑名单成功") : ResponseMessage.newErrorInstance("移除黑名单失败");
@@ -52,8 +53,8 @@ public class BlacklistController {
     @GetMapping("/getBlacklist")
     @ApiOperation("查看黑名单(展示的是被拉黑的问题)")
     public ResponseMessage<List<GetBlacklistResult>> getBlacklist(){
-        Subject subject = SecurityUtils.getSubject();
-        return ResponseMessage.newSuccessInstance(blacklistService.getBlacklist((User) subject.getPrincipal()), "获取成功");
+//        Subject subject = SecurityUtils.getSubject();
+        return ResponseMessage.newSuccessInstance(blacklistService.getBlacklist(ShiroUtil.getUser()), "获取成功");
     }
 
 }
