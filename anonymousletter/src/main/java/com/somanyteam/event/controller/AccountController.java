@@ -47,9 +47,9 @@ public class AccountController {
         response.setHeader("Authorization", jwt);
         response.setHeader("Access-control-Expose-Headers", "Authorization");
 
-        Subject subject = SecurityUtils.getSubject();
-        boolean authenticated = subject.isAuthenticated();
-        System.out.println(authenticated);
+//        Subject subject = SecurityUtils.getSubject();
+//        boolean authenticated = subject.isAuthenticated();
+//        System.out.println(authenticated);
         return Result.succ(MapUtil.builder()
                 .put("id", user.getId())
                 .put("username", user.getUsername())

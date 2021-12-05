@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/vue.js"></script>
+    <title>个人主页-已答</title>
+    <link rel="stylesheet" href="css/home.css"></link>
+</head>
+
+<body>
+    <div id="root">
+        <div class="all">
+            <div class="user">
+                <ul>
+                    <li>
+                        <span style="float: left;margin-left:10px; margin-top:10px;">编辑背景</span>
+                        <a href="setting.html"><img src="images/设置.png" width="30px" style="float: right;margin-right:10px; margin-top:10px;;"></a>
+                    </li>
+                    <li class="line"></li>
+                    <li class="userImage">
+                        <img :src="imgUrl" width="96px" class="Image">
+                    </li>
+                    <li>
+                        <span class="username">{{username}} </span><img :src="sexImg" width="18px " class="sex ">
+                    </li>
+                    <li class="introduceMy">{{profile}} </li>
+                    <!-- <li class="introduceMy">一句话介绍自己</li> -->
+                    <li>
+                        <!-- <a href="/home/home.html ">
+                            <div class="ask">span</div>
+                        </a> -->
+                        <a href="../question/answer-question.html">
+                            <div class="ask">
+                                <span class="askanything">Ask Me Anything ！</span>
+                                <span class="goin">点击进入提问箱
+                                <img src="/home/images/方向粗箭头-向右.png" width="100px" >
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="question">
+
+                <span>
+                    <a href="#" @click="createcode1">
+                        <div class="answered" >已答</div>
+                    </a>
+                </span>
+                <span>
+                    <!-- <a href="home2-noanswered.html"> -->
+                    <a href="#" @click="createcode2" >
+                        <div  class="answered" style="margin-left: 20px;">未答</div>
+                        <!-- <div  class="noanswered" >未答</div> -->
+                    </a>
+                </span>
+                <span>
+                    <!-- <a href="home3-had-answered.html"> -->
+                        <a href="#" @click="createcode3">
+                        <div class="answered"  style="margin-left: 20px;">已回答</div>
+                        <!-- <div class="had-answered">已回答</div> -->
+                    </a>
+                </span>
+                <span>
+                        <!-- <a href="home4-had-noanswered.html"> -->
+                        <a href="#"  @click="createcode4">
+                            <div class="answered" style="margin-left: 20px;">未回答</div>
+                            <!-- <div class="had-noanswered">未回答</div> -->
+                        </a>
+                </span>
+            </div>
+            <!-- 1 -->
+            <!-- <ul class="allquestions"> -->
+            <ul class="allquestions" v-if="code1">
+                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题已答</span>
+                <li v-for="item in questionArr">
+                    <a href="../question/answer-question.html">
+                        <div class="questions" @click="getquestionId($event)" :id="item.id">
+                            <span v-text="item.content">正在获取</span>
+                            <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <div class="questions">偷你匿名提问箱欢迎你！
+                        <div style=" float: right;margin-right: 10px; font-size: small;color: #696969; font-style: italic; ">——好几个队</div>
+                    </div>
+
+                </li>
+            </ul>
+            <!-- 2 -->
+            <ul class="allquestions" v-if="code2">
+                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题未答</span>
+                <li>
+                    <div class="questions" v-if="nothing">{{message}} </div>
+                </li>
+                <li v-for="item in questionArr">
+                    <a href="../question/answer-question.html">
+                        <div class="questions" @click="getquestionId($event)" :id="item.id">
+                            <span v-text="item.content">正在获取</span>
+                            <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
+                        </div>
+                    </a>
+                </li>
+
+            </ul>
+            <!-- 3 -->
+            <ul class="allquestions" v-if="code3">
+                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题已收到回答</span>
+                <li v-for="item in questionArr">
+                    <a href="../question/answer-question.html">
+                        <div class="questions" @click="getquestionId($event)" :id="item.id">
+                            <span v-text="item.content">正在获取</span>
+                            <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <!-- 4 -->
+            <ul class="allquestions" v-if="code4">
+                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题未收到回答</span>
+                <li>
+                    <div class="questions" v-if="nothing">{{message}} </div>
+                </li>
+                <li v-for="item in questionArr">
+                    <a href="../question/answer-question.html">
+                        <div class="questions" @click="getquestionId($event)" :id="item.id">
+                            <span v-text="item.content">正在获取</span>
+                            <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js "></script>
+<script>
+    new Vue({
+        el: "#root ",
+        data: {
+            id: " ",
+            username: " ",
+            imgUrl: "images/logo.jpg",
+            questionArr: [],
+            profile: " ",
+            message: " ",
+            nothing: false,
+            sexImg: "images/性别.png",
+            // sexImg: "images/女.png",
+            questionId: " ",
+            seen: false,
+            code1: true,
+            code2: false,
+            code3: false,
+            code4: false,
+
+        },
+        methods: {
+            //已回答
+            createcode1: function() {
+                var that = this;
+                axios.get("http://localhost:8082/question/getAnsweredQuestion ", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //未回答
+            createcode2: function() {
+                var that = this;
+                that.code1 = false,
+                    that.code2 = true,
+                    that.code3 = false,
+                    that.code4 = false,
+                    axios.get("http://localhost:8082/question/getUnansweredQuestion", {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
+                        }
+                    }).then(
+                        function(response) {
+                            if (response.data.data == null) {
+                                that.nothing = true,
+                                    that.message = response.data.message;
+                                that.questionArr = [];
+                            } else {
+                                that.nothing = false
+                                that.questionArr = response.data.data;
+                            }
+                            console.log(response.data)
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+            },
+            //已收到回答
+            createcode3: function() {
+                var that = this;
+                that.code1 = false,
+                    that.code2 = false,
+                    that.code3 = true,
+                    that.code4 = false,
+                    axios.get("http://localhost:8082/question/getReceivedAnswerQuestionList", {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
+                        }
+                    }).then(
+                        function(response) {
+                            if (response.data.data == null) {
+                                that.nothing = true,
+                                    that.message = response.data.message;
+                            } else {
+                                that.nothing = false
+                                that.questionArr = response.data.data;
+                            }
+                            console.log(response.data)
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+            },
+            //未收到回答
+            createcode4: function() {
+                var that = this;
+                that.code1 = false,
+                    that.code2 = false,
+                    that.code3 = false,
+                    that.code4 = true,
+                    axios.get("http://localhost:8082/question/getUnreceivedAnswerQuestionList", {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
+                        }
+                    }).then(
+                        function(response) {
+                            if (response.data.data == null) {
+                                that.nothing = true,
+                                    that.message = response.data.message;
+                            } else {
+                                that.nothing = false
+                                that.questionArr = response.data.data;
+                            }
+                            console.log(response.data)
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+            },
+            getquestionId: function(e) {
+                var that = this
+                console.log(e.currentTarget.id);
+                that.questionId = e.currentTarget.id
+                localStorage.setItem("questionId", this.questionId);
+            },
+            //获取用户名，个人简介，性别
+            getuser: function() {
+                var that = this;
+                axios.post("http://localhost:8082/user/getUserInfo ", {}, {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.status === 200) {
+                            console.log(response.data);
+                            that.username = response.data.data.username;
+                            that.profile = response.data.data.profile;
+                            if (response.data.data.sex == 1) {
+                                that.sexImg = "images/女.png"
+                            } else if (response.data.data.sex == 0) {
+                                that.sexImg = "images/男性.png"
+                            }
+                        } else {
+
+                        }
+
+                    })
+            },
+            // onmouseover: function() {
+            //     this.seen = true;
+            //     console.log("nihao ")
+            //     console.log(this.innerhtml)
+            // },
+            // onmouseout: function() {
+            //     this.seen = false
+            //     console.log("走了 ")
+            // },
+        },
+        mounted() {
+            this.getuser();
+            this.createcode1();
+        }
+
+
+    })
+</script>
+
+</html>

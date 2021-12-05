@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/vue.js"></script>
+    <title>回答问题</title>
+    <link rel="stylesheet" href="css/answer-question.css"></link>
+</head>
+
+<body>
+    <div id="root">
+        <div class="all">
+            <div class="setting">
+
+                <ul class="first">
+                    <li class="userImage" style="float: left;">
+                        <img :src="imgUrl" width="80px" class="Image">
+                    </li>
+                    <li class="username">{{username}}的所有已回答问题({{questionArr.length}})</li>
+
+                </ul>
+
+                <div>
+                    <ul class="allquestions">
+                        <li>
+                            <div class="questions" v-if="nothing">{{message}} </div>
+                        </li>
+                        <li v-for="item in questionArr">
+                            <a href="#" style="text-decoration: none;">
+                                <div class="questions" @click="changequestionId($event);getotherquestion" @click="getotherquestion" :id="item.id">
+                                    <span v-text="item.content">正在获取</span>
+                                    <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="settingform">
+                <div class="questionbox">
+                    <p class="questiontip">
+                        <li v-for="(item,index) in AllQuestions"><span style="float: left;">问题{{index+1}}：{{item.content}}</span><br>
+                            <div class="time">——{{item.createTime}}</div>
+                        </li>
+                        <li v-for="(item,index) in AllAnswers"><span style="float: left;">回答{{index+1}}：{{item.content}}</span><br>
+                            <div class="time">——{{item.updateTime}}</div>
+                        </li>
+
+                    </p>
+                </div>
+                <!-- <div class="time">——2021年11月24日</div> -->
+                <!-- <div class="answerbox"></div> -->
+                <textarea type="text" class="answerbox" v-model="content"></textarea>
+                <input type="button" class="answertip" value="点击保存答案" @click="write">
+                <div class="choose">
+                    <ul>
+                        <li>
+                            问题设置：
+                            <input type="radio" name="sex" style="margin-left: 0px;" value="0" v-model="answerStatus" />公开回答
+                            <input type="radio" name="sex" style="margin-left: 10px;" value="1" v-model="answerStatus" />定向回答
+                        </li>
+                        <li>举报问题：
+                            <select>
+                        <option>政治敏感问题</option>
+                        <option>低俗暴力色情</option>
+                        <option>人身攻击</option>
+                        <option>其他</option>
+                    </select>
+                            <input type="button" class="report" value="选择原因举报" @click="report">
+                        </li>
+                        <li> 拉黑提问者：
+                            <input type="button" class="report" value="点击拉黑" @click="addblacklist"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="turn">
+            <a href="../home/home.html">
+                <span class="back" style="margin-left: 10px;">返回个人主页</span>
+            </a>
+            <a href="#l">
+                <span class="back">分享链接</span>
+            </a>
+        </div>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js "></script>
+<script>
+    var vm = new Vue({
+        el: "#root ",
+        data: {
+            imgUrl: "images/logo.jpg",
+            username: "",
+            answerStatus: "0",
+            content: "此处可以添加答案以及重新编辑已答问题的答案，若该问题有追问，则只能重新编辑追问的答案，无法修改第一个问题",
+            Id: "",
+            questionArr: [],
+            questionId: " ",
+            nothing: false,
+            AllQuestions: [],
+            AllAnswers: [],
+            nothing: false
+        },
+        methods: {
+            //获取所有已回答问题列表
+            createcode: function() {
+                var that = this;
+                axios.get("http://localhost:8082/question/getAnsweredQuestion", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+
+                        } else {
+                            that.questionArr = response.data.data;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            // 获取该问题的回答
+            getotherquestion: function() {
+                var that = this;
+                axios.get("http://localhost:8082/question/getQuestionAndAnswer/" + this.questionId, {
+                    params: {
+                        flag: false
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data !== null) {
+                            that.AllQuestions = [];
+                            that.AllAnswers = [];
+                            console.log(response.data.message);
+                            that.AllQuestions = response.data.data.allQuestion;
+                            that.AllAnswers = response.data.data.allAnswer;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            // 查看其他问题答案
+            changequestionId(e) {
+                var that = this
+                console.log("@" + e.currentTarget.id);
+                that.questionId = e.currentTarget.id
+                localStorage.setItem("questionId", this.questionId);
+                axios.get("http://localhost:8082/question/getQuestionAndAnswer/" + this.questionId, {
+                    params: {
+                        flag: false
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data !== null) {
+                            that.AllQuestions = [];
+                            that.AllAnswers = [];
+                            console.log(response.data.message);
+                            that.AllQuestions = response.data.data.allQuestion;
+                            that.AllAnswers = response.data.data.allAnswer;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //获取当前问题ID
+            getquestionId: function() {
+                var that = this;
+                that.questionId = localStorage.getItem("questionId");
+                console.log(localStorage.getItem("questionId"));
+            },
+            //编辑当前问题的答案
+            write: function() {
+                var that = this;
+                if (this.AllAnswers.length > 1) {
+                    that.questionId = this.AllQuestions[this.AllQuestions.length - 1].id;
+                    that.Id = this.AllAnswers[this.AllAnswers.length - 1].id;
+                    console.log(this.Id)
+                    console.log(this.questionId)
+                    debugger
+                    axios.post("http://localhost:8082/question/addOrUpdateAnswer", {
+                        answerStatus: this.answerStatus,
+                        content: this.content,
+                        id: this.Id,
+                        questionId: this.questionId,
+                    }, {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
+                        }
+                    }).then(
+                        function(response) {
+                            alert("编辑成功,点击该问题进行刷新")
+                            console.log(response.data);
+                            // this.$options.methods.getotherquestion();
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+                } else {
+                    axios.post("http://localhost:8082/question/addOrUpdateAnswer", {
+                        answerStatus: this.answerStatus,
+                        content: this.content,
+                        // id: this.Id,
+                        questionId: this.questionId
+                    }, {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
+                        }
+                    }).then(
+                        function(response) {
+                            alert(response.data.message)
+                            console.log(response.data);
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+                }
+            },
+            //删除问题！！！！！！！
+            deletequestion: function() {
+                axios.post("http://localhost:8082/question/deleteQuestion", {
+                    id: localStorage.getItem("questionId")
+                }).then(
+                    function(response) {
+                        alert(response.data.message)
+                        console.log(response.data);
+                        // debugger;
+                        if (response.data.status === 200) {
+                            location.href = "/login/login.html";
+
+                        } else {
+                            // this.imgCode = 'http://localhost:8082/user/getImage?' + Math.random();
+                        }
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //举报当前问题(可用）
+            report: function() {
+                axios.post("http://localhost:8082/user/report", {
+                    questionId: localStorage.getItem("questionId"),
+                    type: 0
+                }).then(
+                    function(response) {
+                        alert(response.data.message)
+                        console.log(response.data);
+                        // debugger;
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //拉黑提问问题的用户
+            addblacklist: function() {
+                axios.post("http://localhost:8082/blacklist/addBlacklist?id=" + this.questionId, {}, {
+                    // axios.post("http://localhost:8082/blacklist/addBlacklist", {}, {
+                    // id: localStorage.getItem("questionId"),
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        alert(response.data.message)
+                        console.log(response.data);
+                        // debugger;
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            }
+        },
+        created() {
+            this.id = localStorage.getItem("id");
+            this.username = localStorage.getItem("username");
+            this.identity = localStorage.getItem("identity");
+        },
+        mounted: function() {
+            this.createcode()
+            this.getquestionId();
+            this.getotherquestion();
+        }
+    })
+</script>
+
+</html>

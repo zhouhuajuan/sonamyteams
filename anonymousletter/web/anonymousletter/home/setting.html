@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/vue.js"></script>
+    <title>设置</title>
+    <link rel="stylesheet" href="css/setting.css"></link>
+    <style>
+        .had-noanswered {
+            background-color: #343434;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <div class="all">
+            <div class="settingform">
+                <ul class="first">
+                    <li><a href="#usermessage">修改个人信息</a></li>
+                    <li><a href="#blakelist">黑名单</a></li>
+                    <li><a href="#contact">联系开发者</a></li>
+                    <li><a href="#cancel">注销账号</a></li>
+                    <li style="border-bottom: 0px;"><a href="#logout">退出登录</a></li>
+                </ul>
+            </div>
+            <div class="setting">
+                <div class="content">
+                    <span id="usermessage">修改个人信息</span><br>
+                    <div>
+                        <ul>
+                            <li>
+                                头像：
+                                <div class="userImage">
+                                    <img :src="imgUrl" width="96px" class="Image">
+                                    <!-- <img src="images/logo.jpg" width="96px" class="Image"> -->
+
+                                </div>
+                            </li>
+                            <li>上传：
+                                <input type="file" class="push">
+                            </li>
+                            <li>用户名：
+                                <input type="text" placeholder="用户名" class="user" style="width: 240px;margin-left: -10px;" v-model="username" /><br/>
+                            </li>
+                            <li>性别：
+                                <input type="radio" name="sex" style="margin-left: 10px;" value="0" v-model="sex" />男
+                                <input type="radio" name="sex" style="margin-left: 10px;" value="1" v-model="sex" />女
+                            </li>
+                            <li>生日：
+                                <input type="text" placeholder="2001" class="birth" v-model="year">年<input type="text" placeholder="01" class="birth" v-model="mouth">月<input type="text" placeholder="01" class="birth" v-model="day">日
+                            </li>
+                            <li>简介：
+                                <textarea type="text" maxlength="50" placeholder="最多50个字符" class="introduce" cols="15" rows="4" v-model="profile"></textarea>
+                            </li>
+                            <li>
+                                <!-- <input type="submit" value="登录" class="login" /><br/> -->
+                                <input type="button" value="修改" class="login" @click="change" /><br/>
+                                <!-- <input type="button" value="登出" class="login" @click="logout" /><br/> -->
+                            </li>
+                        </ul>
+                    </div>
+                    <br>
+                    <hr>
+                    <br>
+                    <span id="blakelist">黑名单</span><br>
+                    <br>
+                    <li v-for="(item,index) in blacklistArr">
+                        <div>问题{{index}}：{{item.content}}
+                            <div style="float: right;font-size: small;color: #696969;font-style: italic;" v-text="item.time"></div>
+                        </div>
+                    </li>
+                    <hr>
+                    <br>
+                    <span id="contact">联系开发者</span><br><br> 我们是好几个队，匿名提问箱是我们一起做的项目，这个箱子还有一个特别可爱的名字叫-----偷你匿名提问箱<br><br> 团队成员：
+                    <br> 小组队长: 宋旭清3219005494
+                    <br> 项目经理: 杨川钡3219005496
+                    <br> 前端人员: 罗桂珊3219005492
+                    <br> 后端人员: 郑宝柔3219005497
+                    <br> 后端人员: 周华娟3219005498
+                    <br>
+
+                    <hr>
+                    <br>
+                    <span id="cancel">注销账号</span><br>点击注销账号：
+                    <input type="button" value="注销" class="logout" @click="cancel" /><br/>
+                    <hr>
+                    <br>
+                    <span id="logout">退出登录</span><br> 点击退出登录：
+                    <input type="button" value="登出" class="logout" @click="logout" /><br/>
+                </div>
+
+            </div>
+        </div>
+        <a href="../home/home.html">
+            <div class="back">返回个人主页</div>
+        </a>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js "></script>
+<script>
+    var vm = new Vue({
+        el: "#root ",
+        data: {
+            email: " ",
+            password: " ",
+            code: " ",
+            remenberMe: 1,
+            // img: "images/logo.jpg "
+            imgUrl: "images/logo.jpg",
+            year: "",
+            mouth: "",
+            day: "",
+            profile: "一句话介绍自己",
+            sex: "1",
+            username: "",
+            blacklistArr: []
+        },
+        computed: {
+            birthday: {
+                //这样简写的原因在本次案例中，只是需要用于展示，而不需要通过fullname去修改姓名
+                //     console.log("年月日")
+                //     return this.year + "-" + this.mouth + "-" + this.day
+                // },
+                get() {
+
+                    // return this.firstname + "-" + this.lastname
+                    return this.year + "-" + this.mouth + "-" + this.day
+                },
+                set(value) {
+                    // console.log("set被调用了")
+                    //使用数组分开 姓 和名
+                    const arr = value.split("-")
+                    this.year = arr[0],
+                        this.mouth = arr[1]
+                    this.day = arr[2]
+                }
+            }
+        },
+        methods: {
+            //修改用户信息
+            change: function() {
+                // console.log("that.joke ");
+                axios.post("http://localhost:8082/user/updateInfo", {
+                    birthday: this.birthday,
+                    profile: this.profile,
+                    sex: this.sex,
+                    username: this.username
+                }, {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    },
+                }).then(
+                    function(response) {
+                        if (response.status == 200) {
+                            alert("修改用户信息成功")
+                        }
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //获取用户信息
+            getuser: function() {
+                var that = this;
+                axios.post("http://localhost:8082/user/getUserInfo", {}, {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    },
+                }).then(
+                    function(response) {
+
+                        if (response.data.status === 200) {
+                            // console.log(response.data);
+                            // console.log(response.data.data.imgUrl + "1");
+                            that.username = response.data.data.username;
+                            that.email = response.data.data.email;
+                            that.sex = response.data.data.sex;
+                            that.birthday = response.data.data.birthday;
+                            that.profile = response.data.data.profile;
+
+
+                        } else {
+
+                        }
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //登出（可用）
+            logout: function() {
+                axios.get("http://localhost:8082/user/logout", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        alert(response.data.message)
+                            //删除本地存储
+                        localStorage.removeItem('Authorization');
+                        console.log(response.data);
+                        location.href = "/login/login.html";
+
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //注销账号
+            cancel: function() {
+                axios.get("http://localhost:8082/user/deleteAccount", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        alert(response.data.message)
+                        localStorage.removeItem('Authorization');
+                        console.log(response.data);
+                        location.href = "/login/login.html";
+
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //获取黑名单
+            getblacklist: function() {
+                var that = this;
+                axios.get("http://localhost:8082/blacklist/getBlacklist", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data.Array == null) {
+                            // console.log("null");
+                            that.blacklistArr[0] = {
+                                content: "暂无内容"
+                            }
+                        } else {
+                            console.log(response.data)
+                            that.blacklistArr = response.data.data
+                        }
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            }
+        },
+        created() {
+            this.id = localStorage.getItem("id");
+            this.username = localStorage.getItem("username");
+            this.identity = localStorage.getItem("identity");
+            // this.imgUrl = localStorage.getItem("imgUrl");
+        },
+        mounted: function() {
+            this.getuser(); //需要触发的函数
+            this.getblacklist();
+        }
+    })
+</script>
+
+</html>

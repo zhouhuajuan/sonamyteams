@@ -12,8 +12,8 @@ import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.UserType;
 import com.somanyteam.event.exception.user.FileNotMatchException;
+import com.somanyteam.event.exception.user.VerifyCodeNotMatchException;
 import com.somanyteam.event.service.UserService;
-import com.somanyteam.event.shiro.Account;
 import com.somanyteam.event.shiro.AccountProfile;
 import com.somanyteam.event.util.JwtUtils;
 import com.somanyteam.event.util.PasswordUtil;
@@ -71,7 +71,7 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation("登录")
-    public ResponseMessage login(@Validated @RequestBody UserLoginReqDTO dto, HttpServletResponse response) {
+    public ResponseMessage login(@Validated @RequestBody UserLoginReqDTO dto, HttpServletResponse response, HttpSession session) {
         User user = userService.getByEmail(dto.getEmail());
         Assert.notNull(user, "用户不存在");//断言拦截
         //判断账号密码是否错误 因为是md5加密所以这里md5判断
@@ -290,9 +290,9 @@ public class UserController {
         System.out.println(principal);
         Integer update = userService.modifyPassword(profile, modifyPasswordReqDTO);
         if(update >= 1){
-           return ResponseMessage.newSuccessInstance("修改成功");
+            return ResponseMessage.newSuccessInstance("修改成功");
         }else{
-           return ResponseMessage.newErrorInstance("修改失败");
+            return ResponseMessage.newErrorInstance("修改失败");
         }
 
     }
@@ -318,7 +318,7 @@ public class UserController {
     @ApiOperation("注销账号")
     @GetMapping("/deleteAccount")
     public ResponseMessage deleteAccount(){
-        return ResponseMessage.newSuccessInstance(userService.deleteAccount( SecurityUtils.getSubject()));
+        return ResponseMessage.newSuccessInstance(userService.deleteAccount( ShiroUtil.getUser()));
     }
 
 //    @ApiOperation("测试是用cookie登录还是正常登录")

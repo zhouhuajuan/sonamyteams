@@ -32,7 +32,7 @@ public class BlacklistController {
     @RequiresAuthentication
     @ApiOperation("根据问题把某用户加入到黑名单")
     @PostMapping("/addBlacklist")
-    public ResponseMessage addBlacklist(@RequestParam("问题id") Long id) {
+    public ResponseMessage addBlacklist(@RequestParam("id") Long id) {
         User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId();
         int i = blacklistService.addBlacklist(id, loginUserId);
