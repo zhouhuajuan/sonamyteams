@@ -181,7 +181,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public int answerAllQuestion(Long id, String qId, String aId) {
-        if (id == 0 || StrUtil.isEmpty(qId) || StrUtil.isEmpty(aId)){
+        if (id == null || StrUtil.isEmpty(qId) || StrUtil.isEmpty(aId)){
             throw new QuestionEnterEmptyException();
         }
         QueryWrapper<Question> wrapper = new QueryWrapper<>();
@@ -201,13 +201,14 @@ public class QuestionServiceImpl implements QuestionService {
         QueryWrapper<Blacklist> wrapper = new QueryWrapper<>();
         wrapper.eq("complaintant", questionAddReqDTO.getAId());
         wrapper.eq("defendant", userId);
-        Blacklist blacklist = blacklistMapper.selectOne(wrapper);
-        if (!ObjectUtil.isEmpty(blacklist)){
+        List<Blacklist> blacklists = blacklistMapper.selectList(wrapper);
+        //Blacklist blacklist = blacklistMapper.selectOne(wrapper);
+        if (blacklists.size()!=0){
             throw new QuestionGotBlackListException();
         }
 
         //2.判断是不是父问题
-        if (questionAddReqDTO.getParentQuestion() != null){
+        if (questionAddReqDTO.getParentQuestion() != 0){
             //判断是否所有问题都回答完
             int i1 = answerAllQuestion(questionAddReqDTO.getParentQuestion(),
                     userId, questionAddReqDTO.getAId());
@@ -221,9 +222,9 @@ public class QuestionServiceImpl implements QuestionService {
             wrapper1.eq("id", questionAddReqDTO.getParentQuestion());
             Question father_question = questionMapper.selectOne(wrapper1);
             question.setAnswerStatus(father_question.getAnswerStatus());
-            Date date = new Date();
-            question.setCreateTime(date);
-            question.setUpdateTime(date);
+//            Date date = new Date();
+//            question.setCreateTime(date);
+//            question.setUpdateTime(date);
             question.setContent(questionAddReqDTO.getContent());
             question.setParentQuestion(questionAddReqDTO.getParentQuestion());
 //            question.setDelFlag((byte) 1);
@@ -231,7 +232,7 @@ public class QuestionServiceImpl implements QuestionService {
         }else {
             question.setQId(userId);
             question.setAId(questionAddReqDTO.getAId());
-            question.setAnswerStatus((byte) 0);
+            //question.setAnswerStatus((byte) 0);
             Date date = new Date();
             question.setCreateTime(date);
             question.setUpdateTime(date);

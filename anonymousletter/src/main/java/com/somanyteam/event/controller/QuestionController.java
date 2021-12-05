@@ -77,10 +77,11 @@ public class QuestionController {
         return (publicQuestions.isEmpty() ? ResponseMessage.newSuccessInstance("公开父问题列表为空") : ResponseMessage.newSuccessInstance(publicQuestions));
     }
 
+    @RequiresAuthentication
     @ApiOperation("添加问题(提问者)")
     @PostMapping("/addQuestion")
     public ResponseMessage addQuestion(@RequestBody @Validated QuestionAddReqDTO questionAddReqDTO) {
-        User loginUser = (User) SecurityUtils.getSubject().getPrincipal();
+        User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId();
 
         Question question1 = questionService.addQuestion(questionAddReqDTO, loginUserId);
@@ -113,7 +114,7 @@ public class QuestionController {
     @RequiresAuthentication
     @ApiOperation("添加或者编辑回答")
     @PostMapping("/addOrUpdateAnswer")
-    public ResponseMessage<Long> addOrUpdateAnswer(MultipartFile[] multipartFiles,  AddOrUpdateAnswerReqDTO dto) throws IOException {
+    public ResponseMessage<Long> addOrUpdateAnswer(MultipartFile[] multipartFiles, @RequestBody AddOrUpdateAnswerReqDTO dto) throws IOException {
 //        Subject subject = SecurityUtils.getSubject();
 
         return ResponseMessage.newSuccessInstance(questionService.addOrUpdateAnswer(multipartFiles, ShiroUtil.getUser(), dto), "获取成功");
@@ -123,7 +124,7 @@ public class QuestionController {
     @ApiOperation("获取父问题和答案及以下的子问题和答案")
     @GetMapping("/getQuestionAndAnswer/{parentId}")
     public ResponseMessage getQuestionAndAnswer(@PathVariable("parentId") Long parentId,
-                                                @RequestParam("表示是否要获取到被删掉的问题") Boolean flag) {
+                                                @RequestParam("flag") Boolean flag) {
         QuestionAndAnswerResult res = questionService.getAllQuestionAndAnswer(parentId,flag);
         return res==null ? ResponseMessage.newErrorInstance("获取问题答案失败") : ResponseMessage.newSuccessInstance(res,"获取问题答案成功");
     }

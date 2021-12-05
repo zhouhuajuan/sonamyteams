@@ -236,20 +236,20 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 注销账户
-     * @param subject subject
+     * @param User user
      * @return boolean
      */
     @Override
-    public boolean deleteAccount(Subject subject) {
+    public boolean deleteAccount(User user) {
 
-        User curUser = (User) subject.getPrincipal();
+        User curUser = user;
 
         int del = userMapper.deleteById(curUser.getId());
         if(del <= 0){
             throw new UserNotExistException();
         }else{
             //用户登出，session失效
-            subject.logout();
+            SecurityUtils.getSubject().logout();
         }
         return true;
     }

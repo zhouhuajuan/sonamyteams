@@ -26,6 +26,7 @@ public class CorsConfig extends WebMvcConfigurationSupport {
         corsConfiguration.addAllowedOrigin("http://localhost:8080");
         corsConfiguration.addAllowedOrigin("http://localhost:8082");
         corsConfiguration.addAllowedOrigin("http://127.0.0.1:5500");
+        //corsConfiguration.addAllowedOrigin("http://localhost:8081");
         corsConfiguration.addAllowedOrigin("http://localhost");
         // 允许任何头
         corsConfiguration.addAllowedHeader("*");

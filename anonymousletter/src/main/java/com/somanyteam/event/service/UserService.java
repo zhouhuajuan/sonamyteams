@@ -31,7 +31,7 @@ public interface UserService {
 
     User getUserInfo(String id) throws ParseException;
 
-    boolean deleteAccount(Subject subject);
+    boolean deleteAccount(User user);
 
     boolean updateInfo(UserUpdateInfoReqDTO dto, User curUser) throws ParseException;
 
