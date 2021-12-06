@@ -226,7 +226,7 @@ public class UserController {
             //保存图片的名字为用户id+图片名称+上传图片时间
             String originalFileName = file.getOriginalFilename();
             String houzui = originalFileName.substring(originalFileName.lastIndexOf("."));
-            if (!houzui.equals(".png") || !houzui.equals(".jpg")){
+            if (!houzui.equals(".png") && !houzui.equals(".jpg")){
                 //文件格式不对
                 throw new FileNotMatchException();
             }
