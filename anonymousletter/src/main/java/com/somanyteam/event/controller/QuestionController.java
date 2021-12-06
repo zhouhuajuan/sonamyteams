@@ -4,6 +4,7 @@ package com.somanyteam.event.controller;
 
 import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
+import com.somanyteam.event.dto.result.question.GetPublicQuestionResult;
 import com.somanyteam.event.dto.result.question.QuestionAddResult;
 import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
@@ -73,8 +74,8 @@ public class QuestionController {
     @ApiOperation("获取公开父问题列表")
     @GetMapping("/getPublicQuestions/{userId}")
     public ResponseMessage getPublicQuestions(@PathVariable("userId")String userId) {
-        List<VariousQuestionsListResult> publicQuestions = questionService.getPublicQuestions(userId);
-        return (publicQuestions.isEmpty() ? ResponseMessage.newSuccessInstance("公开父问题列表为空") : ResponseMessage.newSuccessInstance(publicQuestions));
+        GetPublicQuestionResult publicQuestions = questionService.getPublicQuestions(userId);
+        return (publicQuestions.getListResults().isEmpty() ? ResponseMessage.newSuccessInstance("公开父问题列表为空") : ResponseMessage.newSuccessInstance(publicQuestions));
     }
 
     @RequiresAuthentication

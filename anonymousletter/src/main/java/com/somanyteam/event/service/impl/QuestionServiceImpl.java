@@ -9,8 +9,10 @@ import cn.hutool.json.JSONUtil;
 import com.somanyteam.event.constant.CommonConstant;
 import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
 import com.somanyteam.event.dto.result.question.AnswerResult;
+import com.somanyteam.event.dto.result.question.GetPublicQuestionResult;
 import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
 import com.somanyteam.event.dto.result.question.QuestionResult;
+import com.somanyteam.event.dto.result.question.UserInfoResult;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 
 import com.somanyteam.event.entity.Answer;
@@ -130,12 +132,21 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<VariousQuestionsListResult> getPublicQuestions(String userId) {
+    public GetPublicQuestionResult getPublicQuestions(String userId) {
         if (StrUtil.isEmpty(userId)){
             //获取不到用户id
             throw new UserIdIsEmptyException();
         }
-        return questionMapper.getPublicQuestions(userId);
+        GetPublicQuestionResult result = new GetPublicQuestionResult();
+
+        List<VariousQuestionsListResult> questions = questionMapper.getPublicQuestions(userId);
+        User user = userMapper.selectById(userId);
+        UserInfoResult userInfo = new UserInfoResult();
+        BeanUtils.copyProperties(user, userInfo);
+
+        result.setListResults(questions);
+        result.setUserInfo(userInfo);
+        return result;
     }
 
     /**

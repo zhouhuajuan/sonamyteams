@@ -4,6 +4,7 @@ import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
 
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 
+import com.somanyteam.event.dto.result.question.GetPublicQuestionResult;
 import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
 import com.somanyteam.event.entity.Answer;
@@ -43,7 +44,7 @@ public interface QuestionService {
      * @param userId 用户id
      * @return List<VariousQuestionsListResult>
      */
-    List<VariousQuestionsListResult> getPublicQuestions(String userId);
+    GetPublicQuestionResult getPublicQuestions(String userId);
 
     /**
      * 获取已收到回答的问题列表

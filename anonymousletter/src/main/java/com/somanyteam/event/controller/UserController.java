@@ -11,6 +11,7 @@ import com.somanyteam.event.dto.result.user.UserGetInfoResult;
 import com.somanyteam.event.dto.result.user.UserLoginResult;
 import com.somanyteam.event.entity.User;
 import com.somanyteam.event.enums.UserType;
+import com.somanyteam.event.exception.CommonException;
 import com.somanyteam.event.exception.user.FileNotMatchException;
 import com.somanyteam.event.exception.user.VerifyCodeNotMatchException;
 import com.somanyteam.event.service.UserService;
@@ -73,7 +74,9 @@ public class UserController {
     @ApiOperation("登录")
     public ResponseMessage login(@Validated @RequestBody UserLoginReqDTO dto, HttpServletResponse response, HttpSession session) {
         User user = userService.getByEmail(dto.getEmail());
-        Assert.notNull(user, "用户不存在");//断言拦截
+        if(user == null){
+            throw new CommonException("用户不存在");
+        }
         //判断账号密码是否错误 因为是md5加密所以这里md5判断
         if (!user.getPassword().equals(PasswordUtil.encryptPassword(user.getId(), dto.getPassword(), user.getSalt()))) {
             //密码不同则抛出异常
