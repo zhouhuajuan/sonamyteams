@@ -21,14 +21,14 @@
                     <input type="text" placeholder="请输入邮箱注册" class="email" v-model="email" /><br/>
                 </li>
                 <li>
+                    <input type="text" class="code" placeholder="请输入验证码" v-model="code" />
+                    <input type="button" class="emial_code_verify" value="发送验证码" @click="sentcode"></input>
+                </li>
+                <li>
                     <input type="password" class="pass" placeholder="密码(字母+数字)" v-model="password" /><br/>
                 </li>
                 <li>
                     <input type="password" class="pass" placeholder="确认密码" v-model="confirmPwd" /><br/>
-                </li>
-                <li>
-                    <input type="text" class="code" placeholder="请输入验证码" v-model="code" />
-                    <input type="button" class="emial_code_verify" value="发送验证码" @click="sentcode"></input>
                 </li>
                 <li>
                     <input type="button" value="注册" class="login" @click="register" /><br/>
@@ -71,6 +71,7 @@
                         console.log(err);
                     })
             },
+            //发送邮件（400）
             sentcode: function() {
                 email = this.email
                 axios.post("http://localhost:8082/user/sendEmail?email=" + email, {

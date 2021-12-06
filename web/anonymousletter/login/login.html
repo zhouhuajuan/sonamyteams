@@ -30,6 +30,7 @@
                 <li>
                     <!-- <input type="submit" value="登录" class="login" /><br/> -->
                     <input type="button" value="登录" class="login" @click="login" /><br/>
+                    <!-- <input type="button" value="登出" class="login" @click="logout" /><br/> -->
                 </li>
                 <li>
                     <a href="regist.html" class="regist">注册新用户</a>
@@ -39,17 +40,24 @@
         </form>
     </div>
 </body>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script> -->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    // axios.defaults.withCredentials = true;
     new Vue({
         el: "#root",
         data: {
+
             email: "",
             password: "",
             code: "",
             remenberMe: 1,
-            // img: "images/logo.jpg"
-            imgCode: 'http://localhost:8082/user/getImage'
+            imgCode: 'http://localhost:8082/user/getImage',
+            id: "",
+            username: "",
+            identity: "",
+            imgUrl: "",
+
         },
         methods: {
             login: function() {
@@ -57,30 +65,61 @@
                 axios.post("http://localhost:8082/user/login", {
                     email: this.email,
                     password: this.password,
-                    code: this.code,
-                    remenberMe: 1,
+                    // code: this.code,
+                    remenberMe: 1
                 }).then(
                     function(response) {
-                        alert(response.data.message)
+                        // alert(response.data.message)
                         console.log(response.data);
-                        // debugger;
-                        if (response.data.status === 200) {
-                            window.location.href = "https://www.smartisan.com/";
+                        console.log(response);
+                        console.log(response.headers['authorization']);
+                        if (response.status === 200) {
+                            localStorage.setItem("id", response.data.data.id);
+                            localStorage.setItem("username", response.data.data.username);
+                            localStorage.setItem("identity", response.data.data.identity);
+                            localStorage.setItem("imgUrl", response.data.data.imgUrl);
+                            localStorage.setItem('Authorization', response.headers['authorization']);
+                            // localStorage.setItem('answerId', 4);
+                            // localStorage.setItem('questionId', );
+                            alert("登录成功")
+                                // debugger;
+                            location.href = "/home/home.html";
+                            // console.log(response);
                         } else {
-                            this.imgCode = 'http://localhost:8082/user/getImage?' + Math.random();
+
                         }
                     },
                     function(err) {
                         console.log(err);
                     })
             },
+            // logout: function() {
+            //     axios.get("http://localhost:8082/user/logout", {
+            //         headers: {
+            //             'Authorization': localStorage.getItem('Authorization')
+            //         }
+            //     }).then(
+            //         function(response) {
+            //             alert(response.data.msg)
+            //                 //删除本地存储
+            //             localStorage.removeItem('Authorization');
+            //             console.log(response.data);
+            //         },
+            //         function(err) {
+            //             console.log(err);
+            //         })
+            // },
             getImage: function() {
                 const num = Math.ceil(Math.random() * 10) // 生成一个随机数（防止缓存）
                 this.imgCode = 'http://localhost:8082/user/getImage?' + num
 
             }
+
         }
+
     })
 </script>
+<!-- da15767394098@163.com 130106zhj
+ ivymartin07@gmail.com Zheng454! -->
 
 </html>
