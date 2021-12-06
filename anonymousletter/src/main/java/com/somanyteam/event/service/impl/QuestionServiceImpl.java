@@ -323,6 +323,12 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Long addOrUpdateAnswer(MultipartFile[] multipartFiles, User curUser, AddOrUpdateAnswerReqDTO dto) throws IOException {
 
+        QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("question_id", dto.getQuestionId());
+        //如果是添加回答
+        if(answerMapper.selectList(queryWrapper).size() != 0 && dto.getId() == null){
+            throw new CommonException("该问题已回答");
+        }
         String imgUrl = "";
         //如果用户的回答中有图片
         if(multipartFiles != null) {
