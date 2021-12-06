@@ -102,6 +102,7 @@ public class UserServiceImpl implements UserService {
 //        }
         return userMapper.updateById(user);
     }
+
     @Override
     public int saveUser(User user) {
         if(!user.getEmail().matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")){
@@ -109,7 +110,7 @@ public class UserServiceImpl implements UserService {
             throw new UserEmailNotMatchException();
         }
 
-        String passRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+        String passRegex = "^(?=.*[A-Z])(?=.*[0-9])(?!.*([~!@&%$^\\(\\)#_]).*\\1.*\\1)[a-zA-Z0-9.~!@\";|:`&%$^\\(\\)#_]{8,16}$";
         boolean matches = (user.getPassword()).matches(passRegex);
         if (!matches){
             //密码不规范
@@ -144,7 +145,7 @@ public class UserServiceImpl implements UserService {
             throw new UserEmailNotMatchException();
         }
 
-        String passRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+        String passRegex = "^(?=.*[A-Z])(?=.*[0-9])(?!.*([~!@&%$^\\(\\)#_]).*\\1.*\\1)[a-zA-Z0-9.~!@\";|:`&%$^\\(\\)#_]{8,16}$";
         boolean matches = modifyPwd.matches(passRegex);
         if (!matches){
             //密码不规范
