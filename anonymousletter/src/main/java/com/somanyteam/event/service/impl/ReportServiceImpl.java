@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.somanyteam.event.dto.request.report.AddReportReqDTO;
 import com.somanyteam.event.dto.request.report.HandleReportReqDTO;
+import com.somanyteam.event.dto.result.question.QuestionAndAnswerListResult;
 import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
 import com.somanyteam.event.dto.result.question.QuestionResult;
 import com.somanyteam.event.dto.result.report.GetReportContentResult;
@@ -135,8 +136,14 @@ public class ReportServiceImpl implements ReportService {
         }
 
         //即使问题被删除了，也返回
-        QuestionAndAnswerResult questionAndAnswer = questionService.getAllQuestionAndAnswer(report.getQuestionId(), true);
-        List<QuestionResult> allQuestion = questionAndAnswer.getAllQuestion();
+        QuestionAndAnswerListResult questionAndAnswer = questionService.getAllQuestionAndAnswer(report.getQuestionId(), true);
+        List<QuestionAndAnswerResult> resultList = questionAndAnswer.getResultList();
+        //List<QuestionResult> allQuestion = questionAndAnswer.getAllQuestion();
+        List<QuestionResult> allQuestion = new ArrayList<>();
+        for (int i=0;i<resultList.size();i++){
+            allQuestion.add(resultList.get(i).getQuestionResult());
+        }
+
         //获取父问题的提问时间
         QuestionResult parentQuestion = allQuestion.get(0);
         String answerUsername = questionMapper.selectAnswerUsernameByQuestionId(parentQuestion.getId());

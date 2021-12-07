@@ -5,9 +5,8 @@ import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
 
 import com.somanyteam.event.dto.result.question.GetPublicQuestionResult;
-import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
+import com.somanyteam.event.dto.result.question.QuestionAndAnswerListResult;
 import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
-import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Question;
 import com.somanyteam.event.entity.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,6 +80,13 @@ public interface QuestionService {
 
     int sendEmail(Question question,String aId);
 
-    QuestionAndAnswerResult getAllQuestionAndAnswer(Long id, Boolean flag);
+    /**
+     * 获取父问题下的所有问题和回答，并排好序
+     * @param id 问题id
+     * @param flag 情景
+     * @return QuestionAndAnswerListResult
+     */
+    QuestionAndAnswerListResult  getAllQuestionAndAnswer(Long id, Boolean flag);
+
 
 }

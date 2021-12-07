@@ -14,16 +14,20 @@ import java.util.List;
  **/
 @Data
 @ApiModel("获取问题和答案结果集")
-public class QuestionAndAnswerResult {
+public class QuestionAndAnswerListResult {
 
 //    @ApiModelProperty(value = "所有问题", required = true)
 //    private List<QuestionResult> allQuestion;
-    @ApiModelProperty(value = "一个问题", required = true)
-    private QuestionResult questionResult;
-
+//
 //    @ApiModelProperty(value = "所有答案", required = true)
 //    private List<AnswerResult> allAnswer;
 
-    @ApiModelProperty(value = "一个回答", required = true)
-    private AnswerResult answerResult;
+    @ApiModelProperty(value = "一个问题一个答案集合", required = true)
+    private List<QuestionAndAnswerResult> resultList;
+
+    @ApiModelProperty(value = "提问者id")
+    private String qUsername;
+
+    @ApiModelProperty(value = "回答者id")
+    private String aUsername;
 }

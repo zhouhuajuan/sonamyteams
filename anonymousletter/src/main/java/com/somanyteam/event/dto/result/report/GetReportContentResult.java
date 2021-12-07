@@ -1,7 +1,7 @@
 package com.somanyteam.event.dto.result.report;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
+import com.somanyteam.event.dto.result.question.QuestionAndAnswerListResult;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -37,7 +37,7 @@ public class GetReportContentResult {
     private Byte status;
 
     @ApiModelProperty("问题和答案结果集")
-    private QuestionAndAnswerResult questionAndAnswerResult;
+    private QuestionAndAnswerListResult questionAndAnswerResult;
 
 
 

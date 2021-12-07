@@ -8,12 +8,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.somanyteam.event.constant.CommonConstant;
 import com.somanyteam.event.dto.request.question.AddOrUpdateAnswerReqDTO;
-import com.somanyteam.event.dto.result.question.AnswerResult;
-import com.somanyteam.event.dto.result.question.GetPublicQuestionResult;
-import com.somanyteam.event.dto.result.question.QuestionAndAnswerResult;
-import com.somanyteam.event.dto.result.question.QuestionResult;
-import com.somanyteam.event.dto.result.question.UserInfoResult;
-import com.somanyteam.event.dto.result.question.VariousQuestionsListResult;
+import com.somanyteam.event.dto.result.question.*;
 
 import com.somanyteam.event.entity.Answer;
 import com.somanyteam.event.entity.Question;
@@ -24,8 +19,6 @@ import com.somanyteam.event.exception.question.QuestionIdEmptyException;
 
 import com.somanyteam.event.exception.question.UserIdIsEmptyException;
 import com.somanyteam.event.mapper.AnswerMapper;
-
-import cn.hutool.core.util.ObjectUtil;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.somanyteam.event.dto.request.question.QuestionAddReqDTO;
@@ -40,9 +33,7 @@ import com.somanyteam.event.mapper.BlacklistMapper;
 import com.somanyteam.event.mapper.QuestionMapper;
 import com.somanyteam.event.mapper.UserMapper;
 import com.somanyteam.event.service.QuestionService;
-import org.apache.commons.collections.ListUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.mockito.internal.util.collections.ListUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -50,8 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.somanyteam.event.util.EmailUtil;
-
-import org.springframework.mail.javamail.JavaMailSender;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -280,10 +269,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionAndAnswerResult getAllQuestionAndAnswer(Long id,Boolean flag) {
+    public QuestionAndAnswerListResult getAllQuestionAndAnswer(Long id, Boolean flag) {
 //        QueryWrapper<Question> wrapper = new QueryWrapper<>();
 //        wrapper.eq("id", id);
 //        Question question1 = questionMapper.selectOne(wrapper);
+        //flag==false,查询未删除的答案问题
         QueryWrapper<Question> wrapper1 = new QueryWrapper<>();
         if (!flag){
             wrapper1.eq("del_flag",0);
@@ -314,9 +304,35 @@ public class QuestionServiceImpl implements QuestionService {
             allAnswer.add(result2);
         }
 
-        QuestionAndAnswerResult result = new QuestionAndAnswerResult();
-        result.setAllQuestion(allQuestion);
-        result.setAllAnswer(allAnswer);
+        QuestionAndAnswerListResult result = new QuestionAndAnswerListResult();
+        List<QuestionAndAnswerResult> resultList = new ArrayList<>();
+//        for (int i=0;i<allQuestion.size();i++) {
+//            for (int j=0;i<allAnswer.size();j++){
+//                if (i==j){
+//                    QuestionAndAnswerResult result1 = new QuestionAndAnswerResult();
+//                    result1.setQuestionResult(allQuestion.get(i));
+//                    result1.setAnswerResult(allAnswer.get(j));
+//                    resultList.add(result1);
+//                }
+//            }
+//        }
+
+        for (int i=0;i<allAnswer.size();i++){
+            QuestionAndAnswerResult result1 = new QuestionAndAnswerResult();
+            result1.setQuestionResult(allQuestion.get(i));
+            result1.setAnswerResult(allAnswer.get(i));
+            resultList.add(result1);
+        }
+
+        if (allQuestion.size() > allAnswer.size()){
+            QuestionAndAnswerResult result1 = new QuestionAndAnswerResult();
+            result1.setQuestionResult(allQuestion.get(allQuestion.size()-1));
+            resultList.add(result1);
+        }
+
+        result.setResultList(resultList);
+//        result.setAllQuestion(allQuestion);
+//        result.setAllAnswer(allAnswer);
 
         Question question = questionList.get(0);
         QueryWrapper<User> wrapper = new QueryWrapper<>();
