@@ -55,8 +55,9 @@
             <div class="settingform1">
                 <div class="questiontip">“Ask Me Anything !”</div>
                 <textarea type="text" class="answerbox" v-model="content" placeholder="请在此处撰写问题"></textarea>
-                <input type="button" class="answertip" value="点击发送问题" @click="addquestion">
-                <input type="button" class="answertip" value="点击追问" @click="addmorequestion">
+                <input type="button" class="answertip" value="点击发送问题" @click="addquestion" :disabled="isDisable1">
+                <!-- 设置disable -->
+                <input type="button" :class="answertip" value="点击追问" @click="addmorequestion" :disabled="isDisable">
             </div>
         </div>
     </div>
@@ -76,7 +77,7 @@
         el: "#root ",
         data: {
             imgUrl: "images/logo.jpg",
-            // username: "",
+            username: "",
             otherusername: "",
             otherid: "",
             answerStatus: "0",
@@ -89,7 +90,27 @@
             nothing: false,
             message: "",
             seen: true,
-            qusername: ""
+            qusername: "",
+            answertip: "answertip",
+            isDisable: false,
+            isDisable1: false
+        },
+        watch: {
+            qusername(val) {
+                console.log("qusername被修改了");
+                var that = this;
+                if (this.qusername != this.username) {
+                    that.isDisable = true;
+                    that.answertip = "answertip1";
+                    console.log("否")
+                } else if (this.qusername == this.username) {
+                    that.isDisable = false;
+                    that.answertip = "answertip";
+                    console.log("是")
+                } else {
+                    console.log("无")
+                }
+            }
         },
         methods: {
             //获取箱子拥有者公开回答问题列表
@@ -120,6 +141,8 @@
                 console.log("@" + e.currentTarget.id);
                 that.OtherquestionId = e.currentTarget.id
                 localStorage.setItem("OtherquestionId", this.OtherquestionId);
+                //判断该问题是否是该ID用户提问的,否则追问按钮失效
+
                 axios.get("http://localhost:8082/question/getQuestionAndAnswer/" + this.OtherquestionId, {
                     params: {
                         flag: false
@@ -131,12 +154,18 @@
                             console.log(response.data.message);
                             that.Alltips = response.data.data.resultList;
                             that.qusername = response.data.data.qusername;
+                            console.log(that.qusername);
+
+
                         }
                         console.log(response.data)
                     },
                     function(err) {
                         console.log(err);
-                    })
+
+                    });
+
+
             },
             //添加问题
             addquestion: function() {
@@ -146,6 +175,8 @@
                 if (this.id == null) {
                     alert("请登录后再返回该网页提问问题");
                     location.href = "/login/login.html";
+                } else if (this.content == "") {
+                    alert("提问的问题不能为空")
                 } else {
                     axios.post("http://localhost:8082/question/addQuestion", {
                         content: this.content,
@@ -166,6 +197,12 @@
                             console.log(err);
                         })
                 }
+                that.isDisable = false;
+                //延长点击
+                setTimeout(() => {
+                    this.isDisable = true //点击一次时隔两秒后才能再次点击
+                    console.log("失效了")
+                }, 5000)
             },
             //添加追问
             addmorequestion: function() {
@@ -175,8 +212,8 @@
                 if (this.id == null) {
                     alert("请登录后再返回该网页提问问题");
                     location.href = "/login/login.html";
-                } else if (this.qusername != localStorage.getItem("username")) {
-                    alert("该问题不是你提问的，无法进行追问");
+                } else if (this.content == "") {
+                    alert("提问的问题不能为空")
                 } else {
                     axios.post("http://localhost:8082/question/addQuestion", {
                         content: this.content,
@@ -192,11 +229,33 @@
                             console.log(response.data);
                             that.content = "";
                             that.createcode();
-                            // that.getquestionId();
-                            that.getotherquestion();
+                            //重新获取回答
+                            axios.get("http://localhost:8082/question/getQuestionAndAnswer/" + this.OtherquestionId, {
+                                params: {
+                                    flag: false
+                                }
+                            }).then(
+                                function(response) {
+                                    if (response.data.data !== null) {
+                                        that.Alltips = [];
+                                        console.log(response.data.message);
+                                        that.Alltips = response.data.data.resultList;
+                                        that.qusername = response.data.data.qusername;
+                                        console.log(that.qusername);
+
+
+                                    }
+                                    console.log(response.data)
+                                },
+                                function(err) {
+                                    console.log(err);
+
+                                });
+
                         },
                         function(err) {
                             console.log(err);
+                            alert("你的上一个问题还没有收到回答")
                         })
                 }
             },
@@ -211,7 +270,7 @@
             this.identity = localStorage.getItem("identity");
             localStorage.setItem("otherid", otherid);
             this.otherusername = localStorage.getItem("otherusername");
-            // this.OtherquestionId = localStorage.getItem("OtherquestionId");
+            this.username = localStorage.getItem("username");
         },
 
         mounted: function() {

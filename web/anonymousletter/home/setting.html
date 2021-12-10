@@ -25,6 +25,7 @@
                     <li><a href="#blakelist">黑名单</a></li>
                     <li><a href="#contact">联系开发者</a></li>
                     <li><a href="#cancel">注销账号</a></li>
+                    <li><a href="#change">修改密码</a></li>
                     <li style="border-bottom: 0px;"><a href="#logout">退出登录</a></li>
                 </ul>
             </div>
@@ -91,6 +92,20 @@
                     <input type="button" value="注销" class="logout" @click="cancel" /><br/>
                     <hr>
                     <br>
+                    <span id="change">修改密码</span>
+                    <li>输入旧密码：
+                        <input type="text" placeholder="请输入旧密码" class="email" v-model="originalPassword" /><br/>
+                    </li>
+                    <li>输入新密码：
+                        <input type="password" class="pass" placeholder="请输入新密码(字母+数字)" v-model="newPassword" /><br/>
+                    </li>
+                    <li>确认新密码：
+                        <input type="password" class="pass" placeholder="确认新密码" v-model="confirmPassword" /><br/>
+                    </li>
+                    <li>点击修改密码：
+                        <input type="button" value="修改" class="logout" @click="change" /></li><br/>
+                    <hr>
+                    <br>
                     <span id="logout">退出登录</span><br> 点击退出登录：
                     <input type="button" value="登出" class="logout" @click="logout" /><br/>
                 </div>
@@ -119,7 +134,10 @@
             profile: "一句话介绍自己",
             sex: "1",
             username: "",
-            blacklistArr: []
+            blacklistArr: [],
+            originalPassword: "",
+            newPassword: "",
+            confirmPassword: "",
         },
         computed: {
             birthday: {
@@ -220,6 +238,28 @@
                         console.log(err);
                     })
             },
+            //修改密码
+            change: function() {
+                // var that = this;
+                // console.log("");
+                axios.post("http://localhost:8082/user/modifyPassword", {
+                    originalPassword: this.originalPassword,
+                    newPassword: this.newPassword,
+                    confirmPassword: this.confirmPassword,
+                }, {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                    // confirmPwd: this.confirmPwd
+                }).then(
+                    function(response) {
+                        console.log(response.data);
+                        alert(response.data.message)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
             //注销账号
             cancel: function() {
                 axios.get("http://localhost:8082/user/deleteAccount", {
@@ -256,7 +296,8 @@
                     }
                 }).then(
                     function(response) {
-                        if (response.data.data.Array == null) {
+                        if (response.data.data == null) {
+                            console.log(response.data)
                             console.log("null");
                             that.blacklistArr[0] = {
                                 content: "暂无内容"

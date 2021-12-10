@@ -57,12 +57,29 @@
                     
                     .first li {
                         width: 170px;
-                        height: 90px;
+                        height: 75px;
                         line-height: 90px;
                         /* background-color: chocolate; */
                         margin: 0px auto;
                         font-size: 18px;
                         border-bottom: 2px solid #343434;
+                    }
+                    
+                    .pass,
+                    .email {
+                        padding: 0px;
+                        margin: 0;
+                        border: 0px;
+                        /* border-radius: 10px; */
+                        /* background-color: #b3b1b15d; */
+                        border-radius: 10px;
+                        border: 2px solid #343434;
+                        height: 30px;
+                        width: 240px;
+                        outline: none;
+                        text-align: left;
+                        font-size: 14px;
+                        text-indent: 2px;
                     }
                     
                     span {

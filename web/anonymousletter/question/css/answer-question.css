@@ -160,6 +160,15 @@
                             padding-right: 5px;
                         }
                         
+                        .questionbox1 {
+                            height: 450px;
+                            margin-top: 20px;
+                            /* background-color: aquamarine; */
+                            overflow: auto;
+                            padding-left: 10px;
+                            padding-right: 5px;
+                        }
+                        
                         .questiontip {
                             text-align: left;
                             font-size: 20px;

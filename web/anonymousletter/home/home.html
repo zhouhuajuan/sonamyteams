@@ -48,27 +48,27 @@
 
                 <span>
                     <a href="#" @click="createcode1">
-                        <div class="answered" >已答</div>
+                        <div class="answered" >已进行回答</div>
                     </a>
                 </span>
                 <span>
                     <!-- <a href="home2-noanswered.html"> -->
                     <a href="#" @click="createcode2" >
-                        <div  class="answered" style="margin-left: 20px;">未答</div>
+                        <div  class="answered" style="margin-left: 20px;">未进行回答</div>
                         <!-- <div  class="noanswered" >未答</div> -->
                     </a>
                 </span>
                 <span>
                     <!-- <a href="home3-had-answered.html"> -->
                         <a href="#" @click="createcode3">
-                        <div class="answered"  style="margin-left: 20px;">已回答</div>
+                        <div class="answered"  style="margin-left: 20px;">已收到回答</div>
                         <!-- <div class="had-answered">已回答</div> -->
                     </a>
                 </span>
                 <span>
                         <!-- <a href="home4-had-noanswered.html"> -->
                         <a href="#"  @click="createcode4">
-                            <div class="answered" style="margin-left: 20px;">未回答</div>
+                            <div class="answered" style="margin-left: 20px;">未收到回答</div>
                             <!-- <div class="had-noanswered">未回答</div> -->
                         </a>
                 </span>
@@ -76,9 +76,9 @@
             <!-- 1 -->
             <!-- <ul class="allquestions"> -->
             <ul class="allquestions" v-if="code1">
-                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题已答</span>
+                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题已进行回答</span>
                 <a href="#" @click="deletetip">
-                    <span style="margin-left:550px;font-size: 19px;">删除问题设置</span></a>
+                    <span style="margin-left:490px;font-size: 19px;">删除问题设置</span></a>
                 <li v-for="item in questionArr">
                     <a href="../question/answer-question.html">
                         <div :class="questions" @click="getquestionId($event)" :id="item.id">
@@ -97,9 +97,9 @@
             </ul>
             <!-- 2 -->
             <ul class="allquestions" v-if="code2">
-                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题未答</span>
+                <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题未进行回答</span>
                 <a href="#" @click="deletetip">
-                    <span style="margin-left:550px;font-size: 19px;">删除问题设置</span></a>
+                    <span style="margin-left:490px;font-size: 19px;">删除问题设置</span></a>
                 <li>
                     <div class="questions" v-if="nothing">{{message}} </div>
                 </li>
@@ -165,7 +165,8 @@
             code3: false,
             code4: false,
             questions: "questions",
-            deletebutton: false
+            deletebutton: false,
+            questionCategory: "1"
         },
         methods: {
             //已回答
@@ -177,24 +178,26 @@
                     that.code4 = false,
                     that.deletebutton = false,
                     that.questions = "questions",
-                    axios.get("http://localhost:8082/question/getAnsweredQuestion ", {
-                        headers: {
-                            'Authorization': localStorage.getItem('Authorization')
+                    that.questionCategory = "1",
+                    localStorage.setItem("questionCategory", this.questionCategory)
+                axios.get("http://localhost:8082/question/getAnsweredQuestion ", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
                         }
-                    }).then(
-                        function(response) {
-                            if (response.data.data == null) {
-                                that.nothing = true,
-                                    that.message = response.data.message;
-                            } else {
-                                that.nothing = false
-                                that.questionArr = response.data.data;
-                            }
-                            console.log(response.data)
-                        },
-                        function(err) {
-                            console.log(err);
-                        })
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
             },
             //未回答
             createcode2: function() {
@@ -205,25 +208,27 @@
                     that.code4 = false,
                     that.deletebutton = false,
                     that.questions = "questions",
-                    axios.get("http://localhost:8082/question/getUnansweredQuestion", {
-                        headers: {
-                            'Authorization': localStorage.getItem('Authorization')
+                    that.questionCategory = "2",
+                    localStorage.setItem("questionCategory", this.questionCategory)
+                axios.get("http://localhost:8082/question/getUnansweredQuestion", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                            that.questionArr = [];
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
                         }
-                    }).then(
-                        function(response) {
-                            if (response.data.data == null) {
-                                that.nothing = true,
-                                    that.message = response.data.message;
-                                that.questionArr = [];
-                            } else {
-                                that.nothing = false
-                                that.questionArr = response.data.data;
-                            }
-                            console.log(response.data)
-                        },
-                        function(err) {
-                            console.log(err);
-                        })
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
             },
             //已收到回答
             createcode3: function() {
@@ -233,24 +238,26 @@
                     that.code3 = true,
                     that.code4 = false,
                     that.deletetips = false,
-                    axios.get("http://localhost:8082/question/getReceivedAnswerQuestionList", {
-                        headers: {
-                            'Authorization': localStorage.getItem('Authorization')
+                    that.questionCategory = "3",
+                    localStorage.setItem("questionCategory", this.questionCategory)
+                axios.get("http://localhost:8082/question/getReceivedAnswerQuestionList", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
                         }
-                    }).then(
-                        function(response) {
-                            if (response.data.data == null) {
-                                that.nothing = true,
-                                    that.message = response.data.message;
-                            } else {
-                                that.nothing = false
-                                that.questionArr = response.data.data;
-                            }
-                            console.log(response.data)
-                        },
-                        function(err) {
-                            console.log(err);
-                        })
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
             },
             //未收到回答
             createcode4: function() {
@@ -260,24 +267,26 @@
                     that.code3 = false,
                     that.code4 = true,
                     that.deletetips = false,
-                    axios.get("http://localhost:8082/question/getUnreceivedAnswerQuestionList", {
-                        headers: {
-                            'Authorization': localStorage.getItem('Authorization')
+                    that.questionCategory = "4",
+                    localStorage.setItem("questionCategory", this.questionCategory);
+                axios.get("http://localhost:8082/question/getUnreceivedAnswerQuestionList", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
                         }
-                    }).then(
-                        function(response) {
-                            if (response.data.data == null) {
-                                that.nothing = true,
-                                    that.message = response.data.message;
-                            } else {
-                                that.nothing = false
-                                that.questionArr = response.data.data;
-                            }
-                            console.log(response.data)
-                        },
-                        function(err) {
-                            console.log(err);
-                        })
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
             },
             //删除问题！！！！！！！
             deletequestion: function(e) {
@@ -361,6 +370,7 @@
         mounted() {
             this.getuser();
             this.createcode1();
+            localStorage.setItem("questionCategory", this.questionCategory)
         }
 
 

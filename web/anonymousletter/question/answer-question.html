@@ -20,7 +20,7 @@
                     <li class="userImage" style="float: left;">
                         <img :src="imgUrl" width="80px" class="Image">
                     </li>
-                    <li class="username">{{username}}的所有已回答问题({{questionArr.length}})</li>
+                    <li class="username">{{username}}的所有{{question}}问题({{questionArr.length}})</li>
 
                 </ul>
 
@@ -42,7 +42,7 @@
 
             </div>
             <div class="settingform">
-                <div class="questionbox">
+                <div :class="questionbox">
                     <p class="questiontip">
                         <li v-for="(item,index) in Alltips">
                             <span style="float: left;">问题{{index+1}}：{{item.questionResult.content}}</span><br>
@@ -53,29 +53,31 @@
 
                     </p>
                 </div>
-                <textarea type="text" class="answerbox" v-model="content" placeholder="此处添加和编辑回答（注：编辑回答只能编辑最后一个子问题的答案）"></textarea>
-                <input type="button" class="answertip" value="点击保存答案" @click="write" :disabled="isDisable">
-                <div class="choose">
-                    <ul>
-                        <li>
-                            问题设置：
-                            <input type="radio" name="sex" style="margin-left: 0px;" value="0" v-model="answerStatus" />公开回答
-                            <input type="radio" name="sex" style="margin-left: 10px;" value="1" v-model="answerStatus" />定向回答
-                        </li>
-                        <li>举报问题：
-                            <select>
+                <div v-show="mine">
+                    <textarea type="text" class="answerbox" v-model="content" placeholder="此处添加和编辑回答（注：编辑回答只能编辑最后一个子问题的答案）"></textarea>
+                    <input type="button" class="answertip" value="点击保存答案" @click="write" :disabled="isDisable">
+                    <div class="choose">
+                        <ul>
+                            <li>
+                                问题设置：
+                                <input type="radio" name="sex" style="margin-left: 0px;" value="0" v-model="answerStatus" />公开回答
+                                <input type="radio" name="sex" style="margin-left: 10px;" value="1" v-model="answerStatus" />定向回答
+                            </li>
+                            <li>举报问题：
+                                <select>
                         <option>政治敏感问题</option>
                         <option>低俗暴力色情</option>
                         <option>人身攻击</option>
                         <option>其他</option>
                     </select>
-                            <input type="button" class="report" value="选择原因举报" @click="report">
-                        </li>
-                        <li> 拉黑提问者：
-                            <input type="button" class="report" value="点击拉黑" @click="addblacklist">
-                            <input type="button" class="report" value="点击删除问题" @click="deletequestion">
-                        </li>
-                    </ul>
+                                <input type="button" class="report" value="选择原因举报" @click="report">
+                            </li>
+                            <li> 拉黑提问者：
+                                <input type="button" class="report" value="点击拉黑" @click="addblacklist">
+                                <input type="button" class="report" value="点击删除问题" @click="deletequestion">
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -106,7 +108,10 @@
             Alltips: [],
             nothing: false,
             link: "",
-            isDisable: false
+            isDisable: false,
+            mine: true,
+            question: "已回答",
+            questionbox: "questionbox"
         },
         methods: {
             //获取所有已回答问题列表
@@ -123,6 +128,73 @@
                                 that.message = response.data.message;
 
                         } else {
+                            that.questionArr = response.data.data;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //未回答
+            createcode2: function() {
+                var that = this;
+                axios.get("http://localhost:8082/question/getUnansweredQuestion", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                            that.questionArr = [];
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //已收到回答
+            createcode3: function() {
+                var that = this;
+                axios.get("http://localhost:8082/question/getReceivedAnswerQuestionList", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                        } else {
+                            that.nothing = false
+                            that.questionArr = response.data.data;
+                        }
+                        console.log(response.data)
+                    },
+                    function(err) {
+                        console.log(err);
+                    })
+            },
+            //未收到回答
+            createcode4: function() {
+                var that = this;
+                axios.get("http://localhost:8082/question/getUnreceivedAnswerQuestionList", {
+                    headers: {
+                        'Authorization': localStorage.getItem('Authorization')
+                    }
+                }).then(
+                    function(response) {
+                        if (response.data.data == null) {
+                            that.nothing = true,
+                                that.message = response.data.message;
+                        } else {
+                            that.nothing = false
                             that.questionArr = response.data.data;
                         }
                         console.log(response.data)
@@ -187,12 +259,6 @@
             //编辑当前问题的答案
             write: function() {
                 var that = this;
-                this.isDisable = true;
-                //延长点击
-                setTimeout(() => {
-                    this.isDisable = false //点击一次时隔两秒后才能再次点击
-                    console.log("失效了")
-                }, 3000)
                 if (this.ausername !== this.username) {
                     alert("该问题所属" + this.ausername + "的，你不能回答");
                 } else {
@@ -251,6 +317,12 @@
                     }
                     // }
                 }
+                that.isDisable = false;
+                //延长点击
+                setTimeout(() => {
+                    this.isDisable = true //点击一次时隔两秒后才能再次点击
+                    console.log("失效了")
+                }, 5000)
             },
             //删除问题
             deletequestion: function() {
@@ -263,23 +335,27 @@
                 if (this.ausername !== this.username) {
                     alert("该问题所属" + this.ausername + "的，你无法删除");
                 } else {
-                    axios.post("http://localhost:8082/question/deleteQuestion?id=" + localStorage.getItem("questionId"), {}, {
-                        headers: {
-                            'Authorization': localStorage.getItem('Authorization')
-                        }
-                    }).then(
-                        function(response) {
-                            alert(response.data.message)
-                            console.log(response.data);
-                            that.createcode();
-                            that.getquestionId();
-                            that.getotherquestion();
-                            that.content = "",
-                                that.Alltips = []
-                        },
-                        function(err) {
-                            console.log(err);
-                        })
+                    if (confirm("是否要删除该问题？") == true) {
+                        axios.post("http://localhost:8082/question/deleteQuestion?id=" + localStorage.getItem("questionId"), {}, {
+                            headers: {
+                                'Authorization': localStorage.getItem('Authorization')
+                            }
+                        }).then(
+                            function(response) {
+                                alert(response.data.message)
+                                console.log(response.data);
+                                that.createcode();
+                                that.getquestionId();
+                                that.getotherquestion();
+                                that.content = "",
+                                    that.Alltips = []
+                            },
+                            function(err) {
+                                console.log(err);
+                            })
+                    } else {
+
+                    }
                 }
             },
             //举报当前问题(可用）
@@ -327,7 +403,25 @@
             this.identity = localStorage.getItem("identity");
         },
         mounted: function() {
-            this.createcode()
+            if (localStorage.getItem("questionCategory") == "1") {
+                this.createcode();
+                this.mine = true;
+                this.question = "已回答";
+            } else if (localStorage.getItem("questionCategory") == "2") {
+                this.createcode2();
+                this.mine = true;
+                this.question = "未回答";
+            } else if (localStorage.getItem("questionCategory") == "3") {
+                this.createcode3();
+                this.mine = false;
+                this.question = "已收到回答";
+                this.questionbox = "questionbox1"
+            } else {
+                this.createcode4();
+                this.mine = false;
+                this.question = "未收到回答";
+                this.questionbox = "questionbox1"
+            }
             this.getquestionId();
             this.getotherquestion();
         }
