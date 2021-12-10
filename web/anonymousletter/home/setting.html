@@ -52,7 +52,8 @@
                                 <input type="radio" name="sex" style="margin-left: 10px;" value="1" v-model="sex" />女
                             </li>
                             <li>生日：
-                                <input type="text" placeholder="2001" class="birth" v-model="year">年<input type="text" placeholder="01" class="birth" v-model="mouth">月<input type="text" placeholder="01" class="birth" v-model="day">日
+                                <input type="text" placeholder="2001" class="birth" v-model="year" maxlength="4">年<input type="text" placeholder="01" class="birth" v-model="mouth" maxlength="2">月<input type="text" placeholder="01" class="birth" v-model="day"
+                                    maxlength="2">日
                             </li>
                             <li>简介：
                                 <textarea type="text" maxlength="50" placeholder="最多50个字符" class="introduce" cols="15" rows="4" v-model="profile"></textarea>
@@ -203,6 +204,14 @@
                         alert(response.data.message)
                             //删除本地存储
                         localStorage.removeItem('Authorization');
+                        localStorage.removeItem('identity');
+                        localStorage.removeItem('questionId');
+                        localStorage.removeItem('id');
+                        localStorage.removeItem('imgUrl');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('otherid');
+                        localStorage.removeItem('otherusername');
+                        localStorage.removeItem('OtherquestionId');
                         console.log(response.data);
                         location.href = "/login/login.html";
 
@@ -220,7 +229,16 @@
                 }).then(
                     function(response) {
                         alert(response.data.message)
+                            //删除本地存储
                         localStorage.removeItem('Authorization');
+                        localStorage.removeItem('identity');
+                        localStorage.removeItem('questionId');
+                        localStorage.removeItem('id');
+                        localStorage.removeItem('imgUrl');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('otherid');
+                        localStorage.removeItem('otherusername');
+                        localStorage.removeItem('OtherquestionId');
                         console.log(response.data);
                         location.href = "/login/login.html";
 
@@ -239,13 +257,13 @@
                 }).then(
                     function(response) {
                         if (response.data.data.Array == null) {
-                            // console.log("null");
+                            console.log("null");
                             that.blacklistArr[0] = {
                                 content: "暂无内容"
                             }
                         } else {
                             console.log(response.data)
-                            that.blacklistArr = response.data.data
+                            that.blacklistArr = response.data.data;
                         }
                     },
                     function(err) {

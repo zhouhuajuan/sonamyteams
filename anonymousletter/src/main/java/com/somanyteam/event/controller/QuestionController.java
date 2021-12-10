@@ -56,7 +56,7 @@ public class QuestionController {
     @RequiresAuthentication
     @ApiOperation("删除问题(被提问者)")
     @PostMapping("/deleteQuestion")
-    public ResponseMessage deleteQuestion(@RequestParam("问题id") Long id) {
+    public ResponseMessage deleteQuestion(@RequestParam("id") Long id) {
         User loginUser = ShiroUtil.getUser();
         String loginUserId = loginUser.getId(); //当前登录用户的id
         int i = questionService.deleteQuestion(loginUserId, id);
