@@ -18,18 +18,23 @@
                     <img src="images/logo.jpg" width="80px" class="logo">
                 </li>
                 <li>
-                    <input type="text" placeholder="请输入邮箱" class="email" v-model="email" /><br/>
+                    <input type="text" placeholder="请输入邮箱" class="email" v-model.trim.lazy="email" /><br/>
+                    <li v-show="erremail" style="font-size:12px; color: brown;">{{warnemail}}</li>
                 </li>
                 <li>
-                    <input type="password" class="pass" placeholder="请输入新密码(字母+数字)" v-model="modifyPwd" /><br/>
+                    <input type="password" class="pass" placeholder="请输入新密码(字母+数字)" v-model.lazy="modifyPwd" /><br/>
+                    <li v-show="errpsd" style="font-size:12px; color: brown;">{{warnpsd}}</li>
                 </li>
                 <li>
-                    <input type="password" class="pass" placeholder="确认新密码" v-model="confirmPwd" /><br/>
+                    <input type="password" class="pass" placeholder="确认新密码" v-model.lazy="confirmPwd" /><br/>
+                    <li v-show="errcpsd" style="font-size:12px; color: brown;">{{warncpsd}}</li>
                 </li>
                 <li>
-                    <input type="text" class="code" placeholder="请输入验证码" v-model="code" />
+                    <input type="text" class="code" placeholder="请输入验证码" v-model.lazy="code" />
                     <input type="button" class="emial_code_verify" value="发送验证码" @click="sentcode"></input>
+                    <li v-show="errcode" style="font-size:12px; color: brown;">{{warncode}}</li>
                 </li>
+
                 <li>
                     <input type="button" value="修改密码" class="login" @click="forget" /><br/>
                 </li>
@@ -48,28 +53,99 @@
             email: "",
             modifyPwd: "",
             confirmPwd: "",
-            code: ""
+            code: "",
+            erremail: false,
+            warnemail: "",
+            errpsd: false,
+            warnpsd: "",
+            errcpsd: false,
+            warncpsd: "",
+            errcode: false,
+            warncode: "",
+        },
+        watch: {
+            email(val) {
+                console.log("email修改了")
+                var that = this;
+                if (this.email == "") {
+                    that.erremail = true;
+                    that.warnemail = "邮箱不能为空";
+                } else if (this.email != "") {
+                    var reg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+                    //调用正则验证test()函数
+                    isok = reg.test(this.email);
+                    if (!isok) {
+                        that.erremail = true;
+                        that.warnemail = "邮箱格式不正确";
+
+                    } else {
+                        that.erremail = false;
+                    }
+                }
+            },
+            modifyPwd(val) {
+                var that = this;
+                if (this.password == "") {
+                    that.errpsd = true;
+                    that.warnpsd = "密码不能为空";
+                } else if (this.password != "") {
+                    var reg = /^(?=.*[A-Z])(?=.*[0-9])(?!.*([~!@&%$^\\(\\)#_]).*\\1.*\\1)[a-zA-Z0-9.~!@\";|:`&%$^\\(\\)#_]{8,16}$/;
+                    //调用正则验证test()函数
+                    isok = reg.test(this.modifyPwd);
+                    if (!isok) {
+                        that.errpsd = true;
+                        that.warnpsd = "密码格式需为8-16位，且至少有一个大写字母和一个数字";
+
+                    } else {
+                        that.errpsd = false;
+                    }
+                } else {
+                    that.errpsd = false;
+                }
+            },
+            confirmPwd(val) {
+                var that = this;
+                if (this.confirmPwd != this.modifyPwd) {
+                    that.errcpsd = true;
+                    that.warncpsd = "与新密码不一致";
+                } else {
+                    that.errcpsd = false;
+                }
+            },
+            code(val) {
+                var that = this;
+                if (this.code == "") {
+                    that.errcode = true;
+                    that.warncode = "验证码不能为空";
+                } else {
+                    that.errcode = false;
+                }
+            }
         },
         methods: {
+
             forget: function() {
                 // var that = this;
-                // console.log("");
-                axios.post("http://localhost:8082/user/forgetPwd", {
-                    email: this.email,
-                    modifyPwd: this.modifyPwd,
-                    code: this.code,
-                    confirmPwd: this.confirmPwd
-                }).then(
-                    function(response) {
-                        console.log(response.data);
-                        alert(response.data.message)
-                        if (response.data.status === 200) {
-                            window.location.href = "login.html";
-                        }
-                    },
-                    function(err) {
-                        console.log(err);
-                    })
+                if (this.email == "" && this.modifyPwd == "" && this.confirmPwd == "") {
+                    alert("邮箱和密码不能为空");
+                } else {
+                    axios.post("http://localhost:8082/user/forgetPwd", {
+                        email: this.email,
+                        modifyPwd: this.modifyPwd,
+                        code: this.code,
+                        confirmPwd: this.confirmPwd
+                    }).then(
+                        function(response) {
+                            console.log(response.data);
+                            alert(response.data.message)
+                            if (response.data.status === 200) {
+                                window.location.href = "login.html";
+                            }
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+                }
             },
             sentcode: function() {
                 email = this.email

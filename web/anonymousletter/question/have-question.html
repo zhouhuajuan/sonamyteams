@@ -44,11 +44,11 @@
             </div>
             <div class="settingform">
                 <div v-show="seen">点击左侧问题可以查看箱子主人的相应的答案</div>
-                <li v-for="(item,index) in AllQuestions"><span style="float: left;">问题{{index+1}}：{{item.content}}</span><br>
-                    <div class="time">——{{item.createTime}}</div>
-                </li>
-                <li v-for="(item,index) in AllAnswers"><span style="float: left;">回答{{index+1}}：{{item.content}}</span><br>
-                    <div class="time">——{{item.updateTime}}</div>
+                <li v-for="(item,index) in Alltips">
+                    <span style="float: left;">问题{{index+1}}：{{item.questionResult.content}}</span><br>
+                    <div class="time">——{{item.questionResult.createTime}}</div>
+                    <span style="float: left;" v-if="item.answerResult">回答 ：{{item.answerResult.content}}</span><br>
+                    <div class="time" v-if="item.answerResult">——{{item.answerResult.updateTime}}</div>
                 </li>
 
             </div>
@@ -78,30 +78,33 @@
             imgUrl: "images/logo.jpg",
             // username: "",
             otherusername: "",
+            otherid: "",
             answerStatus: "0",
             content: "",
             id: "1",
             questionArr: [],
             OtherquestionId: "2",
             nothing: false,
-            AllQuestions: [],
-            AllAnswers: [],
+            Alltips: [],
             nothing: false,
             message: "",
-            seen: true
+            seen: true,
+            qusername: ""
         },
         methods: {
             //获取箱子拥有者公开回答问题列表
             createcode: function() {
                 var that = this;
+                that.otherid = localStorage.getItem("otherid");
                 // that.otherusername = localStorage.getItem("otherusername");
-                axios.get("http://localhost:8082/question/getPublicQuestions/NotApn", {}).then(
+                axios.get("http://localhost:8082/question/getPublicQuestions/" + this.otherid, {}).then(
                     function(response) {
-                        if (response.data.data == null) {
+                        if (response.data.data.listResults == null) {
                             that.nothing = true,
                                 that.message = "这里还没有问题，快来提问吧";
                         } else {
-                            that.questionArr = response.data.data;
+                            that.questionArr = response.data.data.listResults;
+                            localStorage.setItem("otherusername", response.data.data.userInfo.username);
                         }
                         console.log(response.data)
                             // console.log("1")
@@ -124,10 +127,10 @@
                 }).then(
                     function(response) {
                         if (response.data.data !== null) {
-                            // console.log(response.data.message);
-                            that.AllQuestions = response.data.data.allQuestion;
-                            that.AllAnswers = response.data.data.allAnswer;
-
+                            that.Alltips = [];
+                            console.log(response.data.message);
+                            that.Alltips = response.data.data.resultList;
+                            that.qusername = response.data.data.qusername;
                         }
                         console.log(response.data)
                     },
@@ -172,6 +175,8 @@
                 if (this.id == null) {
                     alert("请登录后再返回该网页提问问题");
                     location.href = "/login/login.html";
+                } else if (this.qusername != localStorage.getItem("username")) {
+                    alert("该问题不是你提问的，无法进行追问");
                 } else {
                     axios.post("http://localhost:8082/question/addQuestion", {
                         content: this.content,
@@ -186,6 +191,9 @@
                             alert(response.data.message)
                             console.log(response.data);
                             that.content = "";
+                            that.createcode();
+                            // that.getquestionId();
+                            that.getotherquestion();
                         },
                         function(err) {
                             console.log(err);
@@ -194,18 +202,22 @@
             },
         },
         created() {
+            var other = window.location.search;
+            const arr = other.split("=");
+            var otherusername = arr[2];
+            var otherid = arr[1];
+            // alert(otherid);
             this.id = localStorage.getItem("id");
             this.identity = localStorage.getItem("identity");
-            localStorage.setItem("otherid", "NotApn");
-            localStorage.setItem("otherusername", "大娟")
+            localStorage.setItem("otherid", otherid);
             this.otherusername = localStorage.getItem("otherusername");
             // this.OtherquestionId = localStorage.getItem("OtherquestionId");
         },
 
         mounted: function() {
-                this.createcode();
-            }
-            // }
+            this.createcode();
+        }
+
     })
 </script>
 

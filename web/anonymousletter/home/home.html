@@ -77,16 +77,19 @@
             <!-- <ul class="allquestions"> -->
             <ul class="allquestions" v-if="code1">
                 <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题已答</span>
+                <a href="#" @click="deletetip">
+                    <span style="margin-left:550px;font-size: 19px;">删除问题设置</span></a>
                 <li v-for="item in questionArr">
                     <a href="../question/answer-question.html">
-                        <div class="questions" @click="getquestionId($event)" :id="item.id">
-                            <span v-text="item.content">正在获取</span>
+                        <div :class="questions" @click="getquestionId($event)" :id="item.id">
+                            <span v-text="item.content">正在获取</span><span v-if="item.newFlag" style="color: crimson;font-size: 18px;font-style: italic;">    NEW</span>
                             <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
                         </div>
                     </a>
+                    <span v-show="deletebutton" @click="deletequestion($event)" :id="item.id" class="deletebutton">X</span>
                 </li>
                 <li>
-                    <div class="questions">偷你匿名提问箱欢迎你！
+                    <div :class="questions">偷你匿名提问箱欢迎你！
                         <div style=" float: right;margin-right: 10px; font-size: small;color: #696969; font-style: italic; ">——好几个队</div>
                     </div>
 
@@ -95,16 +98,19 @@
             <!-- 2 -->
             <ul class="allquestions" v-if="code2">
                 <span style="margin-left:10px;font-size: 19px;">{{questionArr.length}}个问题未答</span>
+                <a href="#" @click="deletetip">
+                    <span style="margin-left:550px;font-size: 19px;">删除问题设置</span></a>
                 <li>
                     <div class="questions" v-if="nothing">{{message}} </div>
                 </li>
                 <li v-for="item in questionArr">
                     <a href="../question/answer-question.html">
-                        <div class="questions" @click="getquestionId($event)" :id="item.id">
+                        <div :class="questions" @click="getquestionId($event)" :id="item.id">
                             <span v-text="item.content">正在获取</span>
                             <div style="float: right;margin-right: 10px; font-size: small;color: #696969;font-style: italic;" v-text="item.updateTime"></div>
                         </div>
                     </a>
+                    <span v-show="deletebutton" @click="deletequestion($event)" :id="item.id" class="deletebutton">X</span>
                 </li>
 
             </ul>
@@ -158,30 +164,37 @@
             code2: false,
             code3: false,
             code4: false,
-
+            questions: "questions",
+            deletebutton: false
         },
         methods: {
             //已回答
             createcode1: function() {
                 var that = this;
-                axios.get("http://localhost:8082/question/getAnsweredQuestion ", {
-                    headers: {
-                        'Authorization': localStorage.getItem('Authorization')
-                    }
-                }).then(
-                    function(response) {
-                        if (response.data.data == null) {
-                            that.nothing = true,
-                                that.message = response.data.message;
-                        } else {
-                            that.nothing = false
-                            that.questionArr = response.data.data;
+                that.code1 = true,
+                    that.code2 = false,
+                    that.code3 = false,
+                    that.code4 = false,
+                    that.deletebutton = false,
+                    that.questions = "questions",
+                    axios.get("http://localhost:8082/question/getAnsweredQuestion ", {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
                         }
-                        console.log(response.data)
-                    },
-                    function(err) {
-                        console.log(err);
-                    })
+                    }).then(
+                        function(response) {
+                            if (response.data.data == null) {
+                                that.nothing = true,
+                                    that.message = response.data.message;
+                            } else {
+                                that.nothing = false
+                                that.questionArr = response.data.data;
+                            }
+                            console.log(response.data)
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
             },
             //未回答
             createcode2: function() {
@@ -190,6 +203,8 @@
                     that.code2 = true,
                     that.code3 = false,
                     that.code4 = false,
+                    that.deletebutton = false,
+                    that.questions = "questions",
                     axios.get("http://localhost:8082/question/getUnansweredQuestion", {
                         headers: {
                             'Authorization': localStorage.getItem('Authorization')
@@ -217,6 +232,7 @@
                     that.code2 = false,
                     that.code3 = true,
                     that.code4 = false,
+                    that.deletetips = false,
                     axios.get("http://localhost:8082/question/getReceivedAnswerQuestionList", {
                         headers: {
                             'Authorization': localStorage.getItem('Authorization')
@@ -243,6 +259,7 @@
                     that.code2 = false,
                     that.code3 = false,
                     that.code4 = true,
+                    that.deletetips = false,
                     axios.get("http://localhost:8082/question/getUnreceivedAnswerQuestionList", {
                         headers: {
                             'Authorization': localStorage.getItem('Authorization')
@@ -261,6 +278,44 @@
                         function(err) {
                             console.log(err);
                         })
+            },
+            //删除问题！！！！！！！
+            deletequestion: function(e) {
+                var that = this;
+                console.log("1");
+                console.log(e.currentTarget.id);
+                that.questionId = e.currentTarget.id
+                localStorage.setItem("questionId", this.questionId);
+                // confirm("是否要删除该问题？")
+                if (confirm("是否要删除该问题？") == true) {
+                    // console.log("1");
+                    axios.post("http://localhost:8082/question/deleteQuestion?id=" + localStorage.getItem("questionId"), {}, {
+                        headers: {
+                            'Authorization': localStorage.getItem('Authorization')
+                        }
+                    }).then(
+                        function(response) {
+
+                            alert(response.data.message)
+                            console.log(response.data);
+                            if (this.code1 == true && this.code2 == false) {
+                                that.createcode1();
+                            } else {
+                                that.createcode2();
+                            }
+                        },
+                        function(err) {
+                            console.log(err);
+                        })
+                } else {
+                    console.log("0")
+                }
+
+            },
+            deletetip: function() {
+                var that = this;
+                that.questions = "questions1";
+                that.deletebutton = true;
             },
             getquestionId: function(e) {
                 var that = this
@@ -292,6 +347,7 @@
 
                     })
             },
+
             // onmouseover: function() {
             //     this.seen = true;
             //     console.log("nihao ")
