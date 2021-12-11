@@ -39,11 +39,11 @@ public class GlobalExceptionHandler {
         return ResponseMessage.newErrorInstance(e.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseMessage handler(RuntimeException e) {
         log.error("运行时异常：----------------{}", e);
-        return ResponseMessage.newErrorInstance(e.getMessage());
+        return ResponseMessage.newErrorInstance( e.getMessage());
     }
 
 }

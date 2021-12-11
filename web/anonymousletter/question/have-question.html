@@ -189,11 +189,19 @@
                         }
                     }).then(
                         function(response) {
+                            console.log(response.data);
+                    
+                            if(response.data.status === 400){
+                            
+                                alert(response.data.message);
+                            }else{
                             alert(response.data.message)
                             console.log(response.data);
                             that.content = "";
+                            }
                         },
                         function(err) {
+                            console.log("错了");
                             console.log(err);
                         })
                 }
