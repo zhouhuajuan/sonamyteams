@@ -284,9 +284,10 @@
                             function(response) {
                                 alert("编辑回答成功")
                                     // console.log(response.data);
-                                that.createcode();
-                                that.getquestionId();
-                                that.getotherquestion();
+                                // that.createcode();
+                                // that.getquestionId();
+                                // that.getotherquestion();
+                                that.alterQuestionType();
 
                             },
                             function(err) {
@@ -307,9 +308,10 @@
                                 alert("添加回答成功")
                                     // alert(response.data.message)
                                 console.log(response.data);
-                                that.createcode();
-                                that.getquestionId();
-                                that.getotherquestion();
+                                // that.createcode();
+                                // that.getquestionId();
+                                // that.getotherquestion();
+                                that.alterQuestionType();
                             },
                             function(err) {
                                 console.log(err);
@@ -395,6 +397,30 @@
                 var that = this;
                 that.link = "http://127.0.0.1:5500/question/have-question.html?userid=" + localStorage.getItem("id");
                 alert("请复制粘贴以下链接后分享给其他人: " + " " + this.link);
+            },
+            alterQuestionType:function(){
+                if (localStorage.getItem("questionCategory") == "1") {
+                this.createcode();
+                this.mine = true;
+                this.question = "已回答";
+            } else if (localStorage.getItem("questionCategory") == "2") {
+                this.createcode2();
+                this.mine = true;
+                this.question = "未回答";
+            } else if (localStorage.getItem("questionCategory") == "3") {
+                this.createcode3();
+                this.mine = false;
+                this.question = "已收到回答";
+                this.questionbox = "questionbox1"
+            } else {
+                this.createcode4();
+                this.mine = false;
+                this.question = "未收到回答";
+                this.questionbox = "questionbox1"
+            }
+            this.getquestionId();
+            this.getotherquestion();
+                
             }
         },
         created() {
